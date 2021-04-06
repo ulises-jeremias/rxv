@@ -1,0 +1,36 @@
+name: Deploy Docs
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Latest V
+      uses: actions/checkout@v2
+      with:
+        repository: vlang/v
+    - name: Checkout RXV
+      uses: actions/checkout@v2
+      with:
+        path: rxv
+    - name: Build V
+      run: |
+        make
+        sudo ./v symlink
+    - name: V doctor
+      run: v doctor
+    - name: Build docs
+      run: |
+        rm -f ./rxv/README.md
+        mv ./rxv/static/DOCS.md ./rxv/README.md
+        v doc -m -f html rxv/
+        mv ./rxv/_docs/rxv.html ./rxv/_docs/index.html
+    - name: Deploy to gh-pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./rxv/_docs/
