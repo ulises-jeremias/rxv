@@ -3,12 +3,14 @@ module rxv
 import context
 import time
 
-pub type ItemValue = []ItemValue | chan ItemValue | string | voidptr
+pub type ItemValue = Error | []ItemValue | byte | chan ItemValue | f32 | f64 | i16 | i64 |
+	i8 | int | string | u16 | u32 | u64 | voidptr
 
 // Item is a wrapper having either a value or an error.
 pub struct Item {
+pub:
 	value ItemValue
-	err   string
+	err   IError
 }
 
 // TimestampItem attach a timestamp to an item.
@@ -33,7 +35,7 @@ pub fn of(value ItemValue) Item {
 }
 
 // error creates an item from an error
-pub fn error(err string) Item {
+pub fn error(err IError) Item {
 	return Item{
 		err: err
 	}
@@ -41,7 +43,7 @@ pub fn error(err string) Item {
 
 // send_items is an utility funtion that send a list of ItemValue and indicate
 // the strategy on whether to close the channel once the function completes
-pub fn send_items(ctx context.Context, ch chan Item, strategy CloseChannelStrategy, items ...ItemValue) {
+pub fn send_items(ctx context.Context, ch chan Item, strategy CloseChannelStrategy, items []ItemValue) {
 	if strategy == .close_channel {
 		defer {
 			ch.close()
@@ -53,7 +55,7 @@ pub fn send_items(ctx context.Context, ch chan Item, strategy CloseChannelStrate
 fn send(ctx context.Context, ch chan Item, items ...ItemValue) {
 	for item in items {
 		match item {
-			string {
+			Error {
 				error(item).send_context(ctx, ch)
 			}
 			chan ItemValue {
@@ -61,7 +63,7 @@ fn send(ctx context.Context, ch chan Item, items ...ItemValue) {
 					select {
 						i := <-item {
 							match i {
-								string {
+								Error {
 									error(i).send_context(ctx, ch)
 								}
 								else {
@@ -89,7 +91,7 @@ fn send(ctx context.Context, ch chan Item, items ...ItemValue) {
 
 // is_error checks if an item is an error
 pub fn (i Item) is_error() bool {
-	return i.err != ''
+	return !isnil(i.err)
 }
 
 // send_blocking sends an item and blocks until it is sent
