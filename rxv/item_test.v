@@ -63,3 +63,12 @@ fn test_item_send_context_false() {
 	context.cancel(ctx)
 	assert !rxv.of(5).send_context(ctx, ch)
 }
+
+fn test_item_send_non_blocking() {
+	ch := chan rxv.Item{cap: 1}
+	defer {
+		ch.close()
+	}
+	assert rxv.of(5).send_non_blocking(ch)
+	assert !rxv.of(5).send_non_blocking(ch)
+}
