@@ -22,6 +22,6 @@ jobs:
       run: v doctor
     - name: Validate docs
       run: |
-        v install rxv
+        v install ulises-jeremias.rxv
         cd rxv
-        v run ../cmd/tools/vcheck-md.v -all
+        v vcheck-md -all
