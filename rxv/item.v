@@ -91,7 +91,13 @@ fn send(ctx context.Context, ch chan Item, items ...ItemValue) {
 
 // is_error checks if an item is an error
 pub fn (i Item) is_error() bool {
-	return !isnil(i.err)
+	if isnil(i.err) {
+		return false
+	}
+	if i.err is none {
+		return false
+	}
+	return true
 }
 
 // send_blocking sends an item and blocks until it is sent
