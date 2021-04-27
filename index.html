@@ -175,18 +175,18 @@
 
 </section>
 						<section id="ErrFunc" class="doc-node">
-							<div class="title"><h2>type ErrFunc <a href="#ErrFunc">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/types.v#L59"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">type</span> ErrFunc <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>err <span class="token builtin">string</span><span class="token punctuation">)</span></code></pre>
+							<div class="title"><h2>type ErrFunc <a href="#ErrFunc">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/types.v#L59"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">type</span> ErrFunc <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>err <span class="token builtin">IError</span><span class="token punctuation">)</span></code></pre>
 <p>ErrFunc handles an string in a stream.</p>
 
 </section>
 						<section id="ErrorFunc" class="doc-node">
-							<div class="title"><h2>type ErrorFunc <a href="#ErrorFunc">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/types.v#L32"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">type</span> ErrorFunc <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>err <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token builtin">voidptr</span></code></pre>
+							<div class="title"><h2>type ErrorFunc <a href="#ErrorFunc">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/types.v#L32"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">type</span> ErrorFunc <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>err <span class="token builtin">IError</span><span class="token punctuation">)</span> <span class="token builtin">voidptr</span></code></pre>
 <p>ErrorFunc defines a function that computes a value from an string.</p>
 
 </section>
 						<section id="Func" class="doc-node">
 							<div class="title"><h2>type Func <a href="#Func">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/types.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">type</span> Func <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> arg <span class="token builtin">voidptr</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token builtin">voidptr</span><span class="token punctuation">,</span> <span class="token builtin">string</span><span class="token punctuation">)</span></code></pre>
-<p>ItemToObservable defines a function that computes an observable from an item.  pub type ItemToObservable = fn(item Item) Observable  ErrorToObservable defines a function that transforms an observable from an string.  pub type ErrorToObservable = fn(err string) Observable  Func defines a function that computes a value from an input value.</p>
+<p>ItemToObservable defines a function that computes an observable from an item.  pub type ItemToObservable = fn(item Item) Observable  ErrorToObservable defines a function that transforms an observable from an string.  pub type ErrorToObservable = fn(err IError) Observable  Func defines a function that computes a value from an input value.</p>
 
 </section>
 						<section id="FuncN" class="doc-node">
@@ -326,7 +326,7 @@
 </section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 26 Apr 2021 04:39:15
+							Powered by vdoc. Generated on: 27 Apr 2021 21:27:22
 						</div>
 					</div>
 					
