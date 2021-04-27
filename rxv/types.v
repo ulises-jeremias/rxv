@@ -17,7 +17,7 @@ pub type Comparator = fn (a voidptr, b voidptr) int
 // pub type ItemToObservable = fn(item Item) Observable
 
 // ErrorToObservable defines a function that transforms an observable from an string.
-// pub type ErrorToObservable = fn(err string) Observable
+// pub type ErrorToObservable = fn(err IError) Observable
 
 // Func defines a function that computes a value from an input value.
 pub type Func = fn (ctx context.Context, arg voidptr) (voidptr, string)
@@ -29,7 +29,7 @@ pub type Func = fn (ctx context.Context, arg voidptr) (voidptr, string)
 pub type FuncN = fn (args ...voidptr) voidptr
 
 // ErrorFunc defines a function that computes a value from an string.
-pub type ErrorFunc = fn (err string) voidptr
+pub type ErrorFunc = fn (err IError) voidptr
 
 // Predicate defines a func that returns a bool from an input value.
 pub type Predicate = fn (voidptr) bool
@@ -56,7 +56,7 @@ pub type Supplier = fn (ctx context.Context) Item
 pub type NextFunc = fn (arg voidptr)
 
 // ErrFunc handles an string in a stream.
-pub type ErrFunc = fn (err string)
+pub type ErrFunc = fn (err IError)
 
 // CompletedFunc handles the end of a stream.
 pub type CompletedFunc = fn ()
