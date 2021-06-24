@@ -124,9 +124,54 @@
 <p>send_items is an utility funtion that send a list of ItemValue and indicate  the strategy on whether to close the channel once the function completes</p>
 
 </section>
+						<section id="serialize" class="doc-node">
+							<div class="title"><h2>fn serialize <a href="#serialize">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/option.v#L181"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">serialize</span><span class="token punctuation">(</span>identifier SerializedFn<span class="token punctuation">)</span> Option</code></pre>
+<p>serialize forces an Observable to make serialized calls and to be well-behaved.</p>
+
+</section>
 						<section id="test" class="doc-node">
 							<div class="title"><h2>fn test <a href="#test">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/assert.v#L215"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">test</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> iterable Iterable<span class="token punctuation">,</span> assertions ...IRxAssert<span class="token punctuation">)</span></code></pre>
 <p>test asserts the result of an iterable against a list of assertions.</p>
+
+</section>
+						<section id="with_back_pressure_strategy" class="doc-node">
+							<div class="title"><h2>fn with_back_pressure_strategy <a href="#with_back_pressure_strategy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/option.v#L159"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">with_back_pressure_strategy</span><span class="token punctuation">(</span>strategy BackpressureStrategy<span class="token punctuation">)</span> Option</code></pre>
+<p>with_back_pressure_strategy sets the back pressure strategy: drop or block.</p>
+
+</section>
+						<section id="with_buffered_channel" class="doc-node">
+							<div class="title"><h2>fn with_buffered_channel <a href="#with_buffered_channel">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/option.v#L123"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">with_buffered_channel</span><span class="token punctuation">(</span>capacity <span class="token builtin">int</span><span class="token punctuation">)</span> Option</code></pre>
+<p>with_buffered_channel allows to configure the capacity of a buffered channel.</p>
+
+</section>
+						<section id="with_context" class="doc-node">
+							<div class="title"><h2>fn with_context <a href="#with_context">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/option.v#L131"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">with_context</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">)</span> Option</code></pre>
+<p>with_context allows to pass a context.</p>
+
+</section>
+						<section id="with_cpu_pool" class="doc-node">
+							<div class="title"><h2>fn with_cpu_pool <a href="#with_cpu_pool">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/option.v#L152"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">with_cpu_pool</span><span class="token punctuation">(</span><span class="token punctuation">)</span> Option</code></pre>
+<p>with_cpu_pool allows to specify an execution pool based on the number of logical CPUs.</p>
+
+</section>
+						<section id="with_error_strategy" class="doc-node">
+							<div class="title"><h2>fn with_error_strategy <a href="#with_error_strategy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/option.v#L167"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">with_error_strategy</span><span class="token punctuation">(</span>strategy OnErrorStrategy<span class="token punctuation">)</span> Option</code></pre>
+<p>with_error_strategy defines how an observable should deal with_ error.  This strategy is propagated to the parent observable.</p>
+
+</section>
+						<section id="with_observation_strategy" class="doc-node">
+							<div class="title"><h2>fn with_observation_strategy <a href="#with_observation_strategy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/option.v#L138"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">with_observation_strategy</span><span class="token punctuation">(</span>strategy ObservationStrategy<span class="token punctuation">)</span> Option</code></pre>
+<p>with_observation_strategy uses the eager observation mode meaning consuming the items even with_out subscription.</p>
+
+</section>
+						<section id="with_pool" class="doc-node">
+							<div class="title"><h2>fn with_pool <a href="#with_pool">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/option.v#L145"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">with_pool</span><span class="token punctuation">(</span>pool <span class="token builtin">int</span><span class="token punctuation">)</span> Option</code></pre>
+<p>with_pool allows to specify an execution pool.</p>
+
+</section>
+						<section id="with_publish_strategy" class="doc-node">
+							<div class="title"><h2>fn with_publish_strategy <a href="#with_publish_strategy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/option.v#L174"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">with_publish_strategy</span><span class="token punctuation">(</span><span class="token punctuation">)</span> Option</code></pre>
+<p>with_publish_strategy converts an ordinary Observable into a connectable Observable.</p>
 
 </section>
 						<section id="IRxAssert" class="doc-node">
@@ -152,6 +197,23 @@
 	<span class="token function">observe</span><span class="token punctuation">(</span>opts ...Option<span class="token punctuation">)</span> <span class="token builtin">chan</span> Item
 <span class="token punctuation">}</span></code></pre>
 <p>Iterable is the basic type that can be observed</p>
+
+</section>
+						<section id="Option" class="doc-node">
+							<div class="title"><h2>interface Option <a href="#Option">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/option.v#L12"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">interface</span> <span class="token symbol">Option</span> <span class="token punctuation">{</span>
+	<span class="token function">apply</span><span class="token punctuation">(</span><span class="token keyword">mut</span> fdo FuncOption<span class="token punctuation">)</span>
+	<span class="token function">to_propagate</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span>
+	<span class="token function">is_eager_observation</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span>
+	<span class="token function">get_pool</span><span class="token punctuation">(</span><span class="token punctuation">)</span> ?<span class="token builtin">int</span>
+	<span class="token function">build_channel</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">chan</span> Item
+	<span class="token function">build_context</span><span class="token punctuation">(</span>parent context<span class="token punctuation">.</span>Context<span class="token punctuation">)</span> context<span class="token punctuation">.</span>Context
+	<span class="token function">get_back_pressure_strategy</span><span class="token punctuation">(</span><span class="token punctuation">)</span> BackpressureStrategy
+	<span class="token function">get_error_strategy</span><span class="token punctuation">(</span><span class="token punctuation">)</span> OnErrorStrategy
+	<span class="token function">is_connectable</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span>
+	<span class="token function">is_connect_operation</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span>
+	<span class="token function">is_serialized</span><span class="token punctuation">(</span><span class="token punctuation">)</span> ?SerializedFn
+<span class="token punctuation">}</span></code></pre>
+<p>Options handles configurable options</p>
 
 </section>
 						<section id="AssertApplyFn" class="doc-node">
@@ -218,6 +280,11 @@
 						<section id="Producer" class="doc-node">
 							<div class="title"><h2>type Producer <a href="#Producer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/types.v#L44"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">type</span> Producer <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> next <span class="token builtin">chan</span> Item<span class="token punctuation">)</span></code></pre>
 <p>Producer defines a producer implementation.</p>
+
+</section>
+						<section id="SliceIterable.observe" class="doc-node">
+							<div class="title"><h2>fn (SliceIterable) observe <a href="#SliceIterable.observe">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/iterable_slice.v#L18"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>i <span class="token operator">&</span>SliceIterable<span class="token punctuation">)</span> <span class="token function">observe</span><span class="token punctuation">(</span>opts ...Option<span class="token punctuation">)</span> <span class="token builtin">chan</span> Item</code></pre>
+
 
 </section>
 						<section id="Supplier" class="doc-node">
@@ -326,7 +393,7 @@
 </section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 24 Jun 2021 04:42:11
+							Powered by vdoc. Generated on: 24 Jun 2021 06:12:02
 						</div>
 					</div>
 					
