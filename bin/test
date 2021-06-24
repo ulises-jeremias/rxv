@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## Copyright (C) 2019-2021 Ulises Jeremias Cornejo Fandos
+## Copyright (C) 2021 Ulises Jeremias Cornejo Fandos
 ## Licensed under MIT
 ##
 ##     @script.name [OPTION] ARGUMENTS...
@@ -18,6 +18,8 @@ source "${ROOT}/util/logs.sh" || exit
 
 set -eo pipefail
 
+rxv_dir_path=$(dirname $(dirname "$0"))
+
 flags=""
 
 if [[ -n "${use_autofree}" ]]; then
@@ -31,6 +33,6 @@ if [[ -n "${stats}" ]]; then
 fi
 
 echo "Executing tests with command: \"v ${flags} test .\""
-v ${flags} test .
+v ${flags} test ${rxv_dir_path}
 
 find . -name '*_test' -exec rm -f {} +
