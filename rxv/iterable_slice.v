@@ -5,17 +5,17 @@ import context
 struct SliceIterable {
 mut:
 	items []Item
-	opts  []Option
+	opts  []RxOption
 }
 
-fn new_slice_iterable(items []Item, opts ...Option) Iterable {
+fn new_slice_iterable(items []Item, opts ...RxOption) Iterable {
 	return &SliceIterable{
 		items: items
 		opts: opts
 	}
 }
 
-pub fn (i &SliceIterable) observe(opts ...Option) chan Item {
+pub fn (i &SliceIterable) observe(opts ...RxOption) chan Item {
 	mut options := i.opts.clone()
 	options << opts.clone()
 	option := parse_options(...options)
