@@ -226,6 +226,11 @@
 <p>AssertPredicate is a custom predicate based on the items.</p>
 
 </section>
+						<section id="ChannelIterable.observe" class="doc-node">
+							<div class="title"><h2>fn (ChannelIterable) observe <a href="#ChannelIterable.observe">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/iterable_channel.v#L19"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> i ChannelIterable<span class="token punctuation">)</span> <span class="token function">observe</span><span class="token punctuation">(</span>opts ...RxOption<span class="token punctuation">)</span> <span class="token builtin">chan</span> Item</code></pre>
+
+
+</section>
 						<section id="Comparator" class="doc-node">
 							<div class="title"><h2>type Comparator <a href="#Comparator">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/types.v#L14"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">type</span> Comparator <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>a <span class="token builtin">voidptr</span><span class="token punctuation">,</span> b <span class="token builtin">voidptr</span><span class="token punctuation">)</span> <span class="token builtin">int</span></code></pre>
 <p>Comparator defines a func that returns an int:  - 0 if two elements are equals  - A negative value if the first argument is less than the second  - A positive value if the first argument is greater than the second</p>
@@ -234,6 +239,11 @@
 						<section id="CompletedFunc" class="doc-node">
 							<div class="title"><h2>type CompletedFunc <a href="#CompletedFunc">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/types.v#L62"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">type</span> CompletedFunc <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>CompletedFunc handles the end of a stream.</p>
+
+</section>
+						<section id="DeferIterable.observe" class="doc-node">
+							<div class="title"><h2>fn (DeferIterable) observe <a href="#DeferIterable.observe">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/iterable_defer.v#L17"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>i <span class="token operator">&</span>DeferIterable<span class="token punctuation">)</span> <span class="token function">observe</span><span class="token punctuation">(</span>opts ...RxOption<span class="token punctuation">)</span> <span class="token builtin">chan</span> Item</code></pre>
+
 
 </section>
 						<section id="ErrFunc" class="doc-node">
@@ -403,7 +413,7 @@
 </section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 26 Jun 2021 02:21:54
+							Powered by vdoc. Generated on: 26 Jun 2021 02:59:33
 						</div>
 					</div>
 					
