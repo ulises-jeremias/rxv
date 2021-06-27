@@ -54,6 +54,17 @@
 
 </section>
 
+						<section id="Constants" class="doc-node const">
+							<div class="title"><h2>Constants <a href="#Constants">#</a></h2></div>
+
+</section>
+						<section id="" class="doc-node const">
+<pre class="signature"><code><span class="token keyword">const</span> <span class="token punctuation">(</span>
+	optional_single_empty <span class="token operator">=</span> <span class="token symbol">Item</span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">)</span></code></pre>
+
+
+</section>
 						<section id="custom_predicate" class="doc-node">
 							<div class="title"><h2>fn custom_predicate <a href="#custom_predicate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/assert.v#L196"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">custom_predicate</span><span class="token punctuation">(</span>predicate AssertPredicate<span class="token punctuation">)</span> IRxAssert</code></pre>
 <p>custom_predicate checks a custom predicate.</p>
@@ -193,10 +204,20 @@
 
 </section>
 						<section id="Iterable" class="doc-node">
-							<div class="title"><h2>interface Iterable <a href="#Iterable">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/iterable.v#L4"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">interface</span> <span class="token symbol">Iterable</span> <span class="token punctuation">{</span>
+							<div class="title"><h2>interface Iterable <a href="#Iterable">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/iterable.v#L8"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">interface</span> <span class="token symbol">Iterable</span> <span class="token punctuation">{</span>
 	<span class="token function">observe</span><span class="token punctuation">(</span>opts ...RxOption<span class="token punctuation">)</span> <span class="token builtin">chan</span> Item
 <span class="token punctuation">}</span></code></pre>
 <p>Iterable is the basic type that can be observed</p>
+
+</section>
+						<section id="OptionalSingle" class="doc-node">
+							<div class="title"><h2>interface OptionalSingle <a href="#OptionalSingle">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/optionalsingle.v#L11"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">interface</span> <span class="token symbol">OptionalSingle</span> <span class="token punctuation">{</span>
+	Iterable
+	<span class="token function">get</span><span class="token punctuation">(</span>opts ...RxOption<span class="token punctuation">)</span> ?Item
+	<span class="token builtin">map</span><span class="token punctuation">(</span>apply Func<span class="token punctuation">,</span> opts ...RxOption<span class="token punctuation">)</span> Single
+	<span class="token function">run</span><span class="token punctuation">(</span>opts ...RxOption<span class="token punctuation">)</span> <span class="token builtin">chan</span> <span class="token builtin">int</span>
+<span class="token punctuation">}</span></code></pre>
+<p>OptionalSingle is an optional single</p>
 
 </section>
 						<section id="RxOption" class="doc-node">
@@ -370,14 +391,6 @@
 <p>OnErrorStrategy is the Observable error strategy.</p>
 
 </section>
-						<section id="DefaultSimpleImpl" class="doc-node">
-							<div class="title"><h2>struct DefaultSimpleImpl <a href="#DefaultSimpleImpl">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/single.v#L15"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">DefaultSimpleImpl</span> <span class="token punctuation">{</span>
-	parent   context<span class="token punctuation">.</span>Context
-	iterable Iterable
-<span class="token punctuation">}</span></code></pre>
-<p>DefaultSimpleImpl implements Single</p>
-
-</section>
 						<section id="Item" class="doc-node">
 							<div class="title"><h2>struct Item <a href="#Item">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/item.v#L10"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">Item</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
@@ -407,6 +420,29 @@
 <p>send_non_blocking sends an item without blocking.  It returns a boolean to indicate whether the item was sent.</p>
 
 </section>
+						<section id="OptionalSingleImpl" class="doc-node">
+							<div class="title"><h2>struct OptionalSingleImpl <a href="#OptionalSingleImpl">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/optionalsingle.v#L19"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">OptionalSingleImpl</span> <span class="token punctuation">{</span>
+	iterable Iterable
+	parent   context<span class="token punctuation">.</span>Context
+<span class="token punctuation">}</span></code></pre>
+<p>OptionalSingleImpl is the default implementation for OptionalSingle</p>
+
+</section>
+						<section id="OptionalSingleImpl.get" class="doc-node">
+							<div class="title"><h2>fn (OptionalSingleImpl) get <a href="#OptionalSingleImpl.get">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/optionalsingle.v#L31"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>o <span class="token operator">&</span>OptionalSingleImpl<span class="token punctuation">)</span> <span class="token function">get</span><span class="token punctuation">(</span>opts ...RxOption<span class="token punctuation">)</span> ?Item</code></pre>
+<p>get returns the item or rxv.optional_empty. The error returned is if the context has been canceled.  this method is blocking.</p>
+
+</section>
+						<section id="OptionalSingleImpl.map" class="doc-node">
+							<div class="title"><h2>fn (OptionalSingleImpl) map <a href="#OptionalSingleImpl.map">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/optionalsingle.v#L56"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>o <span class="token operator">&</span>OptionalSingleImpl<span class="token punctuation">)</span> <span class="token builtin">map</span><span class="token punctuation">(</span>apply Func<span class="token punctuation">,</span> opts ...RxOption<span class="token punctuation">)</span> OptionalSingle</code></pre>
+<p>map transforms the items emitted by an optional_single by applying a function to each item</p>
+
+</section>
+						<section id="OptionalSingleImpl.run" class="doc-node">
+							<div class="title"><h2>fn (OptionalSingleImpl) run <a href="#OptionalSingleImpl.run">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/optionalsingle.v#L65"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>o <span class="token operator">&</span>OptionalSingleImpl<span class="token punctuation">)</span> <span class="token function">run</span><span class="token punctuation">(</span>opts ...RxOption<span class="token punctuation">)</span> <span class="token builtin">chan</span> <span class="token builtin">int</span></code></pre>
+<p>run creates an observer without consuming the emitted items</p>
+
+</section>
 						<section id="RxAssert" class="doc-node">
 							<div class="title"><h2>struct RxAssert <a href="#RxAssert">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/assert.v#L27"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">RxAssert</span> <span class="token punctuation">{</span>
 	f AssertApplyFn
@@ -432,6 +468,14 @@
 
 
 </section>
+						<section id="SimpleImpl" class="doc-node">
+							<div class="title"><h2>struct SimpleImpl <a href="#SimpleImpl">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/single.v#L15"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">SimpleImpl</span> <span class="token punctuation">{</span>
+	iterable Iterable
+	parent   context<span class="token punctuation">.</span>Context
+<span class="token punctuation">}</span></code></pre>
+<p>SimpleImpl implements Single</p>
+
+</section>
 						<section id="TimestampItem" class="doc-node">
 							<div class="title"><h2>struct TimestampItem <a href="#TimestampItem">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/item.v#L17"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">TimestampItem</span> <span class="token punctuation">{</span>
 	timestamp time<span class="token punctuation">.</span>Time
@@ -442,7 +486,7 @@
 </section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 27 Jun 2021 15:50:47
+							Powered by vdoc. Generated on: 27 Jun 2021 21:20:57
 						</div>
 					</div>
 					
