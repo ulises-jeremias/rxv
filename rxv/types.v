@@ -11,7 +11,7 @@ struct OperationOptions {
 // - 0 if two elements are equals
 // - A negative value if the first argument is less than the second
 // - A positive value if the first argument is greater than the second
-pub type Comparator = fn (a voidptr, b voidptr) int
+pub type Comparator = fn (a ItemValue, b ItemValue) int
 
 // ItemToObservable defines a function that computes an observable from an item.
 // pub type ItemToObservable = fn(item Item) Observable
@@ -20,25 +20,25 @@ pub type Comparator = fn (a voidptr, b voidptr) int
 // pub type ErrorToObservable = fn(err IError) Observable
 
 // Func defines a function that computes a value from an input value.
-pub type Func = fn (ctx context.Context, arg voidptr) (voidptr, string)
+pub type Func = fn (ctx context.Context, arg ItemValue) (ItemValue, string)
 
 // Func2 defines a function that computes a value from two input values.
-// pub type Func2 = fn(ctx context.Context, arg voidptr, voidptr) (voidptr, string)
+// pub type Func2 = fn(ctx context.Context, arg ItemValue, ItemValue) (ItemValue, string)
 
 // FuncN defines a function that computes a value from N input values.
-pub type FuncN = fn (args ...voidptr) voidptr
+pub type FuncN = fn (args ...ItemValue) ItemValue
 
 // ErrorFunc defines a function that computes a value from an string.
-pub type ErrorFunc = fn (err IError) voidptr
+pub type ErrorFunc = fn (err IError) ItemValue
 
 // Predicate defines a func that returns a bool from an input value.
-pub type Predicate = fn (voidptr) bool
+pub type Predicate = fn (ItemValue) bool
 
-// Marshaller defines a marshaller type (voidptr to []byte).
-pub type Marshaller = fn (voidptr) ([]byte, string)
+// Marshaller defines a marshaller type (ItemValue to []byte).
+pub type Marshaller = fn (ItemValue) ([]byte, string)
 
 // Unmarshaller defines an unmarshaller type ([]byte to interface).
-pub type Unmarshaller = fn ([]byte, voidptr) string
+pub type Unmarshaller = fn ([]byte, ItemValue) string
 
 // Producer defines a producer implementation.
 pub type Producer = fn (ctx context.Context, next chan Item)
@@ -53,7 +53,7 @@ pub type Supplier = fn (ctx context.Context) Item
 // pub type Disposable = context.CancelFunc
 
 // NextFunc handles a next item in a stream.
-pub type NextFunc = fn (arg voidptr)
+pub type NextFunc = fn (arg ItemValue)
 
 // ErrFunc handles an string in a stream.
 pub type ErrFunc = fn (err IError)
