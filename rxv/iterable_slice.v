@@ -20,7 +20,7 @@ pub fn (i &SliceIterable) observe(opts ...RxOption) chan Item {
 	options << opts.clone()
 	option := parse_options(...options)
 	next := option.build_channel()
-	ctx := option.build_context(voidptr(0))
+	ctx := option.build_context(empty_context)
 
 	go fn (i &SliceIterable, next chan Item, ctx context.Context) {
 		for item in i.items {

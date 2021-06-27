@@ -26,7 +26,7 @@ pub fn (mut i ChannelIterable) observe(opts ...RxOption) chan Item {
 	}
 
 	if option.is_connect_operation() {
-		i.connect(option.build_context(voidptr(0)))
+		i.connect(option.build_context(empty_context))
 	}
 
 	ch := option.build_channel()

@@ -21,7 +21,7 @@ pub fn (i &RangeIterable) observe(opts ...RxOption) chan Item {
 	mut options := i.opts.clone()
 	options << opts.clone()
 	option := parse_options(...options)
-	ctx := option.build_context(voidptr(0))
+	ctx := option.build_context(empty_context)
 	next := option.build_channel()
 
 	go fn (i &RangeIterable, next chan Item, ctx context.Context) {

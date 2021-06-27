@@ -11,8 +11,10 @@ pub interface Single {
 	run(opts ...RxOption) chan int
 }
 
-// DefaultSimpleImpl implements Single
-pub struct DefaultSimpleImpl {
-	parent context.Context
+// SimpleImpl implements Single
+pub struct SimpleImpl {
 	iterable Iterable
+	parent   context.Context
 }
+
+// filter

@@ -12,7 +12,7 @@ struct CreateIterable {
 fn new_create_iterable(fs []Producer, opts ...RxOption) Iterable {
 	mut options := opts.clone()
 	option := parse_options(...options)
-	ctx := option.build_context(voidptr(0))
+	ctx := option.build_context(empty_context)
 	next := option.build_channel()
 
 	go fn (fs []Producer, next chan Item, ctx context.Context) {
@@ -40,7 +40,7 @@ pub fn (mut i CreateIterable) observe(opts ...RxOption) chan Item {
 	}
 
 	if option.is_connect_operation() {
-		i.connect(option.build_context(voidptr(0)))
+		i.connect(option.build_context(empty_context))
 	}
 
 	ch := option.build_channel()
