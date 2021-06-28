@@ -3,8 +3,9 @@ module rxv
 import context
 import time
 
-pub type ItemValue = Error | []ItemValue | byte | chan ItemValue | f32 | f64 | i16 | i64 |
-	i8 | int | string | u16 | u32 | u64 | voidptr
+pub type ItemValue = Error | MapOperatorOptionalSingle | MapOperatorSingle | []ItemValue |
+	byte | chan ItemValue | f32 | f64 | i16 | i64 | i8 | int | string | u16 | u32 | u64 |
+	voidptr
 
 // Item is a wrapper having either a value or an error.
 pub struct Item {
@@ -35,7 +36,13 @@ pub fn of(value ItemValue) Item {
 }
 
 // error creates an item from an error
+[inline]
 pub fn error(err IError) Item {
+	return from_error(err)
+}
+
+// from_error creates an item from an error
+pub fn from_error(err IError) Item {
 	return Item{
 		err: err
 	}

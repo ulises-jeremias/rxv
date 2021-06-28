@@ -52,6 +52,32 @@ pub fn (o &OptionalSingleImpl) get(opts ...RxOption) ?Item {
 	return rxv.optional_single_empty
 }
 
+struct MapOperatorOptionalSingle {
+	apply Func
+}
+
+fn (op &MapOperatorOptionalSingle) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
+	if res := op.apply(ctx, item.value) {
+		dst <- of(res)
+	} else {
+		dst <- from_error(err)
+		operator_options.stop()
+	}
+}
+
+fn (op &MapOperatorOptionalSingle) err(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
+	default_error_func_operator(ctx, item, dst, operator_options)
+}
+
+fn (op &MapOperatorOptionalSingle) end(_ context.Context, _ chan Item) {}
+
+fn (op &MapOperatorOptionalSingle) gather_next(_ context.Context, item Item, dst chan Item, _ OperatorOptions) {
+	if item.value is MapOperatorOptionalSingle {
+		return
+	}
+	dst <- item
+}
+
 // map transforms the items emitted by an optional_single by applying a function to each item
 pub fn (o &OptionalSingleImpl) map(apply Func, opts ...RxOption) OptionalSingle {
 	return optional_single(o.parent, o, fn () {

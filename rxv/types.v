@@ -2,7 +2,7 @@ module rxv
 
 import context
 
-struct OperationOptions {
+struct OperatorOptions {
 	stop           fn ()
 	reset_iterable fn (Iterable)
 }
@@ -14,16 +14,16 @@ struct OperationOptions {
 pub type Comparator = fn (a ItemValue, b ItemValue) int
 
 // ItemToObservable defines a function that computes an observable from an item.
-// pub type ItemToObservable = fn(item Item) Observable
+pub type ItemToObservable = fn (item Item) Observable
 
 // ErrorToObservable defines a function that transforms an observable from an string.
-// pub type ErrorToObservable = fn(err IError) Observable
+pub type ErrorToObservable = fn (err IError) Observable
 
 // Func defines a function that computes a value from an input value.
-pub type Func = fn (ctx context.Context, arg ItemValue) (ItemValue, string)
+pub type Func = fn (ctx context.Context, arg ItemValue) ?ItemValue
 
 // Func2 defines a function that computes a value from two input values.
-// pub type Func2 = fn(ctx context.Context, arg ItemValue, ItemValue) (ItemValue, string)
+pub type Func2 = fn (ctx context.Context, a ItemValue, b ItemValue) ?ItemValue
 
 // FuncN defines a function that computes a value from N input values.
 pub type FuncN = fn (args ...ItemValue) ItemValue
@@ -35,7 +35,7 @@ pub type ErrorFunc = fn (err IError) ItemValue
 pub type Predicate = fn (ItemValue) bool
 
 // Marshaller defines a marshaller type (ItemValue to []byte).
-pub type Marshaller = fn (ItemValue) ([]byte, string)
+pub type Marshaller = fn (ItemValue) ?[]byte
 
 // Unmarshaller defines an unmarshaller type ([]byte to interface).
 pub type Unmarshaller = fn ([]byte, ItemValue) string
