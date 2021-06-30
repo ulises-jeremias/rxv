@@ -123,6 +123,7 @@ fn parse_options(opts ...RxOption) RxOption {
 pub fn with_buffered_channel(capacity int) RxOption {
 	return new_func_option(fn (mut options FuncOption) {
 		options.is_buffer = true
+		// @todo: Fix once closures are supported
 		// options.buffer = capacity
 	})
 }
@@ -130,6 +131,7 @@ pub fn with_buffered_channel(capacity int) RxOption {
 // with_context allows to pass a context.
 pub fn with_context(ctx context.Context) RxOption {
 	return new_func_option(fn (mut options FuncOption) {
+		// @todo: Fix once closures are supported
 		// options.ctx = ctx
 	})
 }
@@ -137,6 +139,7 @@ pub fn with_context(ctx context.Context) RxOption {
 // with_observation_strategy uses the eager observation mode meaning consuming the items even with_out subscription.
 pub fn with_observation_strategy(strategy ObservationStrategy) RxOption {
 	return new_func_option(fn (mut options FuncOption) {
+		// @todo: Fix once closures are supported
 		// options.observation = strategy
 	})
 }
@@ -144,6 +147,7 @@ pub fn with_observation_strategy(strategy ObservationStrategy) RxOption {
 // with_pool allows to specify an execution pool.
 pub fn with_pool(pool int) RxOption {
 	return new_func_option(fn (mut options FuncOption) {
+		// @todo: Fix once closures are supported
 		// options.pool = pool
 	})
 }
@@ -158,6 +162,7 @@ pub fn with_cpu_pool() RxOption {
 // with_back_pressure_strategy sets the back pressure strategy: drop or block.
 pub fn with_back_pressure_strategy(strategy BackpressureStrategy) RxOption {
 	return new_func_option(fn (mut options FuncOption) {
+		// @todo: Fix once closures are supported
 		// options.back_pressure_strategy = strategy
 	})
 }
@@ -166,6 +171,7 @@ pub fn with_back_pressure_strategy(strategy BackpressureStrategy) RxOption {
 // This strategy is propagated to the parent observable.
 pub fn with_error_strategy(strategy OnErrorStrategy) RxOption {
 	return new_func_option(fn (mut options FuncOption) {
+		// @todo: Fix once closures are supported
 		// options.on_error_strategy = strategy
 	})
 }
@@ -180,6 +186,7 @@ pub fn with_publish_strategy() RxOption {
 // serialize forces an Observable to make serialized calls and to be well-behaved.
 pub fn serialize(identifier SerializedFn) RxOption {
 	return new_func_option(fn (mut options FuncOption) {
+		// @todo: Fix once closures are supported
 		// options.serialized = identifier
 	})
 }

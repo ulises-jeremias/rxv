@@ -9,6 +9,8 @@ pub type FactoryFn = fn () ItemValue
 
 pub type IdentifierFn = fn (value ItemValue) int
 
+pub type IterableFactoryFn = fn (ctx context.Context, next chan Item, option RxOption, opts ...RxOption)
+
 pub type RetryFn = fn (err IError) bool
 
 pub type TimeExtractorFn = fn (value ItemValue) time.Time
@@ -93,14 +95,37 @@ pub interface Observable {
 }
 
 // ObservableImpl implements Observable.
-// pub struct ObservableImpl {
-// 	iterable Iterable
-// 	parent   context.Context
-// }
+pub struct ObservableImpl {
+	iterable Iterable
+	parent   context.Context
+}
 
 fn default_error_func_operator(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
 	item.send_context(ctx, dst)
 	operator_options.stop()
+}
+
+fn custom_observable_operator(parent context.Context, f IterableFactoryFn, opts ...RxOption) Observable {
+	option := parse_options(...opts)
+	next := option.build_channel()
+	ctx := option.build_context(parent)
+
+	if option.is_eager_observation() {
+		go f(ctx, next, option, ...opts)
+		return &ObservableImpl{
+			iterable: new_channel_iterable(next)
+		}
+	}
+
+	return &ObservableImpl{
+		iterable: new_factory_iterable(fn (propagated_options ...RxOption) chan Item {
+			// @todo: Fix once closures are supported
+			// mut merged_options := opts.clone()
+			// merged_options << propagated_options
+			// go f(ctx, next, option, ...merged_options)
+			return chan Item{}
+		})
+	}
 }
 
 interface Operator {

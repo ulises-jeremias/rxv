@@ -128,6 +128,7 @@ pub fn new_assertion(f AssertApplyFn) IRxAssert {
 pub fn has_items(items ...ItemValue) IRxAssert {
 	return new_assertion(fn (mut a RxAssert) {
 		a.check_has_items = true
+		// @todo: Fix once closures are supported
 		// a.items = items
 	})
 }
@@ -136,6 +137,7 @@ pub fn has_items(items ...ItemValue) IRxAssert {
 pub fn has_item(i ItemValue) IRxAssert {
 	return new_assertion(fn (mut a RxAssert) {
 		a.check_has_item = true
+		// @todo: Fix once closures are supported
 		// a.item = i
 	})
 }
@@ -144,6 +146,7 @@ pub fn has_item(i ItemValue) IRxAssert {
 pub fn has_items_no_order(items ...ItemValue) IRxAssert {
 	return new_assertion(fn (mut a RxAssert) {
 		a.check_has_items_no_order = true
+		// @todo: Fix once closures are supported
 		// a.items_no_order = items
 	})
 }
@@ -166,6 +169,7 @@ pub fn is_empty() IRxAssert {
 pub fn has_error(err IError) IRxAssert {
 	return new_assertion(fn (mut a RxAssert) {
 		a.check_has_raised_error = true
+		// @todo: Fix once closures are supported
 		// a.err = err
 	})
 }
@@ -181,6 +185,7 @@ pub fn has_an_error() IRxAssert {
 pub fn has_errors(errs ...IError) IRxAssert {
 	return new_assertion(fn (mut a RxAssert) {
 		a.check_has_raised_errors = true
+		// @todo: Fix once closures are supported
 		// a.errs = errs
 	})
 }
@@ -199,6 +204,7 @@ pub fn custom_predicate(predicate AssertPredicate) IRxAssert {
 			a.check_has_custom_predicate = true
 			a.custom_predicates = []AssertPredicate{}
 		}
+		// @todo: Fix once closures are supported
 		// a.custom_predicates << predicate
 	})
 }
@@ -245,6 +251,7 @@ pub fn test(ctx context.Context, iterable Iterable, assertions ...IRxAssert) {
 	}
 
 	if expected_items := ass.items_to_be_checked() {
+		// @todo: Fix this assertion
 		// assert expected_items == got
 	}
 
@@ -270,11 +277,13 @@ pub fn test(ctx context.Context, iterable Iterable, assertions ...IRxAssert) {
 			if errs.len == 0 {
 				panic('No error raised')
 			}
+			// @todo: Fix this assertion
 			// assert expected_error == errs[0]
 		}
 	}
 
 	if expected_errors := ass.raised_errors_to_be_checked() {
+		// @todo: Fix this assertion
 		// assert expected_errors == errs
 	}
 
