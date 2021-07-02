@@ -134,3 +134,42 @@ fn run_parallel(ctx context.Context, next chan Item, observe chan Item, operator
 		gather.close()
 	}(mut wg, gather)
 }
+
+fn run_first_item(ctx context.Context, f IdentifierFn, notif chan Item, observe chan Item, next chan Item, iterable Iterable, operator_factory OperatorFactoryFn, option RxOption, opts ...RxOption) {
+	go fn (ctx context.Context, f IdentifierFn, notif chan Item, next chan Item, observe chan Item, operator_factory OperatorFactoryFn, option RxOption) {
+		op := operator_factory()
+		stopped := false
+		operator := OperatorOptions{
+			stop: fn () {
+				// @todo: Fix once closures are supported
+				// if option.get_error_strategy() == .stop_on_error {
+				// 	stopped = true
+				// }
+			}
+			reset_iterable: fn (new_iterable Iterable) {
+				// @todo: Fix once closures are supported
+				// observe = new_iterable.observe(...opts)
+			}
+		}
+
+		done := ctx.done()
+		loop: for !stopped {
+			select {
+				_ := <-done {
+					break loop
+				}
+				item := <-observe {
+					if item.is_error() {
+						op.err(ctx, item, next, operator)
+						item.send_context(ctx, notif)
+					} else {
+						op.gather_next(ctx, item, next, operator)
+						of(f(item.value)).send_context(ctx, notif)
+					}
+				}
+			}
+		}
+		op.end(ctx, next)
+		next.close()
+	}(ctx, f, notif, next, observe, operator_factory, option)
+}
