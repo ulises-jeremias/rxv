@@ -134,3 +134,79 @@ interface Operator {
 	end(ctx context.Context, dst chan Item)
 	gather_next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions)
 }
+
+fn single(parent context.Context, iterable Iterable, operator_factory OperatorFactoryFn, force_seq bool, bypass_gather bool, opts ...RxOption) Single {
+	option := parse_options(...opts)
+	parallel := if _ := option.get_pool() { true } else { false }
+
+	next := option.build_channel()
+	ctx := option.build_context(parent)
+
+	if option.is_eager_observation() {
+		if force_seq || !parallel {
+			run_sequential(ctx, next, iterable, operator_factory, option, ...opts)
+		} else {
+			run_parallel(ctx, next, iterable.observe(...opts), operator_factory, bypass_gather,
+				option, ...opts)
+		}
+		return &SingleImpl{
+			iterable: new_channel_iterable(next)
+		}
+	}
+
+	return &SingleImpl{
+		iterable: new_factory_iterable(fn (propagated_options ...RxOption) chan Item {
+			// @todo: Fix once closures are supported
+			// merged_options := append(opts, ...propagated_options)
+			// option = parse_options(...merged_options)
+
+			// if force_seq || !parallel {
+			// 	run_sequential(ctx, next, iterable, operator_factory, option, ...merged_options)
+			// } else {
+			// 	run_parallel(ctx, next, iterable.observe(...merged_options), operator_factory,
+			// 		bypass_gather, option, ...merged_options)
+			// }
+			// return next
+			return chan Item{}
+		})
+	}
+}
+
+fn optional_single(parent context.Context, iterable Iterable, operator_factory OperatorFactoryFn, force_seq bool, bypass_gather bool, opts ...RxOption) OptionalSingle {
+	option := parse_options(...opts)
+	ctx := option.build_context(parent)
+	parallel := if _ := option.get_pool() { true } else { false }
+
+	if option.is_eager_observation() {
+		next := option.build_channel()
+		if force_seq || !parallel {
+			run_sequential(ctx, next, iterable, operator_factory, option, ...opts)
+		} else {
+			run_parallel(ctx, next, iterable.observe(...opts), operator_factory, bypass_gather,
+				option, ...opts)
+		}
+		return &OptionalSingleImpl{
+			iterable: new_channel_iterable(next)
+		}
+	}
+
+	return &OptionalSingleImpl{
+		iterable: new_factory_iterable(fn (propagated_options ...RxOption) chan Item {
+			// @todo: Fix once closures are supported
+			// merged_options := append(opts, ...propagated_options)
+			// option = parse_options(...merged_options)
+
+			// next := option.build_channel()
+			// ctx := option.build_context(parent)
+
+			// if force_seq || !parallel {
+			// 	run_sequential(ctx, next, iterable, operator_factory, option, ...merged_options)
+			// } else {
+			// 	run_parallel(ctx, next, iterable.observe(...merged_options), operator_factory,
+			// 		bypass_gather, option, ...merged_options)
+			// }
+			// return next
+			return chan Item{}
+		})
+	}
+}
