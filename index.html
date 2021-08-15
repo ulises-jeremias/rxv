@@ -5,9 +5,10 @@
 		<meta http-equiv="x-ua-compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>rxv | vdoc</title>
-		<link rel="preconnect" href="https://fonts.gstatic.com">
-		<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-		<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
 		<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 		<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 		<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
@@ -127,6 +128,16 @@
 </section>
 						<section id="new_assertion" class="doc-node">
 							<div class="title"><h2>fn new_assertion <a href="#new_assertion">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/assert.v#L121"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">new_assertion</span><span class="token punctuation">(</span>f AssertApplyFn<span class="token punctuation">)</span> IRxAssert</code></pre>
+
+
+</section>
+						<section id="new_illegal_input_error" class="doc-node">
+							<div class="title"><h2>fn new_illegal_input_error <a href="#new_illegal_input_error">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/errors.v#L10"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">new_illegal_input_error</span><span class="token punctuation">(</span>msg <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token builtin">IError</span></code></pre>
+
+
+</section>
+						<section id="new_index_out_of_bound_error" class="doc-node">
+							<div class="title"><h2>fn new_index_out_of_bound_error <a href="#new_index_out_of_bound_error">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/errors.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">new_index_out_of_bound_error</span><span class="token punctuation">(</span>msg <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token builtin">IError</span></code></pre>
 
 
 </section>
@@ -432,8 +443,8 @@
 </section>
 						<section id="ItemValue" class="doc-node">
 							<div class="title"><h2>type ItemValue <a href="#ItemValue">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/item.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">type</span> ItemValue <span class="token operator">=</span> Error <span class="token operator">|</span> MapOperatorOptionalSingle <span class="token operator">|</span> MapOperatorSingle <span class="token operator">|</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>ItemValue <span class="token operator">|</span>
-	<span class="token builtin">byte</span> <span class="token operator">|</span> <span class="token builtin">chan</span> ItemValue <span class="token operator">|</span> <span class="token builtin">f32</span> <span class="token operator">|</span> <span class="token builtin">f64</span> <span class="token operator">|</span> <span class="token builtin">i16</span> <span class="token operator">|</span> <span class="token builtin">i64</span> <span class="token operator">|</span> <span class="token builtin">i8</span> <span class="token operator">|</span> <span class="token builtin">int</span> <span class="token operator">|</span> <span class="token builtin">string</span> <span class="token operator">|</span> <span class="token builtin">u16</span> <span class="token operator">|</span> <span class="token builtin">u32</span> <span class="token operator">|</span> <span class="token builtin">u64</span> <span class="token operator">|</span>
-	<span class="token builtin">voidptr</span></code></pre>
+	<span class="token builtin">bool</span> <span class="token operator">|</span> <span class="token builtin">byte</span> <span class="token operator">|</span> <span class="token builtin">chan</span> ItemValue <span class="token operator">|</span> <span class="token builtin">f32</span> <span class="token operator">|</span> <span class="token builtin">f64</span> <span class="token operator">|</span> <span class="token builtin">i16</span> <span class="token operator">|</span> <span class="token builtin">i64</span> <span class="token operator">|</span> <span class="token builtin">i8</span> <span class="token operator">|</span> <span class="token builtin">int</span> <span class="token operator">|</span> <span class="token builtin">string</span> <span class="token operator">|</span> <span class="token builtin">u16</span> <span class="token operator">|</span> <span class="token builtin">u32</span> <span class="token operator">|</span>
+	<span class="token builtin">u64</span> <span class="token operator">|</span> <span class="token builtin">voidptr</span></code></pre>
 
 
 </section>
@@ -529,6 +540,24 @@
 <p>OnErrorStrategy is the Observable error strategy.</p>
 
 </section>
+						<section id="IllegalInputError" class="doc-node">
+							<div class="title"><h2>struct IllegalInputError <a href="#IllegalInputError">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/errors.v#L4"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">IllegalInputError</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	msg  <span class="token builtin">string</span>
+	code <span class="token builtin">int</span>
+<span class="token punctuation">}</span></code></pre>
+<p>IllegalInputError is triggered when the observable receives an illegal input</p>
+
+</section>
+						<section id="IndexOutOfBoundError" class="doc-node">
+							<div class="title"><h2>struct IndexOutOfBoundError <a href="#IndexOutOfBoundError">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/errors.v#L17"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">IndexOutOfBoundError</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	msg  <span class="token builtin">string</span>
+	code <span class="token builtin">int</span>
+<span class="token punctuation">}</span></code></pre>
+<p>IndexOutOfBoundError is triggered when the observable cannot access to the specified index</p>
+
+</section>
 						<section id="Item" class="doc-node">
 							<div class="title"><h2>struct Item <a href="#Item">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/item.v#L11"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">Item</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
@@ -564,6 +593,46 @@
 	parent   context<span class="token punctuation">.</span>Context
 <span class="token punctuation">}</span></code></pre>
 <p>ObservableImpl implements Observable.</p>
+
+</section>
+						<section id="ObservableImpl.all" class="doc-node">
+							<div class="title"><h2>fn (ObservableImpl) all <a href="#ObservableImpl.all">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/observable_operator.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>o <span class="token operator">&</span>ObservableImpl<span class="token punctuation">)</span> <span class="token function">all</span><span class="token punctuation">(</span>predicate Predicate<span class="token punctuation">,</span> opts ...RxOption<span class="token punctuation">)</span> Single</code></pre>
+<p>all determines whether all items emitted by an Observable meet some criteria</p>
+
+</section>
+						<section id="ObservableImpl.average_f32" class="doc-node">
+							<div class="title"><h2>fn (ObservableImpl) average_f32 <a href="#ObservableImpl.average_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/observable_operator.v#L49"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>o <span class="token operator">&</span>ObservableImpl<span class="token punctuation">)</span> <span class="token function">average_f32</span><span class="token punctuation">(</span>opts ...RxOption<span class="token punctuation">)</span> Single</code></pre>
+<p>average_f32 calculates the average of numbers emitted by an Observable and emits the average f32</p>
+
+</section>
+						<section id="ObservableImpl.average_f64" class="doc-node">
+							<div class="title"><h2>fn (ObservableImpl) average_f64 <a href="#ObservableImpl.average_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/observable_operator.v#L103"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>o <span class="token operator">&</span>ObservableImpl<span class="token punctuation">)</span> <span class="token function">average_f64</span><span class="token punctuation">(</span>opts ...RxOption<span class="token punctuation">)</span> Single</code></pre>
+<p>average_f64 calculates the average of numbers emitted by an Observable and emits the average f64</p>
+
+</section>
+						<section id="ObservableImpl.average_i16" class="doc-node">
+							<div class="title"><h2>fn (ObservableImpl) average_i16 <a href="#ObservableImpl.average_i16">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/observable_operator.v#L210"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>o <span class="token operator">&</span>ObservableImpl<span class="token punctuation">)</span> <span class="token function">average_i16</span><span class="token punctuation">(</span>opts ...RxOption<span class="token punctuation">)</span> Single</code></pre>
+<p>average_i16 calculates the average of numbers emitted by an Observable and emits the average i16</p>
+
+</section>
+						<section id="ObservableImpl.average_i32" class="doc-node">
+							<div class="title"><h2>fn (ObservableImpl) average_i32 <a href="#ObservableImpl.average_i32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/observable_operator.v#L157"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>o <span class="token operator">&</span>ObservableImpl<span class="token punctuation">)</span> <span class="token function">average_i32</span><span class="token punctuation">(</span>opts ...RxOption<span class="token punctuation">)</span> Single</code></pre>
+<p>average_i32 calculates the average of numbers emitted by an Observable and emits the average i32</p>
+
+</section>
+						<section id="ObservableImpl.average_i64" class="doc-node">
+							<div class="title"><h2>fn (ObservableImpl) average_i64 <a href="#ObservableImpl.average_i64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/observable_operator.v#L256"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>o <span class="token operator">&</span>ObservableImpl<span class="token punctuation">)</span> <span class="token function">average_i64</span><span class="token punctuation">(</span>opts ...RxOption<span class="token punctuation">)</span> Single</code></pre>
+<p>average_i64 calculates the average of numbers emitted by an Observable and emits the average i64</p>
+
+</section>
+						<section id="ObservableImpl.average_int" class="doc-node">
+							<div class="title"><h2>fn (ObservableImpl) average_int <a href="#ObservableImpl.average_int">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/observable_operator.v#L164"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>o <span class="token operator">&</span>ObservableImpl<span class="token punctuation">)</span> <span class="token function">average_int</span><span class="token punctuation">(</span>opts ...RxOption<span class="token punctuation">)</span> Single</code></pre>
+<p>average_int calculates the average of numbers emitted by an Observable and emits the average int</p>
+
+</section>
+						<section id="ObservableImpl.buffer_with_count" class="doc-node">
+							<div class="title"><h2>fn (ObservableImpl) buffer_with_count <a href="#ObservableImpl.buffer_with_count">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/rxv/observable_operator.v#L307"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>o <span class="token operator">&</span>ObservableImpl<span class="token punctuation">)</span> <span class="token function">buffer_with_count</span><span class="token punctuation">(</span>count <span class="token builtin">int</span><span class="token punctuation">,</span> opts ...RxOption<span class="token punctuation">)</span> Observable</code></pre>
+<p>BufferWithCount returns an Observable that emits buffers of items it collects  from the source Observable.  The resulting Observable emits buffers every skip items, each containing a slice of count items.  When the source Observable completes or encounters an error,  the resulting Observable emits the current buffer and propagates  the notification from the source Observable</p>
 
 </section>
 						<section id="OptionalSingleImpl" class="doc-node">
@@ -652,7 +721,7 @@
 </section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 3 Jul 2021 20:34:18
+							Powered by vdoc. Generated on: 15 Aug 2021 22:00:28
 						</div>
 					</div>
 					
