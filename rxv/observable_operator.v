@@ -15,7 +15,7 @@ pub fn (o &ObservableImpl) all(predicate Predicate, opts ...RxOption) Single {
 struct AllOperator {
 	predicate Predicate
 mut:
-	all       bool
+	all bool
 }
 
 fn (mut op AllOperator) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
@@ -309,7 +309,7 @@ pub fn (o &ObservableImpl) buffer_with_count(count int, opts ...RxOption) Observ
 		return thrown(new_illegal_input_error('count must be positive'))
 	}
 
-	return observable(o.parent, o, fn() Operator {
+	return observable(o.parent, o, fn () Operator {
 		return &BufferWithCountOperator{
 			count: count
 			buffer: []ItemValue{len: count}
@@ -319,13 +319,12 @@ pub fn (o &ObservableImpl) buffer_with_count(count int, opts ...RxOption) Observ
 
 struct BufferWithCountOperator {
 mut:
-	count int
+	count   int
 	i_count int
-	buffer []ItemValue
+	buffer  []ItemValue
 }
 
 fn (op &BufferWithCountOperator) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	
 }
 
 fn (op &BufferWithCountOperator) err(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
@@ -337,4 +336,3 @@ fn (op &BufferWithCountOperator) end(ctx context.Context, dst chan Item) {
 
 fn (op &BufferWithCountOperator) gather_next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
 }
-

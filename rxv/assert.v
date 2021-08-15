@@ -126,28 +126,25 @@ pub fn new_assertion(f AssertApplyFn) IRxAssert {
 
 // has_items checks that the observable produces the corresponding items.
 pub fn has_items(items ...ItemValue) IRxAssert {
-	return new_assertion(fn (mut a RxAssert) {
+	return new_assertion(fn [items] (mut a RxAssert) {
 		a.check_has_items = true
-		// @todo: Fix once closures are supported
-		// a.items = items
+		a.items = items
 	})
 }
 
 // has_item checks if a single or optional single has a specific item.
 pub fn has_item(i ItemValue) IRxAssert {
-	return new_assertion(fn (mut a RxAssert) {
+	return new_assertion(fn [i] (mut a RxAssert) {
 		a.check_has_item = true
-		// @todo: Fix once closures are supported
-		// a.item = i
+		a.item = i
 	})
 }
 
 // has_items_no_order checks that an observable produces the corresponding items regardless of the order.
 pub fn has_items_no_order(items ...ItemValue) IRxAssert {
-	return new_assertion(fn (mut a RxAssert) {
+	return new_assertion(fn [items] (mut a RxAssert) {
 		a.check_has_items_no_order = true
-		// @todo: Fix once closures are supported
-		// a.items_no_order = items
+		a.items_no_order = items
 	})
 }
 
@@ -167,10 +164,9 @@ pub fn is_empty() IRxAssert {
 
 // has_error checks that the observable has produce a specific error.
 pub fn has_error(err IError) IRxAssert {
-	return new_assertion(fn (mut a RxAssert) {
+	return new_assertion(fn [err] (mut a RxAssert) {
 		a.check_has_raised_error = true
-		// @todo: Fix once closures are supported
-		// a.err = err
+		a.err = err
 	})
 }
 
@@ -183,10 +179,9 @@ pub fn has_an_error() IRxAssert {
 
 // has_errors checks that the observable has produce a set of errors.
 pub fn has_errors(errs ...IError) IRxAssert {
-	return new_assertion(fn (mut a RxAssert) {
+	return new_assertion(fn [errs] (mut a RxAssert) {
 		a.check_has_raised_errors = true
-		// @todo: Fix once closures are supported
-		// a.errs = errs
+		a.errs = errs
 	})
 }
 
@@ -199,13 +194,12 @@ pub fn has_no_error() IRxAssert {
 
 // custom_predicate checks a custom predicate.
 pub fn custom_predicate(predicate AssertPredicate) IRxAssert {
-	return new_assertion(fn (mut a RxAssert) {
+	return new_assertion(fn [predicate] (mut a RxAssert) {
 		if !a.check_has_custom_predicate {
 			a.check_has_custom_predicate = true
 			a.custom_predicates = []AssertPredicate{}
 		}
-		// @todo: Fix once closures are supported
-		// a.custom_predicates << predicate
+		a.custom_predicates << predicate
 	})
 }
 
@@ -251,15 +245,14 @@ pub fn test(ctx context.Context, iterable Iterable, assertions ...IRxAssert) {
 	}
 
 	if expected_items := ass.items_to_be_checked() {
-		// @todo: Fix this assertion
-		// assert expected_items == got
+		assert expected_items == got
 	}
 
 	// TODO: assert using `items_no_order := ass.items_no_ordered_to_be_checked()`
 
 	if value := ass.item_to_be_checked() {
 		assert got.len == 1
-		// 	assert value == got[0]
+		assert value == got[0]
 	}
 
 	if ass.no_items_to_be_checked() {
@@ -277,14 +270,12 @@ pub fn test(ctx context.Context, iterable Iterable, assertions ...IRxAssert) {
 			if errs.len == 0 {
 				panic('No error raised')
 			}
-			// @todo: Fix this assertion
-			// assert expected_error == errs[0]
+			assert expected_error == errs[0]
 		}
 	}
 
 	if expected_errors := ass.raised_errors_to_be_checked() {
-		// @todo: Fix this assertion
-		// assert expected_errors == errs
+		assert expected_errors == errs
 	}
 
 	if expected_error := ass.raised_an_error_to_be_checked() {
