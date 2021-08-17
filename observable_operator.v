@@ -510,7 +510,7 @@ pub fn (o &ObservableImpl) buffer_with_time_or_count(timespan Duration, count in
 // connect instructs a connectable Observable to begin emitting items to its subscribers.
 pub fn (o &ObservableImpl) connect(ctx context.Context) (context.Context, Disposable) {
 	cancel_ctx := context.with_cancel(ctx)
-	cancel := fn [cancel_ctx] {
+	cancel := fn [cancel_ctx] () {
 		context.cancel(cancel_ctx)
 	}
 	o.observe(with_context(cancel_ctx), connect())
@@ -588,14 +588,14 @@ pub fn (op &CountOperator) gather_next(_ context.Context, _ Item, _ chan Item, _
 
 // debounce only emits an item from an Observable if a particular timespan has passed without it emitting another item.
 pub fn (o &ObservableImpl) debounce(timespan Duration, opts ...RxOption) Observable {
-	f := fn [timestamp] (ctx context.Context, next chan Item, option Option, opts ...RxOption) {
+	f := fn [timespan] (ctx context.Context, next chan Item, option Option, opts ...RxOption) {
 		defer {
 			next.close()
 		}
 		observe := o.observe(...opts)
-		mut latest = ItemValue(voidptr(0))
+		mut latest := ItemValue(voidptr(0))
 
-		duration := timestamp.duration()
+		duration := timespan.duration()
 		done := ctx.done()
 
 		for select {
@@ -613,6 +613,7 @@ pub fn (o &ObservableImpl) debounce(timespan Duration, opts ...RxOption) Observa
 				} else {
 					latest = item.value
 				}
+			}
 			duration {
 				if latest is voidptr {
 					if isnil(latest) {
@@ -624,7 +625,7 @@ pub fn (o &ObservableImpl) debounce(timespan Duration, opts ...RxOption) Observa
 				}
 				latest = ItemValue(voidptr(0))
 			}
-		}
+		} {}
 	}
 
 	return custom_observable_operator(o.parent, f, ...opts)
