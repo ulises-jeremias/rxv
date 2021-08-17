@@ -3,7 +3,7 @@ module rxv
 import context
 import time
 
-pub type ItemValue = Error | MapOperatorOptionalSingle | MapOperatorSingle | []ItemValue |
+pub type ItemValue = Error | MapOperatorOptionalSingle | MapOperatorSingle | []ItemValue | DistinctOperator |
 	bool | byte | chan ItemValue | f32 | f64 | i16 | i64 | i8 | int | string | u16 | u32 |
 	u64 | voidptr
 
