@@ -678,6 +678,7 @@ pub fn (o &ObservableImpl) distinct(apply Func, opts ...RxOption) Observable {
 
 struct DistinctOperator {
 	apply  Func
+mut:
 	keyset map[ItemValue]ItemValue
 }
 
@@ -1156,92 +1157,97 @@ fn abs(n i64) i64 {
 	return (n ^ y) - y
 }
 
+pub type TimeExtractorFn = fn (ItemValue) time.Time
+
 // Join combines items emitted by two Observables whenever an item from one Observable is emitted during
 // a time window defined according to an item emitted by the other Observable.
-// The time is extracted using a timeExtractor function.
-pub fn (o &ObservableImpl) join(joiner Func2, right Observable, timeExtractor fn (interface{}) time.Time, window Duration, opts ...RxOption) Observable {
-	f := fn (ctx context.Context, next chan Item, option Option, opts ...RxOption) {
+// The time is extracted using a time_extractor function.
+pub fn (o &ObservableImpl) join(joiner Func2, right Observable, time_extractor TimeExtractorFn, window Duration, opts ...RxOption) Observable {
+	f := fn [joiner, right, time_extractor, window] (ctx context.Context, next chan Item, option Option, opts ...RxOption) {
 		defer {
 			next.close()
 		}
-		windowDuration := i64(window.duration())
-		rBuf := make([]Item, 0)
+		window_duration := i64(window.duration())
+		r_buf := []Item{}
 
-		lObserve := o.observe()
-		rObserve := right.observe()
-	lLoop:
+		l_observe := o.observe()
+		r_observe := right.observe()
+
+		done := ctx.done()
+
+	l_loop:
 		for select {
-			case <-ctx.done():
+			_ := <-done {
 				return
-			case lItem, ok := <-lObserve:
-				if lItem.V == nil && !ok {
+			}
+			l_item := <-l_observe {
+				if isnil(l_item.value) {
 					return
 				}
-				if lItem.is_error() {
-					lItem.send_context(ctx, next)
+				if l_item.is_error() {
+					l_item.send_context(ctx, next)
 					if option.get_error_strategy() == .stop_on_error {
 						return
 					}
 					continue
 				}
-				lTime := timeExtractor(lItem.V).UnixNano()
-				cutPoint := 0
-				for i, rItem := range rBuf {
-					rTime := timeExtractor(rItem.V).UnixNano()
-					if abs(lTime-rTime) <= windowDuration {
-						i, err := joiner(ctx, lItem.V, rItem.V)
-						if err != nil {
+				l_time := time_extractor(l_item.value).unix_nano()
+				cut_point := 0
+				for i, r_item in r_buf {
+					r_time := time_extractor(r_item.value).unix_nano()
+					if abs(l_time-r_time) <= window_duration {
+						if i := joiner(ctx, l_item.value, r_item.value) {
+							of(i).send_context(ctx, next)
+						} else {
 							error(err).send_context(ctx, next)
 							if option.get_error_strategy() == .stop_on_error {
 								return
 							}
 							continue
 						}
-						of(i).send_context(ctx, next)
 					}
-					if lTime > rTime+windowDuration {
-						cutPoint = i + 1
+					if l_time > r_time+window_duration {
+						cut_point = i + 1
 					}
 				}
 
-				rBuf = rBuf[cutPoint:]
+				r_buf = r_buf[cut_point..]
 
-				for {
-					select {
-					case <-ctx.done():
+				for select {
+					_ := <-done {
 						return
-					case rItem, ok := <-rObserve:
-						if rItem.V == nil && !ok {
-							continue lLoop
+					}
+					r_item := <-r_observe {
+						if isnil(r_item.value) {
+							continue l_loop
 						}
-						if rItem.is_error() {
-							rItem.send_context(ctx, next)
+						if r_item.is_error() {
+							r_item.send_context(ctx, next)
 							if option.get_error_strategy() == .stop_on_error {
 								return
 							}
 							continue
 						}
 
-						rBuf = append(rBuf, rItem)
-						rTime := timeExtractor(rItem.V).UnixNano()
-						if abs(lTime-rTime) <= windowDuration {
-							i, err := joiner(ctx, lItem.V, rItem.V)
-							if err != nil {
+						r_buf << r_item
+						r_time := time_extractor(r_item.value).unix_nano()
+						if abs(l_time-r_time) <= window_duration {
+							if i := joiner(ctx, l_item.value, r_item.value) {
+								of(i).send_context(ctx, next)
+								continue
+							} else {
 								error(err).send_context(ctx, next)
 								if option.get_error_strategy() == .stop_on_error {
 									return
 								}
 								continue
 							}
-							of(i).send_context(ctx, next)
-
-							continue
 						}
-						continue lLoop
+						continue l_loop
 					}
-				}
+				} {}
 			}
-		}
+		} {}
 	}
 
 	return custom_observable_operator(o.parent, f, ...opts)
@@ -1905,8 +1911,8 @@ func popAndCompareFirstItems(
 	inputSequence1 []interface{},
 	inputSequence2 []interface{}) (bool, []interface{}, []interface{}) {
 	if len(inputSequence1) > 0 && len(inputSequence2) > 0 {
-		s1, sequence1 := inputSequence1[0], inputSequence1[1:]
-		s2, sequence2 := inputSequence2[0], inputSequence2[1:]
+		s1, sequence1 := inputSequence1[0], inputSequence1[1..]
+		s2, sequence2 := inputSequence2[0], inputSequence2[1..]
 		return s1 == s2, sequence1, sequence2
 	}
 	return true, inputSequence1, inputSequence2
@@ -2360,7 +2366,7 @@ struct TakeLast {
 
 pub fn (op &TakeLast) next(_ context.Context, item Item, _ chan Item, _ operator_options) {
 	op.count++
-	op.r.Value = item.value
+	op.r.valuealue = item.value
 	op.r = op.r.Next()
 }
 
@@ -2379,7 +2385,7 @@ pub fn (op &TakeLast) end(ctx context.Context, dst chan Item) {
 		op.n = op.count
 	}
 	for i := 0; i < op.n; i++ {
-		of(op.r.Value).send_context(ctx, dst)
+		of(op.r.valuealue).send_context(ctx, dst)
 		op.r = op.r.Next()
 	}
 }
@@ -2938,7 +2944,7 @@ pub fn (o &ObservableImpl) zip_from_iterable(iterable Iterable, zipper Func2, op
 							i2.send_context(ctx, next)
 							return
 						}
-						v, err := zipper(ctx, i1.V, i2.V)
+						v, err := zipper(ctx, i1.value, i2.value)
 						if err != nil {
 							error(err).send_context(ctx, next)
 							return
