@@ -314,7 +314,7 @@ pub fn (o &ObservableImpl) buffer_with_count(count int, opts ...RxOption) Observ
 	return observable(o.parent, o, fn [count] () Operator {
 		return &BufferWithCountOperator{
 			count: count
-			buffer: []ItemValue{len: count}
+			buffer: []ItemValue{len: count, init: 0}
 		}
 	}, true, false, ...opts)
 }
@@ -1450,7 +1450,7 @@ pub fn (op &LastOrDefaultOperator) gather_next(_ context.Context, _ Item, _ chan
 
 // map transforms the items emitted by an Observable by applying a function to each item.
 pub fn (o &ObservableImpl) map(apply Func, opts ...RxOption) Observable {
-	return observable(o.parent, o, fn () Operator {
+	return observable(o.parent, o, fn [apply] () Operator {
 		return &MapOperator{ apply: apply }
 	}, false, true, ...opts)
 }
@@ -1585,7 +1585,7 @@ pub fn (o &ObservableImpl) observe(opts ...RxOption) chan Item {
 // OnErrorResumeNext instructs an Observable to pass control to another Observable rather than invoking
 // onError if it encounters an error.
 pub fn (o &ObservableImpl) on_error_resume_next(resume_sequence ErrorToObservable, opts ...RxOption) Observable {
-	return observable(o.parent, o, fn () Operator {
+	return observable(o.parent, o, fn [resume_sequence] () Operator {
 		return &OnErrorResumeNextOperator{ resume_sequence: resume_sequence }
 	}, true, false, ...opts)
 }
@@ -1611,7 +1611,7 @@ pub fn (op &OnErrorResumeNextOperator) gather_next(_ context.Context, _ Item, _ 
 // OnErrorReturn instructs an Observable to emit an item (returned by a specified function)
 // rather than invoking onError if it encounters an error.
 pub fn (o &ObservableImpl) on_error_return(resume_fn ErrorFunc, opts ...RxOption) Observable {
-	return observable(o.parent, o, fn () Operator {
+	return observable(o.parent, o, fn [resume_fn] () Operator {
 		return &OnErrorReturnOperator{ resume_fn: resume_fn }
 	}, true, false, ...opts)
 }
@@ -1726,7 +1726,7 @@ pub fn (o &ObservableImpl) repeat(count i64, frequency Duration, opts ...RxOptio
 struct RepeatOperator {
 mut:
 	count     i64
-	frequency time.Duration
+	frequency Duration
 	seq       []Item
 }
 
@@ -1754,7 +1754,7 @@ pub fn (mut op RepeatOperator) end(ctx context.Context, dst chan Item) {
 			}
 		}
 		if !isnil(op.frequency) {
-			time.sleep(op.frequency)
+			time.sleep(op.frequency.duration())
 		}
 		for v in op.seq {
 			v.send_context(ctx, dst)
@@ -2049,7 +2049,7 @@ pub fn (o &ObservableImpl) sequence_equal(iterable Iterable, opts ...RxOption) S
 }
 
 // Serialize forces an Observable to make serialized calls and to be well-behaved.
-pub fn (o &ObservableImpl) serialize(from int, identifier IdentifierFn, opts ...RxOption) Observable {
+pub fn (o &ObservableImpl) serialize(from context.Context, identifier IdentifierFn, opts ...RxOption) Observable {
 	option := parse_options(...opts)
 	next := option.build_channel()
 
@@ -2062,7 +2062,7 @@ pub fn (o &ObservableImpl) serialize(from int, identifier IdentifierFn, opts ...
 // returns a new Observable with the rest items.
 // Cannot be run in parallel.
 pub fn (o &ObservableImpl) skip(nth u32, opts ...RxOption) Observable {
-	return observable(o.parent, o, fn () Operator {
+	return observable(o.parent, o, fn [nth] () Operator {
 		return &SkipOperator{
 			nth: nth
 		}
@@ -2097,7 +2097,7 @@ pub fn (op &SkipOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ 
 // returns a new Observable with the rest items.
 // Cannot be run in parallel.
 pub fn (o &ObservableImpl) skip_last(nth u32, opts ...RxOption) Observable {
-	return observable(o.parent, o, fn () Operator {
+	return observable(o.parent, o, fn [nth] () Operator {
 		return &SkipLastOperator{
 			nth: nth
 		}
@@ -2299,7 +2299,7 @@ pub fn (o &ObservableImpl) sum_i64(opts ...RxOption) OptionalSingle {
 // take emits only the first n items emitted by an Observable.
 // Cannot be run in parallel.
 pub fn (o &ObservableImpl) take(nth u32, opts ...RxOption) Observable {
-	return observable(o.parent, o, fn () Operator {
+	return observable(o.parent, o, fn [nth] () Operator {
 		return &TakeOperator{
 			nth: nth
 		}
@@ -2332,23 +2332,11 @@ pub fn (op &TakeOperator) end(_ context.Context, _ chan Item) {
 pub fn (op &TakeOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
-// take_last emits only the last n items emitted by an Observable.
-// Cannot be run in parallel.
-pub fn (o &ObservableImpl) take_last(nth u32, opts ...RxOption) Observable {
-	return observable(o.parent, o, fn () Operator {
-		n := int(nth)
-		return &TakeLast{
-			n: n
-			r: ring.New(n)
-		}
-	}, true, false, ...opts)
-}
-
 // take_until returns an Observable that emits items emitted by the source Observable,
 // checks the specified predicate for each item, and then completes when the condition is satisfied.
 // Cannot be run in parallel.
 pub fn (o &ObservableImpl) take_until(apply Predicate, opts ...RxOption) Observable {
-	return observable(o.parent, o, fn () Operator {
+	return observable(o.parent, o, fn [apply] () Operator {
 		return &TakeUntilOperator{
 			apply: apply
 		}
@@ -2381,7 +2369,7 @@ pub fn (op &TakeUntilOperator) gather_next(_ context.Context, _ Item, _ chan Ite
 // item satisfied a specified condition, and then completes as soon as this condition is not satisfied.
 // Cannot be run in parallel.
 pub fn (o &ObservableImpl) take_while(apply Predicate, opts ...RxOption) Observable {
-	return observable(o.parent, o, fn () Operator {
+	return observable(o.parent, o, fn [apply] () Operator {
 		return &TakeWhileOperator{
 			apply: apply
 		}
