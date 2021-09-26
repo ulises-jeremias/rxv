@@ -377,7 +377,7 @@ pub fn (o &ObservableImpl) buffer_with_time(timespan Duration, opts ...RxOption)
 				mutex.unlock()
 			}
 
-			duration := timespan.duration()
+			duration := timespan.duration().nanoseconds()
 			done := ctx.done()
 
 			for select {
@@ -455,7 +455,7 @@ pub fn (o &ObservableImpl) buffer_with_time_or_count(timespan Duration, count in
 				mutex.unlock()
 			}
 
-			duration := timespan.duration()
+			duration := timespan.duration().nanoseconds()
 			done := ctx.done()
 
 			for select {
@@ -600,7 +600,7 @@ pub fn (o &ObservableImpl) debounce(timespan Duration, opts ...RxOption) Observa
 		observe := o.observe(...opts)
 		mut latest := ItemValue(voidptr(0))
 
-		duration := timespan.duration()
+		duration := timespan.duration().nanoseconds()
 		done := ctx.done()
 
 		for select {
@@ -2696,7 +2696,7 @@ pub fn (o &ObservableImpl) window_with_time(timespan Duration, opts ...RxOption)
 				_ := <-done {
 					return
 				}
-				timespan.duration() {
+				timespan.duration().nanoseconds() {
 					mutex.@lock()
 					if empty {
 						mutex.unlock()
@@ -2790,7 +2790,7 @@ pub fn (o &ObservableImpl) window_with_time_or_count(timespan Duration, count in
 				_ := <-done {
 					return
 				}
-				timespan.duration() {
+				timespan.duration().nanoseconds() {
 					mutex.@lock()
 					if i_count == 0 {
 						mutex.unlock()
