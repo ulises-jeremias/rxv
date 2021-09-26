@@ -38,7 +38,7 @@ fn run_sequential(ctx context.Context, next chan Item, iterable Iterable, operat
 		}
 		op.end(ctx, next)
 		next.close()
-	}(ctx, next, observe, operator_factory, option)
+	}(ctx, next, operator_factory, option)
 }
 
 fn run_parallel(ctx context.Context, next chan Item, observe chan Item, operator_factory OperatorFactoryFn, bypass_gather bool, option RxOption, opts ...RxOption) {

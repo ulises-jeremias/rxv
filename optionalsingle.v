@@ -79,8 +79,8 @@ fn (op &MapOperatorOptionalSingle) gather_next(_ context.Context, item Item, dst
 }
 
 // map transforms the items emitted by an optional_single by applying a function to each item
-pub fn (o &OptionalSingleImpl) map(apply Func, opts ...RxOption) OptionalSingle {
-	return optional_single(o.parent, o, fn () Operator {
+pub fn (o &OptionalSingleImpl) map(apply Func, opts ...RxOption) Single {
+	return single(o.parent, o, fn () Operator {
 		return &MapOperatorOptionalSingle{
 			apply: unsafe { voidptr(0) } // apply
 		}

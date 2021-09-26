@@ -2,6 +2,9 @@ module rxv
 
 import time
 
+// infinite represents an infinite wait time
+const infinite = -1
+
 // Duration represents a duration
 pub interface Duration {
 	duration() time.Duration

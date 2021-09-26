@@ -3,9 +3,35 @@ module rxv
 import context
 import time
 
-pub type ItemValue = Error | MapOperatorOptionalSingle | MapOperatorSingle | []ItemValue | DistinctOperator |
-	bool | byte | chan ItemValue | f32 | f64 | i16 | i64 | i8 | int | string | u16 | u32 |
-	u64 | voidptr
+pub type ItemValue = DistinctOperator
+	| Error
+	| GroupedObservable
+	| Item
+	| MapOperator
+	| MapOperatorOptionalSingle
+	| MapOperatorSingle
+	| MaxOperator
+	| MinOperator
+	| ObservableImpl
+	| ReduceOperator
+	| TimestampItem
+	| []ItemValue
+	| bool
+	| byte
+	| chan Item
+	| chan ItemValue
+	| f32
+	| f64
+	| i16
+	| i64
+	| i8
+	| int
+	| map[voidptr]ItemValue
+	| string
+	| u16
+	| u32
+	| u64
+	| voidptr
 
 // Item is a wrapper having either a value or an error.
 pub struct Item {

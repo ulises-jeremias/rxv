@@ -5,6 +5,8 @@ import time
 
 pub type DistributionFn = fn (item Item) int
 
+pub type DistributionStrFn = fn (item Item) string
+
 pub type FactoryFn = fn () ItemValue
 
 pub type IdentifierFn = fn (value ItemValue) int
@@ -22,7 +24,7 @@ pub interface Observable {
 	average_f32(opts ...RxOption) Single
 	average_f64(opts ...RxOption) Single
 	average_int(opts ...RxOption) Single
-	average_i8(opts ...RxOption) Single
+	// average_i8(opts ...RxOption) Single
 	average_i16(opts ...RxOption) Single
 	average_i32(opts ...RxOption) Single
 	average_i64(opts ...RxOption) Single
@@ -50,7 +52,7 @@ pub interface Observable {
 	flat_map(apply ItemToObservable, opts ...RxOption) Observable
 	for_each(next_func NextFunc, err_func ErrFunc, completed_func CompletedFunc, opts ...RxOption) chan int
 	group_by(length int, distribution DistributionFn, opts ...RxOption) Observable
-	group_by_dynamic(distribution DistributionFn, opts ...RxOption) Observable
+	group_by_dynamic(distribution DistributionStrFn, opts ...RxOption) Observable
 	ignore_elements(opts ...RxOption) Observable
 	join(joiner Func2, right Observable, time_extractor TimeExtractorFn, window Duration, opts ...RxOption) Observable
 	last(opts ...RxOption) OptionalSingle
@@ -100,7 +102,7 @@ pub struct ObservableImpl {
 	parent   context.Context
 }
 
-fn default_error_func_operator(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
+pub fn default_error_func_operator(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
 	item.send_context(ctx, dst)
 	operator_options.stop()
 }
@@ -118,7 +120,7 @@ fn custom_observable_operator(parent context.Context, f IterableFactoryFn, opts 
 	}
 
 	return &ObservableImpl{
-		iterable: new_factory_iterable(fn [ctx, next, option, opts] (propagated_options ...RxOption) chan Item {
+		iterable: new_factory_iterable(fn [ctx, next, option, opts, f] (propagated_options ...RxOption) chan Item {
 			mut merged_options := opts.clone()
 			merged_options << propagated_options
 			go f(ctx, next, option, ...merged_options)
@@ -135,7 +137,7 @@ interface Operator {
 }
 
 fn single(parent context.Context, iterable Iterable, operator_factory OperatorFactoryFn, force_seq bool, bypass_gather bool, opts ...RxOption) Single {
-	option := parse_options(...opts)
+	mut option := parse_options(...opts)
 	parallel := if _ := option.get_pool() { true } else { false }
 
 	next := option.build_channel()
@@ -154,8 +156,8 @@ fn single(parent context.Context, iterable Iterable, operator_factory OperatorFa
 	}
 
 	return &SingleImpl{
-		iterable: new_factory_iterable(fn [ctx, next, iterable, operator_factory, bypass_gather, option, opts] (propagated_options ...RxOption) chan Item {
-			mut merged_options := opts
+		iterable: new_factory_iterable(fn [ctx, next, iterable, operator_factory, bypass_gather, mut option, opts, force_seq, parallel] (propagated_options ...RxOption) chan Item {
+			mut merged_options := opts.clone()
 			merged_options << propagated_options
 			option = parse_options(...merged_options)
 
@@ -171,7 +173,7 @@ fn single(parent context.Context, iterable Iterable, operator_factory OperatorFa
 }
 
 fn optional_single(parent context.Context, iterable Iterable, operator_factory OperatorFactoryFn, force_seq bool, bypass_gather bool, opts ...RxOption) OptionalSingle {
-	option := parse_options(...opts)
+	mut option := parse_options(...opts)
 	ctx := option.build_context(parent)
 	parallel := if _ := option.get_pool() { true } else { false }
 
@@ -189,8 +191,8 @@ fn optional_single(parent context.Context, iterable Iterable, operator_factory O
 	}
 
 	return &OptionalSingleImpl{
-		iterable: new_factory_iterable(fn [iterable, operator_factory, bypass_gather, option, opts] (propagated_options ...RxOption) chan Item {
-			mut merged_options := opts
+		iterable: new_factory_iterable(fn [parent, iterable, operator_factory, bypass_gather, mut option, opts, force_seq, parallel] (propagated_options ...RxOption) chan Item {
+			mut merged_options := opts.clone()
 			merged_options << propagated_options
 			option = parse_options(...merged_options)
 

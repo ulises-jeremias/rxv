@@ -2,6 +2,7 @@ module rxv
 
 import context
 import time
+import sync
 
 // all determines whether all items emitted by an Observable meet some criteria
 pub fn (o &ObservableImpl) all(predicate Predicate, opts ...RxOption) Single {
@@ -75,7 +76,7 @@ fn (mut op AverageF32Operator) next(ctx context.Context, item Item, dst chan Ite
 			op.count++
 		}
 		else {
-			error(new_illegal_input_error('expected type: f32, f64 or int, got $item')).send_context(ctx,
+			from_error(new_illegal_input_error('expected type: f32, f64 or int, got $item')).send_context(ctx,
 				dst)
 			operator_options.stop()
 		}
@@ -129,7 +130,7 @@ fn (mut op AverageF64Operator) next(ctx context.Context, item Item, dst chan Ite
 			op.count++
 		}
 		else {
-			error(new_illegal_input_error('expected type: f32, f64 or int, got $item')).send_context(ctx,
+			from_error(new_illegal_input_error('expected type: f32, f64 or int, got $item')).send_context(ctx,
 				dst)
 			operator_options.stop()
 		}
@@ -182,7 +183,7 @@ fn (mut op AverageIntOperator) next(ctx context.Context, item Item, dst chan Ite
 			op.count++
 		}
 		else {
-			error(new_illegal_input_error('expected type: int, got $item')).send_context(ctx,
+			from_error(new_illegal_input_error('expected type: int, got $item')).send_context(ctx,
 				dst)
 			operator_options.stop()
 		}
@@ -228,7 +229,7 @@ fn (mut op AverageI16Operator) next(ctx context.Context, item Item, dst chan Ite
 			op.count++
 		}
 		else {
-			error(new_illegal_input_error('expected type: i16, got $item')).send_context(ctx,
+			from_error(new_illegal_input_error('expected type: i16, got $item')).send_context(ctx,
 				dst)
 			operator_options.stop()
 		}
@@ -274,7 +275,7 @@ fn (mut op AverageI64Operator) next(ctx context.Context, item Item, dst chan Ite
 			op.count++
 		}
 		else {
-			error(new_illegal_input_error('expected type: i64, got $item')).send_context(ctx,
+			from_error(new_illegal_input_error('expected type: i64, got $item')).send_context(ctx,
 				dst)
 			operator_options.stop()
 		}
@@ -331,7 +332,7 @@ fn (mut op BufferWithCountOperator) next(ctx context.Context, item Item, dst cha
 	if op.i_count == op.count {
 		of(op.buffer).send_context(ctx, dst)
 		op.i_count = 0
-		op.buffer = []ItemValue{len: op.count}
+		op.buffer = []ItemValue{len: op.count, init: 0}
 	}
 }
 
@@ -353,45 +354,45 @@ fn (op &BufferWithCountOperator) gather_next(ctx context.Context, item Item, dst
 // When the source Observable completes or encounters an error, the resulting Observable emits
 // the current buffer and propagates the notification from the source Observable.
 pub fn (o &ObservableImpl) buffer_with_time(timespan Duration, opts ...RxOption) Observable {
-	f := fn [timespan] (ctx context.Context, next chan Item, option Option, opts ...RxOption) {
+	f := fn [timespan, o] (ctx context.Context, next chan Item, option RxOption, opts ...RxOption) {
 		observe := o.observe(...opts)
 		mut buffer := []ItemValue{}
 		stop := chan int{cap: 1}
 		mut mutex := sync.new_mutex()
 
-		check_buffer := fn [mut buffer, mut mutex] () {
-			mutex.@lock()
-			if buffer.len != 0 {
-				if !of(buffer).send_context(ctx, next) {
-					mutex.unlock()
-					return
-				}
-				buffer = []ItemValue{}
-			}
-			mutex.unlock()
-		}
-
-		go fn [check_buffer] (ctx context.Context, next chan Item, stop chan int, timespan Duration) {
+		go fn [mut buffer, mut mutex] (ctx context.Context, next chan Item, stop chan int, timespan Duration) {
 			defer {
-				next <- 0
 				next.close()
+			}
+
+			check_buffer := fn [ctx, next, mut buffer, mut mutex] () {
+				mutex.@lock()
+				if buffer.len != 0 {
+					if !of(buffer).send_context(ctx, next) {
+						mutex.unlock()
+						return
+					}
+					buffer = []ItemValue{}
+				}
+				mutex.unlock()
 			}
 
 			duration := timespan.duration()
 			done := ctx.done()
 
 			for select {
-					_ := <-stop {
-						check_buffer()
-						return
-					}
-					_ := <-done {
-						return
-					}
-					duration {
-						check_buffer()
-					}
-			} {}
+				_ := <-stop {
+					check_buffer()
+					return
+				}
+				_ := <-done {
+					return
+				}
+				duration {
+					check_buffer()
+				}
+			} {
+			}
 		}(ctx, next, stop, timespan)
 
 		done := ctx.done()
@@ -416,7 +417,8 @@ pub fn (o &ObservableImpl) buffer_with_time(timespan Duration, opts ...RxOption)
 					mutex.unlock()
 				}
 			}
-		} {}
+		} {
+		}
 	}
 
 	return custom_observable_operator(o.parent, f, ...opts)
@@ -426,52 +428,52 @@ pub fn (o &ObservableImpl) buffer_with_time(timespan Duration, opts ...RxOption)
 // Observable either from a given count or at a given time interval.
 pub fn (o &ObservableImpl) buffer_with_time_or_count(timespan Duration, count int, opts ...RxOption) Observable {
 	if count <= 0 {
-		return thrown(new_illegal_input_error("count must be positive"))
+		return thrown(new_illegal_input_error('count must be positive'))
 	}
 
-	f := fn [timespan, count] (ctx context.Context, next chan Item, option Option, opts ...RxOption) {
+	f := fn [o, timespan, count] (ctx context.Context, next chan Item, option RxOption, opts ...RxOption) {
 		observe := o.observe(...opts)
-		buffer := []ItemValue{}
+		mut buffer := []ItemValue{}
+		mut mutex := sync.new_mutex()
 		stop := chan int{cap: 1}
 		send := chan int{cap: 1}
-		mutex := sync.new_mutex()
 
-		check_buffer := fn [mut buffer, mut mutex] () {
-			mutex.@lock()
-			if buffer.len != 0 {
-				if !of(buffer).send_context(ctx, next) {
-					mutex.unlock()
-					return
-				}
-				buffer = []ItemValue{}
-			}
-			mutex.unlock()
-		}
-
-		go fn [check_buffer] (ctx context.Context, next chan Item, stop chan int, send chan int, timespan Duration) {
+		go fn [mut buffer, mut mutex] (ctx context.Context, next chan Item, stop chan int, send chan int, timespan Duration) {
 			defer {
-				next <- 0
 				next.close()
+			}
+
+			check_buffer := fn [ctx, next, mut buffer, mut mutex] () {
+				mutex.@lock()
+				if buffer.len != 0 {
+					if !of(buffer).send_context(ctx, next) {
+						mutex.unlock()
+						return
+					}
+					buffer = []ItemValue{}
+				}
+				mutex.unlock()
 			}
 
 			duration := timespan.duration()
 			done := ctx.done()
 
 			for select {
-					_ := <-send {
-						check_buffer()
-					}
-					_ := <-stop {
-						check_buffer()
-						return
-					}
-					_ := <-done {
-						return
-					}
-					duration {
-						check_buffer()
-					}
-			} {}
+				_ := <-send {
+					check_buffer()
+				}
+				_ := <-stop {
+					check_buffer()
+					return
+				}
+				_ := <-done {
+					return
+				}
+				duration {
+					check_buffer()
+				}
+			} {
+			}
 		}(ctx, next, stop, send, timespan)
 
 		done := ctx.done()
@@ -501,7 +503,8 @@ pub fn (o &ObservableImpl) buffer_with_time_or_count(timespan Duration, count in
 					}
 				}
 			}
-		} {}
+		} {
+		}
 	}
 
 	return custom_observable_operator(o.parent, f, ...opts)
@@ -521,14 +524,14 @@ pub fn (o &ObservableImpl) connect(ctx context.Context) (context.Context, Dispos
 pub fn (o &ObservableImpl) contains(equal Predicate, opts ...RxOption) Single {
 	return single(o.parent, o, fn [equal] () Operator {
 		return &ContainsOperator{
-			equal:    equal,
-			contains: false,
+			equal: equal
+			contains: false
 		}
 	}, false, false, ...opts)
 }
 
 struct ContainsOperator {
-	equal    Predicate
+	equal Predicate
 mut:
 	contains bool
 }
@@ -552,10 +555,12 @@ pub fn (op &ContainsOperator) end(ctx context.Context, dst chan Item) {
 }
 
 pub fn (mut op ContainsOperator) gather_next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	if item.value == true {
-		of(true).send_context(ctx, dst)
-		operator_options.stop()
-		op.contains = true
+	if item.value is bool {
+		if item.value == true {
+			of(true).send_context(ctx, dst)
+			operator_options.stop()
+			op.contains = true
+		}
 	}
 }
 
@@ -571,7 +576,7 @@ mut:
 	count i64
 }
 
-pub fn (mut op CountOperator) next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (mut op CountOperator) next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 	op.count++
 }
 
@@ -583,12 +588,12 @@ pub fn (op &CountOperator) end(ctx context.Context, dst chan Item) {
 	of(op.count).send_context(ctx, dst)
 }
 
-pub fn (op &CountOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &CountOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // debounce only emits an item from an Observable if a particular timespan has passed without it emitting another item.
 pub fn (o &ObservableImpl) debounce(timespan Duration, opts ...RxOption) Observable {
-	f := fn [timespan] (ctx context.Context, next chan Item, option Option, opts ...RxOption) {
+	f := fn [timespan, o] (ctx context.Context, next chan Item, option RxOption, opts ...RxOption) {
 		defer {
 			next.close()
 		}
@@ -625,7 +630,8 @@ pub fn (o &ObservableImpl) debounce(timespan Duration, opts ...RxOption) Observa
 				}
 				latest = ItemValue(voidptr(0))
 			}
-		} {}
+		} {
+		}
 	}
 
 	return custom_observable_operator(o.parent, f, ...opts)
@@ -636,18 +642,19 @@ pub fn (o &ObservableImpl) debounce(timespan Duration, opts ...RxOption) Observa
 pub fn (o &ObservableImpl) default_if_empty(default_value ItemValue, opts ...RxOption) Observable {
 	return observable(o.parent, o, fn [default_value] () Operator {
 		return &DefaultIfEmptyOperator{
-			default_value: default_value,
-			empty:        true,
+			default_value: default_value
+			empty: true
 		}
 	}, true, false, ...opts)
 }
 
 struct DefaultIfEmptyOperator {
 	default_value ItemValue
-	empty        bool
+mut:
+	empty bool
 }
 
-pub fn (op &DefaultIfEmptyOperator) next(ctx context.Context, item Item, dst chan Item, _ operator_options) {
+pub fn (mut op DefaultIfEmptyOperator) next(ctx context.Context, item Item, dst chan Item, _ OperatorOptions) {
 	op.empty = false
 	item.send_context(ctx, dst)
 }
@@ -662,7 +669,7 @@ pub fn (op &DefaultIfEmptyOperator) end(ctx context.Context, dst chan Item) {
 	}
 }
 
-pub fn (op &DefaultIfEmptyOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &DefaultIfEmptyOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // distinct suppresses duplicate items in the original Observable and returns
@@ -670,21 +677,21 @@ pub fn (op &DefaultIfEmptyOperator) gather_next(_ context.Context, _ Item, _ cha
 pub fn (o &ObservableImpl) distinct(apply Func, opts ...RxOption) Observable {
 	return observable(o.parent, o, fn [apply] () Operator {
 		return &DistinctOperator{
-			apply:  apply,
-			keyset: map[ItemValue]ItemValue{},
+			apply: apply
+			keyset: map[voidptr]ItemValue{}
 		}
 	}, false, false, ...opts)
 }
 
 struct DistinctOperator {
-	apply  Func
+	apply Func
 mut:
-	keyset map[ItemValue]ItemValue
+	keyset map[voidptr]ItemValue
 }
 
 pub fn (mut op DistinctOperator) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
 	key := op.apply(ctx, item.value) or {
-		error(err).send_context(ctx, dst)
+		from_error(err).send_context(ctx, dst)
 		operator_options.stop()
 		return
 	}
@@ -702,7 +709,7 @@ pub fn (op &DistinctOperator) err(ctx context.Context, item Item, dst chan Item,
 pub fn (op &DistinctOperator) end(_ context.Context, _ chan Item) {
 }
 
-pub fn (mut op DistinctOperator) gather_next(ctx context.Context, item Item, dst chan Item, _ operator_options) {
+pub fn (mut op DistinctOperator) gather_next(ctx context.Context, item Item, dst chan Item, _ OperatorOptions) {
 	if item.value !is DistinctOperator {
 		return
 	}
@@ -718,19 +725,20 @@ pub fn (mut op DistinctOperator) gather_next(ctx context.Context, item Item, dst
 pub fn (o &ObservableImpl) distinct_until_changed(apply Func, opts ...RxOption) Observable {
 	return observable(o.parent, o, fn [apply] () Operator {
 		return &DistinctUntilChangedOperator{
-			apply: apply,
+			apply: apply
 		}
 	}, true, false, ...opts)
 }
 
 struct DistinctUntilChangedOperator {
-	apply   Func
+	apply Func
+mut:
 	current ItemValue
 }
 
 pub fn (mut op DistinctUntilChangedOperator) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
 	key := op.apply(ctx, item.value) or {
-		error(err).send_context(ctx, dst)
+		from_error(err).send_context(ctx, dst)
 		operator_options.stop()
 		return
 	}
@@ -747,11 +755,11 @@ pub fn (op &DistinctUntilChangedOperator) err(ctx context.Context, item Item, ds
 pub fn (op &DistinctUntilChangedOperator) end(_ context.Context, _ chan Item) {
 }
 
-pub fn (op &DistinctUntilChangedOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &DistinctUntilChangedOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // do_on_completed registers a callback action that will be called once the Observable terminates.
-pub fn (o &ObservableImpl) do_on_completed(handle_complete CompletedFunc, opts ...RxOption) Disposed {
+pub fn (o &ObservableImpl) do_on_completed(handle_complete CompletedFunc, opts ...RxOption) chan int {
 	dispose := chan int{cap: 1}
 
 	handler := fn [dispose, handle_complete] (ctx context.Context, src chan Item) {
@@ -766,15 +774,16 @@ pub fn (o &ObservableImpl) do_on_completed(handle_complete CompletedFunc, opts .
 		done := ctx.done()
 
 		for select {
-			_ := done {
+			_ := <-done {
 				return
 			}
-			i <-src {
+			i := <-src {
 				if i.is_error() {
 					return
 				}
 			}
-		} {}
+		} {
+		}
 	}
 
 	option := parse_options(...opts)
@@ -784,7 +793,7 @@ pub fn (o &ObservableImpl) do_on_completed(handle_complete CompletedFunc, opts .
 }
 
 // do_on_error registers a callback action that will be called if the Observable terminates abnormally.
-pub fn (o &ObservableImpl) do_on_error(handle_err ErrFunc, opts ...RxOption) Disposed {
+pub fn (o &ObservableImpl) do_on_error(handle_err ErrFunc, opts ...RxOption) chan int {
 	dispose := chan int{cap: 1}
 
 	handler := fn [dispose, handle_err] (ctx context.Context, src chan Item) {
@@ -799,13 +808,14 @@ pub fn (o &ObservableImpl) do_on_error(handle_err ErrFunc, opts ...RxOption) Dis
 			_ := <-done {
 				return
 			}
-			i <-src {
+			i := <-src {
 				if i.is_error() {
 					handle_err(i.err)
 					return
 				}
 			}
-		} {}
+		} {
+		}
 	}
 
 	option := parse_options(...opts)
@@ -815,7 +825,7 @@ pub fn (o &ObservableImpl) do_on_error(handle_err ErrFunc, opts ...RxOption) Dis
 }
 
 // do_on_next registers a callback action that will be called on each item emitted by the Observable.
-pub fn (o &ObservableImpl) do_on_next(handle_next NextFunc, opts ...RxOption) Disposed {
+pub fn (o &ObservableImpl) do_on_next(handle_next NextFunc, opts ...RxOption) chan int {
 	dispose := chan int{cap: 1}
 
 	handler := fn [dispose, handle_next] (ctx context.Context, src chan Item) {
@@ -830,13 +840,14 @@ pub fn (o &ObservableImpl) do_on_next(handle_next NextFunc, opts ...RxOption) Di
 			_ := <-done {
 				return
 			}
-			i <-src {
+			i := <-src {
 				if i.is_error() {
 					return
 				}
 				handle_next(i.value)
 			}
-		} {}
+		} {
+		}
 	}
 
 	option := parse_options(...opts)
@@ -850,16 +861,16 @@ pub fn (o &ObservableImpl) do_on_next(handle_next NextFunc, opts ...RxOption) Di
 pub fn (o &ObservableImpl) element_at(index u32, opts ...RxOption) Single {
 	return single(o.parent, o, fn [index] () Operator {
 		return &ElementAtOperator{
-			index: index,
+			index: index
 		}
 	}, true, false, ...opts)
 }
 
 struct ElementAtOperator {
 mut:
-	index     u32
+	index      u32
 	take_count int
-	sent      bool
+	sent       bool
 }
 
 pub fn (mut op ElementAtOperator) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
@@ -878,11 +889,11 @@ pub fn (op &ElementAtOperator) err(ctx context.Context, item Item, dst chan Item
 
 pub fn (op &ElementAtOperator) end(ctx context.Context, dst chan Item) {
 	if !op.sent {
-		error(new_illegal_input_error("")).send_context(ctx, dst)
+		from_error(new_illegal_input_error('')).send_context(ctx, dst)
 	}
 }
 
-pub fn (op &ElementAtOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &ElementAtOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // error returns the eventual Observable error.
@@ -903,7 +914,8 @@ pub fn (o &ObservableImpl) error(opts ...RxOption) IError {
 				return item.err
 			}
 		}
-	} {}
+	} {
+	}
 
 	return none
 }
@@ -916,6 +928,8 @@ pub fn (o &ObservableImpl) errors(opts ...RxOption) []IError {
 	observe := o.iterable.observe(...opts)
 	mut errs := []IError{}
 
+	done := ctx.done()
+
 	for select {
 		_ := <-done {
 			return [ctx.err()]
@@ -925,7 +939,8 @@ pub fn (o &ObservableImpl) errors(opts ...RxOption) []IError {
 				errs << item.err
 			}
 		}
-	} {}
+	} {
+	}
 
 	return errs
 }
@@ -933,7 +948,7 @@ pub fn (o &ObservableImpl) errors(opts ...RxOption) []IError {
 // filter emits only those items from an Observable that pass a predicate test.
 pub fn (o &ObservableImpl) filter(apply Predicate, opts ...RxOption) Observable {
 	return observable(o.parent, o, fn [apply] () Operator {
-		return &FilterOperator{apply: apply}
+		return &FilterOperator{ apply: apply }
 	}, false, true, ...opts)
 }
 
@@ -941,7 +956,7 @@ struct FilterOperator {
 	apply Predicate
 }
 
-pub fn (op &FilterOperator) next(ctx context.Context, item Item, dst chan Item, _ operator_options) {
+pub fn (op &FilterOperator) next(ctx context.Context, item Item, dst chan Item, _ OperatorOptions) {
 	if op.apply(item.value) {
 		item.send_context(ctx, dst)
 	}
@@ -954,14 +969,14 @@ pub fn (op &FilterOperator) err(ctx context.Context, item Item, dst chan Item, o
 pub fn (op &FilterOperator) end(_ context.Context, _ chan Item) {
 }
 
-pub fn (op &FilterOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &FilterOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // find emits the first item passing a predicate then complete.
 pub fn (o &ObservableImpl) find(find Predicate, opts ...RxOption) OptionalSingle {
-	return optionalSingle(o.parent, o, fn [find] () Operator {
+	return optional_single(o.parent, o, fn [find] () Operator {
 		return &FindOperator{
-			find: find,
+			find: find
 		}
 	}, true, true, ...opts)
 }
@@ -984,13 +999,13 @@ pub fn (op &FindOperator) err(ctx context.Context, item Item, dst chan Item, ope
 pub fn (op &FindOperator) end(_ context.Context, _ chan Item) {
 }
 
-pub fn (op &FindOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &FindOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // first returns new Observable which emit only first item.
 // Cannot be run in parallel.
 pub fn (o &ObservableImpl) first(opts ...RxOption) OptionalSingle {
-	return optionalSingle(o.parent, o, fn () Operator {
+	return optional_single(o.parent, o, fn () Operator {
 		return &FirstOperator{}
 	}, true, false, ...opts)
 }
@@ -1009,7 +1024,7 @@ pub fn (op &FirstOperator) err(ctx context.Context, item Item, dst chan Item, op
 pub fn (op &FirstOperator) end(_ context.Context, _ chan Item) {
 }
 
-pub fn (op &FirstOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &FirstOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // first_or_default returns new Observable which emit only first item.
@@ -1018,7 +1033,7 @@ pub fn (op &FirstOperator) gather_next(_ context.Context, _ Item, _ chan Item, _
 pub fn (o &ObservableImpl) first_or_default(default_value ItemValue, opts ...RxOption) Single {
 	return single(o.parent, o, fn [default_value] () Operator {
 		return &FirstOrDefaultOperator{
-			default_value: default_value,
+			default_value: default_value
 		}
 	}, true, false, ...opts)
 }
@@ -1026,7 +1041,7 @@ pub fn (o &ObservableImpl) first_or_default(default_value ItemValue, opts ...RxO
 struct FirstOrDefaultOperator {
 	default_value ItemValue
 mut:
-	sent         bool
+	sent bool
 }
 
 pub fn (mut op FirstOrDefaultOperator) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
@@ -1045,17 +1060,18 @@ pub fn (op &FirstOrDefaultOperator) end(ctx context.Context, dst chan Item) {
 	}
 }
 
-pub fn (op &FirstOrDefaultOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &FirstOrDefaultOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // flat_map transforms the items emitted by an Observable into Observables, then flatten the emissions from those into a single Observable.
 pub fn (o &ObservableImpl) flat_map(apply ItemToObservable, opts ...RxOption) Observable {
-	f := fn [apply] (ctx context.Context, next chan Item, option Option, opts ...RxOption) {
+	f := fn [o, apply] (ctx context.Context, next chan Item, option RxOption, opts ...RxOption) {
 		defer {
 			next.close()
 		}
 
 		observe := o.observe(...opts)
+		mut observe2 := chan Item{}
 		done := ctx.done()
 
 		for select {
@@ -1063,9 +1079,9 @@ pub fn (o &ObservableImpl) flat_map(apply ItemToObservable, opts ...RxOption) Ob
 				return
 			}
 			item := <-observe {
-				observe2 := apply(item).observe(...opts)
+				observe2 = apply(item).observe(...opts)
 			}
-			loop2:
+			else {
 				for select {
 					_ := <-done {
 						return
@@ -1082,10 +1098,10 @@ pub fn (o &ObservableImpl) flat_map(apply ItemToObservable, opts ...RxOption) Ob
 							}
 						}
 					}
-				} {} else {
-					break loop2
+				} {
 				}
 			}
+		} {
 		}
 	}
 
@@ -1093,7 +1109,7 @@ pub fn (o &ObservableImpl) flat_map(apply ItemToObservable, opts ...RxOption) Ob
 }
 
 // for_each subscribes to the Observable and receives notifications for each element.
-pub fn (o &ObservableImpl) for_each(handle_next NextFunc, handle_err ErrFunc, handle_complete CompletedFunc, opts ...RxOption) Disposed {
+pub fn (o &ObservableImpl) for_each(handle_next NextFunc, handle_err ErrFunc, handle_complete CompletedFunc, opts ...RxOption) chan int {
 	dispose := chan int{cap: 1}
 
 	handler := fn [dispose, handle_next, handle_err, handle_complete] (ctx context.Context, src chan Item) {
@@ -1109,13 +1125,15 @@ pub fn (o &ObservableImpl) for_each(handle_next NextFunc, handle_err ErrFunc, ha
 				handle_complete()
 				return
 			}
-			i <-src {
+			i := <-src {
 				if i.is_error() {
 					return
 				}
 				handle_next(i.value)
 			}
-		} {} else {
+		} {
+		}
+		{
 			handle_complete()
 		}
 	}
@@ -1138,7 +1156,7 @@ pub fn (o &ObservableImpl) ignore_elements(opts ...RxOption) Observable {
 
 struct IgnoreElementsOperator {}
 
-pub fn (op &IgnoreElementsOperator) next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &IgnoreElementsOperator) next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 pub fn (op &IgnoreElementsOperator) err(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
@@ -1148,7 +1166,7 @@ pub fn (op &IgnoreElementsOperator) err(ctx context.Context, item Item, dst chan
 pub fn (op &IgnoreElementsOperator) end(_ context.Context, _ chan Item) {
 }
 
-pub fn (op &IgnoreElementsOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &IgnoreElementsOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // abs returns absolute value for i64
@@ -1163,20 +1181,19 @@ pub type TimeExtractorFn = fn (ItemValue) time.Time
 // a time window defined according to an item emitted by the other Observable.
 // The time is extracted using a time_extractor function.
 pub fn (o &ObservableImpl) join(joiner Func2, right Observable, time_extractor TimeExtractorFn, window Duration, opts ...RxOption) Observable {
-	f := fn [joiner, right, time_extractor, window] (ctx context.Context, next chan Item, option Option, opts ...RxOption) {
+	f := fn [o, joiner, right, time_extractor, window] (ctx context.Context, next chan Item, option RxOption, opts ...RxOption) {
 		defer {
 			next.close()
 		}
 		window_duration := i64(window.duration())
-		r_buf := []Item{}
+		mut r_buf := []Item{}
 
 		l_observe := o.observe()
 		r_observe := right.observe()
 
 		done := ctx.done()
 
-	l_loop:
-		for select {
+		lloop: for select {
 			_ := <-done {
 				return
 			}
@@ -1191,22 +1208,22 @@ pub fn (o &ObservableImpl) join(joiner Func2, right Observable, time_extractor T
 					}
 					continue
 				}
-				l_time := time_extractor(l_item.value).unix_nano()
+				l_time := time_extractor(l_item.value).unix_time()
 				cut_point := 0
 				for i, r_item in r_buf {
-					r_time := time_extractor(r_item.value).unix_nano()
-					if abs(l_time-r_time) <= window_duration {
-						if i := joiner(ctx, l_item.value, r_item.value) {
-							of(i).send_context(ctx, next)
+					r_time := time_extractor(r_item.value).unix_time()
+					if abs(l_time - r_time) <= window_duration {
+						if it := joiner(ctx, l_item.value, r_item.value) {
+							of(it).send_context(ctx, next)
 						} else {
-							error(err).send_context(ctx, next)
+							from_error(err).send_context(ctx, next)
 							if option.get_error_strategy() == .stop_on_error {
 								return
 							}
 							continue
 						}
 					}
-					if l_time > r_time+window_duration {
+					if l_time > r_time + window_duration {
 						cut_point = i + 1
 					}
 				}
@@ -1219,7 +1236,8 @@ pub fn (o &ObservableImpl) join(joiner Func2, right Observable, time_extractor T
 					}
 					r_item := <-r_observe {
 						if isnil(r_item.value) {
-							continue l_loop
+							// continue lloop
+							continue
 						}
 						if r_item.is_error() {
 							r_item.send_context(ctx, next)
@@ -1230,143 +1248,150 @@ pub fn (o &ObservableImpl) join(joiner Func2, right Observable, time_extractor T
 						}
 
 						r_buf << r_item
-						r_time := time_extractor(r_item.value).unix_nano()
-						if abs(l_time-r_time) <= window_duration {
+						r_time := time_extractor(r_item.value).unix_time()
+						if abs(l_time - r_time) <= window_duration {
 							if i := joiner(ctx, l_item.value, r_item.value) {
 								of(i).send_context(ctx, next)
 								continue
 							} else {
-								error(err).send_context(ctx, next)
+								from_error(err).send_context(ctx, next)
 								if option.get_error_strategy() == .stop_on_error {
 									return
 								}
 								continue
 							}
 						}
-						continue l_loop
+						// continue lloop
+						continue
 					}
-				} {}
+				} {
+				}
 			}
-		} {}
+		} {
+		}
 	}
 
 	return custom_observable_operator(o.parent, f, ...opts)
 }
 
 // GroupBy divides an Observable into a set of Observables that each emit a different group of items from the original Observable, organized by key.
-pub fn (o &ObservableImpl) group_by(length int, distribution fn (Item) int, opts ...RxOption) Observable {
+pub fn (o &ObservableImpl) group_by(length int, distribution DistributionFn, opts ...RxOption) Observable {
 	option := parse_options(...opts)
 	ctx := option.build_context(o.parent)
 
-	s := make([]Item, length)
-	chs := make([]chan Item, length)
-	for i := 0; i < length; i++ {
-		ch := option.buildChannel()
+	mut s := []Item{len: length}
+	mut chs := []chan Item{len: length}
+	for i in 0 .. length {
+		ch := option.build_channel()
 		chs[i] = ch
 		s[i] = of(&ObservableImpl{
-			iterable: newChannelIterable(ch),
+			iterable: new_channel_iterable(ch)
 		})
 	}
 
-	go fn () {
+	go fn [ctx, o, opts, chs, length, distribution] () {
 		observe := o.observe(...opts)
-		defer fn () {
-			for i := 0; i < length; i++ {
-				close(chs[i])
-			}
-		}()
-
-		for select {
-			case <-ctx.done():
-				return
-			item := <-observe:
-				if !ok {
-					return
+		defer {
+			fn [chs, length] () {
+				for i in 0 .. length {
+					chs[i].close()
 				}
+			}()
+		}
+
+		done := ctx.done()
+		for select {
+			_ := <-done {
+				return
+			}
+			item := <-observe {
 				idx := distribution(item)
 				if idx >= length {
-					err := error(IndexOutofBoundError{error: fmt.Sprintf("index %d, length %d", idx, length)})
-					for i := 0; i < length; i++ {
+					err := from_error(new_index_out_of_bound_error('index $idx, length $length'))
+					for i in 0 .. length {
 						err.send_context(ctx, chs[i])
 					}
 					return
 				}
 				item.send_context(ctx, chs[idx])
 			}
+		} {
 		}
 	}()
 
 	return &ObservableImpl{
-		iterable: newSliceIterable(s, ...opts),
+		iterable: new_slice_iterable(s, ...opts)
 	}
 }
 
 // GroupedObservable is the observable type emitted by the GroupByDynamic operator.
 struct GroupedObservable {
-	Observable
-	// Key is the distribution key
-	Key string
+	ObservableImpl
+	key string // key is the distribution key
 }
 
 // GroupByDynamic divides an Observable into a dynamic set of Observables that each emit GroupedObservable from the original Observable, organized by key.
-pub fn (o &ObservableImpl) group_by_dynamic(distribution fn (Item) string, opts ...RxOption) Observable {
+pub fn (o &ObservableImpl) group_by_dynamic(distribution DistributionStrFn, opts ...RxOption) Observable {
 	option := parse_options(...opts)
-	next := option.buildChannel()
+	next := option.build_channel()
 	ctx := option.build_context(o.parent)
-	chs := make(map[string]chan Item)
+	mut chs := map[string]chan Item{}
 
-	go fn () {
+	go fn [o, ctx, distribution, opts, mut chs, option, next] () {
 		observe := o.observe(...opts)
-	loop:
+
+		done := ctx.done()
 		for select {
-			case <-ctx.done():
-				break loop
-			case i, ok := <-observe:
-				if !ok {
-					break loop
-				}
+			_ := <-done {
+				break
+			}
+			i := <-observe {
 				idx := distribution(i)
-				ch, contains := chs[idx]
-				if !contains {
-					ch = option.buildChannel()
+				if idx !in chs {
+					ch := option.build_channel()
 					chs[idx] = ch
-					of(GroupedObservable{
-						Observable: &ObservableImpl{
-							iterable: newChannelIterable(ch),
-						},
-						Key: idx,
-					}).send_context(ctx, next)
+					mut grouped := GroupedObservable
+					{
+						iterable:
+						new_channel_iterable(ch)
+						key:
+						idx
+					}
+					of(grouped).send_context(ctx, next)
 				}
+				ch := chs[idx]
 				i.send_context(ctx, ch)
 			}
+		} {
 		}
-		for _, ch := range chs {
-			close(ch)
+		for _, ch in chs {
+			ch.close()
 		}
-		close(next)
+		next.close()
 	}()
 
 	return &ObservableImpl{
-		iterable: newChannelIterable(next),
+		iterable: new_channel_iterable(next)
 	}
 }
 
 // Last returns a new Observable which emit only last item.
 // Cannot be run in parallel.
 pub fn (o &ObservableImpl) last(opts ...RxOption) OptionalSingle {
-	return optionalSingle(o.parent, o, fn () Operator {
+	return optional_single(o.parent, o, fn () Operator {
 		return &LastOperator{
-			empty: true,
+			empty: true
 		}
 	}, true, false, ...opts)
 }
 
 struct LastOperator {
+mut:
 	last  Item
 	empty bool
 }
 
-pub fn (op &LastOperator) next(_ context.Context, item Item, _ chan Item, _ operator_options) {
+pub fn (mut op LastOperator) next(_ context.Context, item Item, _ chan Item, _ OperatorOptions) {
 	op.last = item
 	op.empty = false
 }
@@ -1381,28 +1406,29 @@ pub fn (op &LastOperator) end(ctx context.Context, dst chan Item) {
 	}
 }
 
-pub fn (op &LastOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &LastOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // LastOrDefault returns a new Observable which emit only last item.
 // If the observable fails to emit any items, it emits a default value.
 // Cannot be run in parallel.
-pub fn (o &ObservableImpl) last_or_default(default_value interface{}, opts ...RxOption) Single {
-	return single(o.parent, o, fn () Operator {
+pub fn (o &ObservableImpl) last_or_default(default_value ItemValue, opts ...RxOption) Single {
+	return single(o.parent, o, fn [default_value] () Operator {
 		return &LastOrDefaultOperator{
-			default_value: default_value,
-			empty:        true,
+			default_value: default_value
+			empty: true
 		}
 	}, true, false, ...opts)
 }
 
 struct LastOrDefaultOperator {
-	default_value interface{}
-	last         Item
-	empty        bool
+	default_value ItemValue
+mut:
+	last  Item
+	empty bool
 }
 
-pub fn (op &LastOrDefaultOperator) next(_ context.Context, item Item, _ chan Item, _ operator_options) {
+pub fn (mut op LastOrDefaultOperator) next(_ context.Context, item Item, _ chan Item, _ OperatorOptions) {
 	op.last = item
 	op.empty = false
 }
@@ -1419,13 +1445,13 @@ pub fn (op &LastOrDefaultOperator) end(ctx context.Context, dst chan Item) {
 	}
 }
 
-pub fn (op &LastOrDefaultOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &LastOrDefaultOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
-// Map transforms the items emitted by an Observable by applying a function to each item.
+// map transforms the items emitted by an Observable by applying a function to each item.
 pub fn (o &ObservableImpl) map(apply Func, opts ...RxOption) Observable {
 	return observable(o.parent, o, fn () Operator {
-		return &MapOperator{apply: apply}
+		return &MapOperator{ apply: apply }
 	}, false, true, ...opts)
 }
 
@@ -1434,9 +1460,8 @@ struct MapOperator {
 }
 
 pub fn (op &MapOperator) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	res, err := op.apply(ctx, item.value)
-	if err != nil {
-		error(err).send_context(ctx, dst)
+	res := op.apply(ctx, item.value) or {
+		from_error(err).send_context(ctx, dst)
 		operator_options.stop()
 		return
 	}
@@ -1450,9 +1475,8 @@ pub fn (op &MapOperator) err(ctx context.Context, item Item, dst chan Item, oper
 pub fn (op &MapOperator) end(_ context.Context, _ chan Item) {
 }
 
-pub fn (op &MapOperator) gather_next(ctx context.Context, item Item, dst chan Item, _ operator_options) {
-	switch item.value.(type) {
-	case *mapOperator:
+pub fn (op &MapOperator) gather_next(ctx context.Context, item Item, dst chan Item, _ OperatorOptions) {
+	if item.value is MapOperator {
 		return
 	}
 	item.send_context(ctx, dst)
@@ -1460,31 +1484,32 @@ pub fn (op &MapOperator) gather_next(ctx context.Context, item Item, dst chan It
 
 // Marshal transforms the items emitted by an Observable by applying a marshalling to each item.
 pub fn (o &ObservableImpl) marshal(marshaller Marshaller, opts ...RxOption) Observable {
-	return o.Map(fn (_ context.Context, i interface{}) (interface{}, error) {
-		return marshaller(i)
+	return o.map(fn [marshaller] (_ context.Context, i ItemValue) ?ItemValue {
+		return (marshaller(i) ?).map(ItemValue(it))
 	}, ...opts)
 }
 
 // Max determines and emits the maximum-valued item emitted by an Observable according to a comparator.
 pub fn (o &ObservableImpl) max(comparator Comparator, opts ...RxOption) OptionalSingle {
-	return optionalSingle(o.parent, o, fn () Operator {
+	return optional_single(o.parent, o, fn [comparator] () Operator {
 		return &MaxOperator{
-			comparator: comparator,
-			empty:      true,
+			comparator: comparator
+			empty: true
 		}
 	}, false, false, ...opts)
 }
 
 struct MaxOperator {
 	comparator Comparator
-	empty      bool
-	max        interface{}
+mut:
+	empty bool
+	max   ItemValue
 }
 
-pub fn (op &MaxOperator) next(_ context.Context, item Item, _ chan Item, _ operator_options) {
+pub fn (mut op MaxOperator) next(_ context.Context, item Item, _ chan Item, _ OperatorOptions) {
 	op.empty = false
 
-	if op.max == nil {
+	if isnil(op.max) {
 		op.max = item.value
 	} else {
 		if op.comparator(op.max, item.value) < 0 {
@@ -1503,30 +1528,32 @@ pub fn (op &MaxOperator) end(ctx context.Context, dst chan Item) {
 	}
 }
 
-pub fn (op &MaxOperator) gather_next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	op.next(ctx, of(item.value.(*maxOperator).max), dst, operator_options)
+pub fn (mut op MaxOperator) gather_next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
+	val := item.value as MaxOperator
+	op.next(ctx, of(val.max), dst, operator_options)
 }
 
 // Min determines and emits the minimum-valued item emitted by an Observable according to a comparator.
 pub fn (o &ObservableImpl) min(comparator Comparator, opts ...RxOption) OptionalSingle {
-	return optionalSingle(o.parent, o, fn () Operator {
+	return optional_single(o.parent, o, fn [comparator] () Operator {
 		return &MinOperator{
-			comparator: comparator,
-			empty:      true,
+			comparator: comparator
+			empty: true
 		}
 	}, false, false, ...opts)
 }
 
 struct MinOperator {
 	comparator Comparator
-	empty      bool
-	max        interface{}
+mut:
+	empty bool
+	max   ItemValue
 }
 
-pub fn (op &MinOperator) next(_ context.Context, item Item, _ chan Item, _ operator_options) {
+pub fn (mut op MinOperator) next(_ context.Context, item Item, _ chan Item, _ OperatorOptions) {
 	op.empty = false
 
-	if op.max == nil {
+	if isnil(op.max) {
 		op.max = item.value
 	} else {
 		if op.comparator(op.max, item.value) > 0 {
@@ -1545,8 +1572,9 @@ pub fn (op &MinOperator) end(ctx context.Context, dst chan Item) {
 	}
 }
 
-pub fn (op &MinOperator) gather_next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	op.next(ctx, of(item.value.(*minOperator).max), dst, operator_options)
+pub fn (mut op MinOperator) gather_next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
+	val := item.value as MinOperator
+	op.next(ctx, of(val.max), dst, operator_options)
 }
 
 // Observe observes an Observable by returning its channel.
@@ -1556,102 +1584,102 @@ pub fn (o &ObservableImpl) observe(opts ...RxOption) chan Item {
 
 // OnErrorResumeNext instructs an Observable to pass control to another Observable rather than invoking
 // onError if it encounters an error.
-pub fn (o &ObservableImpl) on_error_resume_next(resumeSequence ErrorToObservable, opts ...RxOption) Observable {
+pub fn (o &ObservableImpl) on_error_resume_next(resume_sequence ErrorToObservable, opts ...RxOption) Observable {
 	return observable(o.parent, o, fn () Operator {
-		return &OnErrorResumeNextOperator{resumeSequence: resumeSequence}
+		return &OnErrorResumeNextOperator{ resume_sequence: resume_sequence }
 	}, true, false, ...opts)
 }
 
 struct OnErrorResumeNextOperator {
-	resumeSequence ErrorToObservable
+	resume_sequence ErrorToObservable
 }
 
-pub fn (op &OnErrorResumeNextOperator) next(ctx context.Context, item Item, dst chan Item, _ operator_options) {
+pub fn (op &OnErrorResumeNextOperator) next(ctx context.Context, item Item, dst chan Item, _ OperatorOptions) {
 	item.send_context(ctx, dst)
 }
 
 pub fn (op &OnErrorResumeNextOperator) err(_ context.Context, item Item, _ chan Item, operator_options OperatorOptions) {
-	operator_options.resetIterable(op.resumeSequence(item.err))
+	operator_options.reset_iterable(op.resume_sequence(item.err))
 }
 
 pub fn (op &OnErrorResumeNextOperator) end(_ context.Context, _ chan Item) {
 }
 
-pub fn (op &OnErrorResumeNextOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &OnErrorResumeNextOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // OnErrorReturn instructs an Observable to emit an item (returned by a specified function)
 // rather than invoking onError if it encounters an error.
-pub fn (o &ObservableImpl) on_error_return(resumeFunc ErrorFunc, opts ...RxOption) Observable {
+pub fn (o &ObservableImpl) on_error_return(resume_fn ErrorFunc, opts ...RxOption) Observable {
 	return observable(o.parent, o, fn () Operator {
-		return &OnErrorReturnOperator{resumeFunc: resumeFunc}
+		return &OnErrorReturnOperator{ resume_fn: resume_fn }
 	}, true, false, ...opts)
 }
 
 struct OnErrorReturnOperator {
-	resumeFunc ErrorFunc
+	resume_fn ErrorFunc
 }
 
-pub fn (op &OnErrorReturnOperator) next(ctx context.Context, item Item, dst chan Item, _ operator_options) {
+pub fn (op &OnErrorReturnOperator) next(ctx context.Context, item Item, dst chan Item, _ OperatorOptions) {
 	item.send_context(ctx, dst)
 }
 
-pub fn (op &OnErrorReturnOperator) err(ctx context.Context, item Item, dst chan Item, _ operator_options) {
-	of(op.resumeFn (item.err)).send_context(ctx, dst)
+pub fn (op &OnErrorReturnOperator) err(ctx context.Context, item Item, dst chan Item, _ OperatorOptions) {
+	of(op.resume_fn(item.err)).send_context(ctx, dst)
 }
 
 pub fn (op &OnErrorReturnOperator) end(_ context.Context, _ chan Item) {
 }
 
-pub fn (op &OnErrorReturnOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &OnErrorReturnOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // OnErrorReturnItem instructs on Observable to emit an item if it encounters an error.
-pub fn (o &ObservableImpl) on_error_return_item(resume interface{}, opts ...RxOption) Observable {
-	return observable(o.parent, o, fn () Operator {
-		return &OnErrorReturnItemOperator{resume: resume}
+pub fn (o &ObservableImpl) on_error_return_item(resume ItemValue, opts ...RxOption) Observable {
+	return observable(o.parent, o, fn [resume] () Operator {
+		return &OnErrorReturnItemOperator{ resume: resume }
 	}, true, false, ...opts)
 }
 
 struct OnErrorReturnItemOperator {
-	resume interface{}
+	resume ItemValue
 }
 
-pub fn (op &OnErrorReturnItemOperator) next(ctx context.Context, item Item, dst chan Item, _ operator_options) {
+pub fn (op &OnErrorReturnItemOperator) next(ctx context.Context, item Item, dst chan Item, _ OperatorOptions) {
 	item.send_context(ctx, dst)
 }
 
-pub fn (op &OnErrorReturnItemOperator) err(ctx context.Context, _ Item, dst chan Item, _ operator_options) {
+pub fn (op &OnErrorReturnItemOperator) err(ctx context.Context, _ Item, dst chan Item, _ OperatorOptions) {
 	of(op.resume).send_context(ctx, dst)
 }
 
 pub fn (op &OnErrorReturnItemOperator) end(_ context.Context, _ chan Item) {
 }
 
-pub fn (op &OnErrorReturnItemOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &OnErrorReturnItemOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // Reduce applies a function to each item emitted by an Observable, sequentially, and emit the final value.
 pub fn (o &ObservableImpl) reduce(apply Func2, opts ...RxOption) OptionalSingle {
-	return optionalSingle(o.parent, o, fn () Operator {
+	return optional_single(o.parent, o, fn [apply] () Operator {
 		return &ReduceOperator{
-			apply: apply,
-			empty: true,
+			apply: apply
+			empty: true
 		}
 	}, false, false, ...opts)
 }
 
 struct ReduceOperator {
 	apply Func2
-	acc   interface{}
+mut:
+	acc   ItemValue
 	empty bool
 }
 
-pub fn (op &ReduceOperator) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
+pub fn (mut op ReduceOperator) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
 	op.empty = false
-	v, err := op.apply(ctx, op.acc, item.value)
-	if err != nil {
-		error(err).send_context(ctx, dst)
+	v := op.apply(ctx, op.acc, item.value) or {
+		from_error(err).send_context(ctx, dst)
 		operator_options.stop()
 		op.empty = true
 		return
@@ -1659,7 +1687,7 @@ pub fn (op &ReduceOperator) next(ctx context.Context, item Item, dst chan Item, 
 	op.acc = v
 }
 
-pub fn (op &ReduceOperator) err(_ context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
+pub fn (mut op ReduceOperator) err(_ context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
 	dst <- item
 	operator_options.stop()
 	op.empty = true
@@ -1671,89 +1699,93 @@ pub fn (op &ReduceOperator) end(ctx context.Context, dst chan Item) {
 	}
 }
 
-pub fn (op &ReduceOperator) gather_next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	op.next(ctx, of(item.value.(*reduceOperator).acc), dst, operator_options)
+pub fn (mut op ReduceOperator) gather_next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
+	val := item.value as ReduceOperator
+	op.next(ctx, of(val.acc), dst, operator_options)
 }
 
 // Repeat returns an Observable that repeats the sequence of items emitted by the source Observable
 // at most count times, at a particular frequency.
 // Cannot run in parallel.
 pub fn (o &ObservableImpl) repeat(count i64, frequency Duration, opts ...RxOption) Observable {
-	if count != Infinite {
+	if count != infinite {
 		if count < 0 {
-			return thrown(IllegalInputError{error: "count must be positive"})
+			return thrown(new_illegal_input_error('count must be positive'))
 		}
 	}
 
-	return observable(o.parent, o, fn () Operator {
+	return observable(o.parent, o, fn [count, frequency] () Operator {
 		return &RepeatOperator{
-			count:     count,
-			frequency: frequency,
-			seq:       make([]Item, 0),
+			count: count
+			frequency: frequency
+			seq: []Item{}
 		}
 	}, true, false, ...opts)
 }
 
 struct RepeatOperator {
+mut:
 	count     i64
 	frequency time.Duration
 	seq       []Item
 }
 
-pub fn (op &RepeatOperator) next(ctx context.Context, item Item, dst chan Item, _ operator_options) {
+pub fn (mut op RepeatOperator) next(ctx context.Context, item Item, dst chan Item, _ OperatorOptions) {
 	item.send_context(ctx, dst)
-	op.seq = append(op.seq, item)
+	op.seq << item
 }
 
 pub fn (op &RepeatOperator) err(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
 	default_error_func_operator(ctx, item, dst, operator_options)
 }
 
-pub fn (op &RepeatOperator) end(ctx context.Context, dst chan Item) {
+pub fn (mut op RepeatOperator) end(ctx context.Context, dst chan Item) {
 	for {
+		done := ctx.done()
 		select {
-		default:
-		case <-ctx.done():
-			return
+			_ := <-done {
+				return
+			}
+			else {}
 		}
-		if op.count != Infinite {
+		if op.count != infinite {
 			if op.count == 0 {
 				break
 			}
 		}
-		if op.frequency != nil {
-			time.Sleep(op.frequency.duration())
+		if !isnil(op.frequency) {
+			time.sleep(op.frequency)
 		}
-		for _, v := range op.seq {
+		for v in op.seq {
 			v.send_context(ctx, dst)
 		}
 		op.count = op.count - 1
 	}
 }
 
-pub fn (op &RepeatOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &RepeatOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // Retry retries if a source Observable sends an error, resubscribe to it in the hopes that it will complete without error.
 // Cannot be run in parallel.
-pub fn (o &ObservableImpl) retry(count int, shouldRetry fn (error) bool, opts ...RxOption) Observable {
+pub fn (o &ObservableImpl) retry(count int, should_retry RetryFn, opts ...RxOption) Observable {
 	option := parse_options(...opts)
-	next := option.buildChannel()
+	next := option.build_channel()
 	ctx := option.build_context(o.parent)
+	mut aux_count := count
 
-	go fn () {
-		observe := o.observe(...opts)
-	loop:
-		for select {
-			case <-ctx.done():
+	go fn [o, opts, next, ctx, mut aux_count, should_retry] () {
+		mut observe := o.observe(...opts)
+
+		done := ctx.done()
+		loop: for select {
+			_ := <-done {
 				break loop
-			case i, ok := <-observe:
-				if !ok {
-					break loop
-				}
+			}
+			i := <-observe {
 				if i.is_error() {
-					count--
-					if count < 0 || !shouldRetry(i.E) {
+					aux_count--
+					if aux_count < 0 || !should_retry(i.err) {
 						i.send_context(ctx, next)
 						break loop
 					}
@@ -1762,35 +1794,35 @@ pub fn (o &ObservableImpl) retry(count int, shouldRetry fn (error) bool, opts ..
 					i.send_context(ctx, next)
 				}
 			}
+		} {
 		}
-		close(next)
+		next.close()
 	}()
 
 	return &ObservableImpl{
-		iterable: newChannelIterable(next),
+		iterable: new_channel_iterable(next)
 	}
 }
 
 // Run creates an Observer without consuming the emitted items.
-pub fn (o &ObservableImpl) run(opts ...RxOption) Disposed {
+pub fn (o &ObservableImpl) run(opts ...RxOption) chan int {
 	dispose := chan int{cap: 1}
 	option := parse_options(...opts)
 	ctx := option.build_context(o.parent)
 
-	go fn () {
+	go fn [dispose, ctx, o, opts] () {
 		defer {
 			dispose <- 0
 			dispose.close()
 		}
 		observe := o.observe(...opts)
+		done := ctx.done()
 		for select {
-			case <-ctx.done():
+			_ := <-done {
 				return
-			case _, ok := <-observe:
-				if !ok {
-					return
-				}
 			}
+			ok := <-observe {}
+		} {
 		}
 	}()
 
@@ -1801,71 +1833,69 @@ pub fn (o &ObservableImpl) run(opts ...RxOption) Disposed {
 // Iterable whenever the input Iterable emits an item.
 pub fn (o &ObservableImpl) sample(iterable Iterable, opts ...RxOption) Observable {
 	option := parse_options(...opts)
-	next := option.buildChannel()
+	next := option.build_channel()
 	ctx := option.build_context(o.parent)
-	itCh := make(chan Item)
-	obsCh := make(chan Item)
+	it_ch := chan Item{}
+	obs_ch := chan Item{}
 
-	go fn () {
-		defer close(obsCh)
+	go fn [ctx, o, opts, obs_ch] () {
+		defer {
+			obs_ch.close()
+		}
 		observe := o.observe(...opts)
+		done := ctx.done()
 		for select {
-			case <-ctx.done():
+			_ := <-done {
 				return
-			case i, ok := <-observe:
-				if !ok {
-					return
-				}
-				i.send_context(ctx, obsCh)
 			}
+			i := <-observe {
+				i.send_context(ctx, obs_ch)
+			}
+		} {
 		}
 	}()
 
-	go fn () {
-		defer close(itCh)
+	go fn [it_ch, iterable, opts, ctx] () {
+		defer {
+			it_ch.close()
+		}
 		observe := iterable.observe(...opts)
+		done := ctx.done()
 		for select {
-			case <-ctx.done():
+			_ := <-done {
 				return
-			case i, ok := <-observe:
-				if !ok {
-					return
-				}
-				i.send_context(ctx, itCh)
 			}
+			i := <-observe {
+				i.send_context(ctx, it_ch)
+			}
+		} {
 		}
 	}()
 
-	go fn () {
+	go fn [next, it_ch, next, obs_ch] () {
 		defer {
 			next.close()
 		}
-		var lastEmittedItem Item
-		isItemWaitingToBeEmitted := false
+		mut last_emitted_item := Item{}
+		mut is_item_waiting_to_be_emitted := false
 
 		for select {
-			case _, ok := <-itCh:
-				if ok {
-					if isItemWaitingToBeEmitted {
-						next <- lastEmittedItem
-						isItemWaitingToBeEmitted = false
-					}
-				} else {
-					return
-				}
-			item := <-obsCh:
-				if ok {
-					lastEmittedItem = item
-					isItemWaitingToBeEmitted = true
-				} else {
-					return
+			_ := <-it_ch {
+				if is_item_waiting_to_be_emitted {
+					next <- last_emitted_item
+					is_item_waiting_to_be_emitted = false
 				}
 			}
+			item := <-obs_ch {
+				last_emitted_item = item
+				is_item_waiting_to_be_emitted = true
+			}
+		} {
 		}
 	}()
 
 	return &ObservableImpl{
-		iterable: newChannelIterable(next),
+		iterable: new_channel_iterable(next)
 	}
 }
 
@@ -1874,20 +1904,20 @@ pub fn (o &ObservableImpl) sample(iterable Iterable, opts ...RxOption) Observabl
 pub fn (o &ObservableImpl) scan(apply Func2, opts ...RxOption) Observable {
 	return observable(o.parent, o, fn () Operator {
 		return &ScanOperator{
-			apply: apply,
+			apply: apply
 		}
 	}, true, false, ...opts)
 }
 
 struct ScanOperator {
-	apply   Func2
-	current interface{}
+	apply Func2
+mut:
+	current ItemValue
 }
 
-pub fn (op &ScanOperator) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	v, err := op.apply(ctx, op.current, item.value)
-	if err != nil {
-		error(err).send_context(ctx, dst)
+pub fn (mut op ScanOperator) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
+	v := op.apply(ctx, op.current, item.value) or {
+		from_error(err).send_context(ctx, dst)
 		operator_options.stop()
 		return
 	}
@@ -1902,44 +1932,42 @@ pub fn (op &ScanOperator) err(ctx context.Context, item Item, dst chan Item, ope
 pub fn (op &ScanOperator) end(_ context.Context, _ chan Item) {
 }
 
-pub fn (op &ScanOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &ScanOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // Compares first items of two sequences and returns true if they are equal and false if
 // they are not. Besides, it returns two new sequences - input sequences without compared items.
-func popAndCompareFirstItems(
-	inputSequence1 []interface{},
-	inputSequence2 []interface{}) (bool, []interface{}, []interface{}) {
-	if len(inputSequence1) > 0 && len(inputSequence2) > 0 {
-		s1, sequence1 := inputSequence1[0], inputSequence1[1..]
-		s2, sequence2 := inputSequence2[0], inputSequence2[1..]
+fn pop_and_compare_first_items(input_sequence1 []ItemValue, input_sequence2 []ItemValue) (bool, []ItemValue, []ItemValue) {
+	if input_sequence1.len > 0 && input_sequence2.len > 0 {
+		s1, sequence1 := input_sequence1[0], input_sequence1[1..]
+		s2, sequence2 := input_sequence2[0], input_sequence2[1..]
 		return s1 == s2, sequence1, sequence2
 	}
-	return true, inputSequence1, inputSequence2
+	return true, input_sequence1, input_sequence2
 }
 
 // Send sends the items to a given channel.
 pub fn (o &ObservableImpl) send(output chan Item, opts ...RxOption) {
-	go fn () {
+	go fn [o, output, opts] () {
 		option := parse_options(...opts)
 		ctx := option.build_context(o.parent)
 		observe := o.observe(...opts)
-	loop:
-		for select {
-			case <-ctx.done():
+
+		done := ctx.done()
+		loop: for select {
+			_ := <-done {
 				break loop
-			case i, ok := <-observe:
-				if !ok {
-					break loop
-				}
+			}
+			i := <-observe {
 				if i.is_error() {
 					output <- i
 					break loop
 				}
 				i.send_context(ctx, output)
 			}
+		} {
 		}
-		close(output)
+		output.close()
 	}()
 }
 
@@ -1947,134 +1975,86 @@ pub fn (o &ObservableImpl) send(output chan Item, opts ...RxOption) {
 // in the same order, with the same termination state. Otherwise, it emits false.
 pub fn (o &ObservableImpl) sequence_equal(iterable Iterable, opts ...RxOption) Single {
 	option := parse_options(...opts)
-	next := option.buildChannel()
+	next := option.build_channel()
 	ctx := option.build_context(o.parent)
-	itCh := make(chan Item)
-	obsCh := make(chan Item)
+	it_ch := chan Item{}
+	obs_ch := chan Item{}
 
-	go fn () {
-		defer close(obsCh)
+	go fn [o, ctx, obs_ch, opts] () {
+		defer {
+			obs_ch.close()
+		}
 		observe := o.observe(...opts)
+		done := ctx.done()
 		for select {
-			case <-ctx.done():
+			_ := <-done {
 				return
-			case i, ok := <-observe:
-				if !ok {
-					return
-				}
-				i.send_context(ctx, obsCh)
 			}
+			i := <-observe {
+				i.send_context(ctx, obs_ch)
+			}
+		} {
 		}
 	}()
 
-	go fn () {
-		defer close(itCh)
+	go fn [o, ctx, it_ch, opts, iterable] () {
+		defer {
+			it_ch.close()
+		}
 		observe := iterable.observe(...opts)
+		done := ctx.done()
 		for select {
-			case <-ctx.done():
+			_ := <-done {
 				return
-			case i, ok := <-observe:
-				if !ok {
-					return
-				}
-				i.send_context(ctx, itCh)
 			}
+			i := <-observe {
+				i.send_context(ctx, it_ch)
+			}
+		} {
 		}
 	}()
 
-	go fn () {
-		var mainSequence []interface{}
-		var obsSequence []interface{}
-		areCorrect := true
-		isMainChannelClosed := false
-		isObsChannelClosed := false
+	go fn [ctx, next, it_ch, obs_ch] () {
+		mut main_sequence := []ItemValue{}
+		mut obs_sequence := []ItemValue{}
+		mut are_correct := true
 
-	mainLoop:
-		for select {
-			item := <-itCh:
-				if ok {
-					mainSequence = append(mainSequence, item)
-					areCorrect, mainSequence, obsSequence = popAndCompareFirstItems(mainSequence, obsSequence)
-				} else {
-					isMainChannelClosed = true
+		main_loop: for {
+			select {
+				item := <-it_ch {
+					main_sequence << item
+					are_correct, main_sequence, obs_sequence = pop_and_compare_first_items(main_sequence,
+						obs_sequence)
 				}
-			item := <-obsCh:
-				if ok {
-					obsSequence = append(obsSequence, item)
-					areCorrect, mainSequence, obsSequence = popAndCompareFirstItems(mainSequence, obsSequence)
-				} else {
-					isObsChannelClosed = true
+				item := <-obs_ch {
+					obs_sequence << item
+					are_correct, main_sequence, obs_sequence = pop_and_compare_first_items(main_sequence,
+						obs_sequence)
 				}
 			}
 
-			if !areCorrect || (isMainChannelClosed && isObsChannelClosed) {
-				break mainLoop
+			if !are_correct || (it_ch.closed && obs_ch.closed) {
+				break main_loop
 			}
 		}
 
-		of(areCorrect && len(mainSequence) == 0 && len(obsSequence) == 0).send_context(ctx, next)
-		close(next)
+		of(are_correct && main_sequence.len == 0 && obs_sequence.len == 0).send_context(ctx,
+			next)
+		next.close()
 	}()
 
 	return &SingleImpl{
-		iterable: newChannelIterable(next),
+		iterable: new_channel_iterable(next)
 	}
 }
 
 // Serialize forces an Observable to make serialized calls and to be well-behaved.
-pub fn (o &ObservableImpl) serialize(from int, identifier fn (interface{}) int, opts ...RxOption) Observable {
+pub fn (o &ObservableImpl) serialize(from int, identifier IdentifierFn, opts ...RxOption) Observable {
 	option := parse_options(...opts)
-	next := option.buildChannel()
-
-	ctx := option.build_context(o.parent)
-	minHeap := binaryheap.NewWith(fn (a, b interface{}) int {
-		return a.(int) - b.(int)
-	})
-	counter := i64(from)
-	items := make(map[int]interface{})
-
-	go fn () {
-		src := o.observe(...opts)
-		defer {
-			next.close()
-		}
-
-		for select {
-			case <-ctx.done():
-				return
-			item := <-src:
-				if !ok {
-					return
-				}
-				if item.is_error() {
-					next <- item
-					return
-				}
-
-				id := identifier(item.value)
-				minHeap.Push(id)
-				items[id] = item.value
-
-				for !minHeap.Empty() {
-					v, _ := minHeap.Peek()
-					id := v.(int)
-					if atomic.LoadInt64(&counter) == i64(id) {
-						if itemValue, contains := items[id]; contains {
-							minHeap.Pop()
-							delete(items, id)
-							of(itemValue).send_context(ctx, next)
-							counter++
-							continue
-						}
-					}
-					break
-				}
-			}
-		}
-	}()
+	next := option.build_channel()
 
 	return &ObservableImpl{
-		iterable: newChannelIterable(next),
+		iterable: new_channel_iterable(next)
 	}
 }
 
@@ -2084,19 +2064,20 @@ pub fn (o &ObservableImpl) serialize(from int, identifier fn (interface{}) int, 
 pub fn (o &ObservableImpl) skip(nth u32, opts ...RxOption) Observable {
 	return observable(o.parent, o, fn () Operator {
 		return &SkipOperator{
-			nth: nth,
+			nth: nth
 		}
 	}, true, false, ...opts)
 }
 
 struct SkipOperator {
-	nth       u32
-	skipCount int
+mut:
+	nth        u32
+	skip_count int
 }
 
-pub fn (op &SkipOperator) next(ctx context.Context, item Item, dst chan Item, _ operator_options) {
-	if op.skipCount < int(op.nth) {
-		op.skipCount++
+pub fn (mut op SkipOperator) next(ctx context.Context, item Item, dst chan Item, _ OperatorOptions) {
+	if op.skip_count < int(op.nth) {
+		op.skip_count++
 		return
 	}
 	item.send_context(ctx, dst)
@@ -2109,7 +2090,7 @@ pub fn (op &SkipOperator) err(ctx context.Context, item Item, dst chan Item, ope
 pub fn (op &SkipOperator) end(_ context.Context, _ chan Item) {
 }
 
-pub fn (op &SkipOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &SkipOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // SkipLast suppresses the last n items in the original Observable and
@@ -2118,22 +2099,23 @@ pub fn (op &SkipOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ 
 pub fn (o &ObservableImpl) skip_last(nth u32, opts ...RxOption) Observable {
 	return observable(o.parent, o, fn () Operator {
 		return &SkipLastOperator{
-			nth: nth,
+			nth: nth
 		}
 	}, true, false, ...opts)
 }
 
 struct SkipLastOperator {
-	nth       u32
-	skipCount int
+mut:
+	nth        u32
+	skip_count int
 }
 
-pub fn (op &SkipLastOperator) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	if op.skipCount >= int(op.nth) {
+pub fn (mut op SkipLastOperator) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
+	if op.skip_count >= int(op.nth) {
 		operator_options.stop()
 		return
 	}
-	op.skipCount++
+	op.skip_count++
 	item.send_context(ctx, dst)
 }
 
@@ -2144,26 +2126,27 @@ pub fn (op &SkipLastOperator) err(ctx context.Context, item Item, dst chan Item,
 pub fn (op &SkipLastOperator) end(_ context.Context, _ chan Item) {
 }
 
-pub fn (op &SkipLastOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &SkipLastOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // SkipWhile discard items emitted by an Observable until a specified condition becomes false.
 // Cannot be run in parallel.
 pub fn (o &ObservableImpl) skip_while(apply Predicate, opts ...RxOption) Observable {
-	return observable(o.parent, o, fn () Operator {
+	return observable(o.parent, o, fn [apply] () Operator {
 		return &SkipWhileOperator{
-			apply: apply,
-			skip:  true,
+			apply: apply
+			skip: true
 		}
 	}, true, false, ...opts)
 }
 
 struct SkipWhileOperator {
 	apply Predicate
-	skip  bool
+mut:
+	skip bool
 }
 
-pub fn (op &SkipWhileOperator) next(ctx context.Context, item Item, dst chan Item, _ operator_options) {
+pub fn (mut op SkipWhileOperator) next(ctx context.Context, item Item, dst chan Item, _ OperatorOptions) {
 	if !op.skip {
 		item.send_context(ctx, dst)
 	} else {
@@ -2181,152 +2164,155 @@ pub fn (op &SkipWhileOperator) err(ctx context.Context, item Item, dst chan Item
 pub fn (op &SkipWhileOperator) end(_ context.Context, _ chan Item) {
 }
 
-pub fn (op &SkipWhileOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &SkipWhileOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // StartWith emits a specified Iterable before beginning to emit the items from the source Observable.
 pub fn (o &ObservableImpl) start_with(iterable Iterable, opts ...RxOption) Observable {
 	option := parse_options(...opts)
-	next := option.buildChannel()
+	next := option.build_channel()
 	ctx := option.build_context(o.parent)
 
-	go fn () {
+	go fn [o, ctx, next, option, iterable, opts] () {
 		defer {
 			next.close()
 		}
-		observe := iterable.observe(...opts)
-	loop1:
-		for select {
-			case <-ctx.done():
+		mut observe := iterable.observe(...opts)
+
+		done := ctx.done()
+		loop1: for select {
+			_ := <-done {
 				break loop1
-			case i, ok := <-observe:
-				if !ok {
-					break loop1
-				}
+			}
+			i := <-observe {
 				if i.is_error() {
 					next <- i
 					return
 				}
 				i.send_context(ctx, next)
 			}
+		} {
 		}
 		observe = o.observe(...opts)
-	loop2:
-		for select {
-			case <-ctx.done():
+
+		loop2: for select {
+			_ := <-done {
 				break loop2
-			case i, ok := <-observe:
-				if !ok {
-					break loop2
-				}
+			}
+			i := <-observe {
 				if i.is_error() {
 					i.send_context(ctx, next)
 					return
 				}
 				i.send_context(ctx, next)
 			}
+		} {
 		}
 	}()
 
 	return &ObservableImpl{
-		iterable: newChannelIterable(next),
+		iterable: new_channel_iterable(next)
 	}
 }
 
-// SumFloat32 calculates the average of float32 emitted by an Observable and emits a float32.
-pub fn (o &ObservableImpl) sum_float32(opts ...RxOption) OptionalSingle {
-	return o.Reduce(fn (_ context.Context, acc, elem interface{}) (interface{}, error) {
-		if acc == nil {
-			acc = float32(0)
-		}
-		sum := acc.(float32)
-		switch i := elem.(type) {
-		default:
-			return nil, IllegalInputError{error: fmt.Sprintf("expected type: (float32|int|int8|int16|int32|i64), got: %t", elem)}
-		case int:
-			return sum + float32(i), nil
-		case int8:
-			return sum + float32(i), nil
-		case int16:
-			return sum + float32(i), nil
-		case int32:
-			return sum + float32(i), nil
-		case i64:
-			return sum + float32(i), nil
-		case float32:
-			return sum + i, nil
-		}
-	}, ...opts)
-}
-
-// SumFloat64 calculates the average of float64 emitted by an Observable and emits a float64.
-pub fn (o &ObservableImpl) sum_float64(opts ...RxOption) OptionalSingle {
-	return o.Reduce(fn (_ context.Context, acc, elem interface{}) (interface{}, error) {
-		if acc == nil {
-			acc = float64(0)
-		}
-		sum := acc.(float64)
-		switch i := elem.(type) {
-		default:
-			return nil, IllegalInputError{error: fmt.Sprintf("expected type: (float32|float64|int|int8|int16|int32|i64), got: %t", elem)}
-		case int:
-			return sum + float64(i), nil
-		case int8:
-			return sum + float64(i), nil
-		case int16:
-			return sum + float64(i), nil
-		case int32:
-			return sum + float64(i), nil
-		case i64:
-			return sum + float64(i), nil
-		case float32:
-			return sum + float64(i), nil
-		case float64:
-			return sum + i, nil
+// sum_f32 calculates the average of f32 emitted by an Observable and emits a f32.
+pub fn (o &ObservableImpl) sum_f32(opts ...RxOption) OptionalSingle {
+	return o.reduce(fn (_ context.Context, acc ItemValue, i ItemValue) ?ItemValue {
+		sum := if isnil(acc) { f32(0) } else { acc as f32 }
+		match i {
+			int {
+				return sum + f32(i)
+			}
+			i8 {
+				return sum + f32(i)
+			}
+			i16 {
+				return sum + f32(i)
+			}
+			i64 {
+				return sum + f32(i)
+			}
+			f32 {
+				return sum + i
+			}
+			else {
+				return new_illegal_input_error('expected type: (f32|int|i8|i16|int|i64), got: $i')
+			}
 		}
 	}, ...opts)
 }
 
-// SumInt64 calculates the average of integers emitted by an Observable and emits an i64.
+// sum_f64 calculates the average of f64 emitted by an Observable and emits a f64.
+pub fn (o &ObservableImpl) sum_f64(opts ...RxOption) OptionalSingle {
+	return o.reduce(fn (_ context.Context, acc ItemValue, i ItemValue) ?ItemValue {
+		sum := if isnil(acc) { f64(0) } else { acc as f64 }
+		match i {
+			int {
+				return sum + f64(i)
+			}
+			i8 {
+				return sum + f64(i)
+			}
+			i16 {
+				return sum + f64(i)
+			}
+			i64 {
+				return sum + f64(i)
+			}
+			f32 {
+				return sum + f64(i)
+			}
+			f64 {
+				return sum + i
+			}
+			else {
+				return new_illegal_input_error('expected type: (f32|f64|int|i8|i16|int|i64), got: $i')
+			}
+		}
+	}, ...opts)
+}
+
+// sum_i64 calculates the average of integers emitted by an Observable and emits an i64.
 pub fn (o &ObservableImpl) sum_i64(opts ...RxOption) OptionalSingle {
-	return o.Reduce(fn (_ context.Context, acc, elem interface{}) (interface{}, error) {
-		if acc == nil {
-			acc = i64(0)
-		}
-		sum := acc.(i64)
-		switch i := elem.(type) {
-		default:
-			return nil, IllegalInputError{error: fmt.Sprintf("expected type: (int|int8|int16|int32|i64), got: %t", elem)}
-		case int:
-			return sum + i64(i), nil
-		case int8:
-			return sum + i64(i), nil
-		case int16:
-			return sum + i64(i), nil
-		case int32:
-			return sum + i64(i), nil
-		case i64:
-			return sum + i, nil
+	return o.reduce(fn (_ context.Context, acc ItemValue, i ItemValue) ?ItemValue {
+		sum := if isnil(acc) { i64(0) } else { acc as i64 }
+		match i {
+			int {
+				return sum + i64(i)
+			}
+			i8 {
+				return sum + i64(i)
+			}
+			i16 {
+				return sum + i64(i)
+			}
+			i64 {
+				return sum + i
+			}
+			else {
+				return new_illegal_input_error('expected type: (int|i8|i16|int|i64), got: $i')
+			}
 		}
 	}, ...opts)
 }
 
-// Take emits only the first n items emitted by an Observable.
+// take emits only the first n items emitted by an Observable.
 // Cannot be run in parallel.
 pub fn (o &ObservableImpl) take(nth u32, opts ...RxOption) Observable {
 	return observable(o.parent, o, fn () Operator {
 		return &TakeOperator{
-			nth: nth,
+			nth: nth
 		}
 	}, true, false, ...opts)
 }
 
 struct TakeOperator {
-	nth       u32
+mut:
+	nth        u32
 	take_count int
 }
 
-pub fn (op &TakeOperator) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
+pub fn (mut op TakeOperator) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
 	if op.take_count >= int(op.nth) {
 		operator_options.stop()
 		return
@@ -2343,63 +2329,28 @@ pub fn (op &TakeOperator) err(ctx context.Context, item Item, dst chan Item, ope
 pub fn (op &TakeOperator) end(_ context.Context, _ chan Item) {
 }
 
-pub fn (op &TakeOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &TakeOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
-// TakeLast emits only the last n items emitted by an Observable.
+// take_last emits only the last n items emitted by an Observable.
 // Cannot be run in parallel.
 pub fn (o &ObservableImpl) take_last(nth u32, opts ...RxOption) Observable {
 	return observable(o.parent, o, fn () Operator {
 		n := int(nth)
 		return &TakeLast{
-			n: n,
-			r: ring.New(n),
+			n: n
+			r: ring.New(n)
 		}
 	}, true, false, ...opts)
 }
 
-struct TakeLast {
-	n     int
-	r     *ring.Ring
-	count int
-}
-
-pub fn (op &TakeLast) next(_ context.Context, item Item, _ chan Item, _ operator_options) {
-	op.count++
-	op.r.valuealue = item.value
-	op.r = op.r.Next()
-}
-
-pub fn (op &TakeLast) err(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	default_error_func_operator(ctx, item, dst, operator_options)
-}
-
-pub fn (op &TakeLast) end(ctx context.Context, dst chan Item) {
-	if op.count < op.n {
-		remaining := op.n - op.count
-		if remaining <= op.count {
-			op.r = op.r.Move(op.n - op.count)
-		} else {
-			op.r = op.r.Move(-op.count)
-		}
-		op.n = op.count
-	}
-	for i := 0; i < op.n; i++ {
-		of(op.r.valuealue).send_context(ctx, dst)
-		op.r = op.r.Next()
-	}
-}
-
-pub fn (op &TakeLast) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
-}
-
-// TakeUntil returns an Observable that emits items emitted by the source Observable,
+// take_until returns an Observable that emits items emitted by the source Observable,
 // checks the specified predicate for each item, and then completes when the condition is satisfied.
 // Cannot be run in parallel.
 pub fn (o &ObservableImpl) take_until(apply Predicate, opts ...RxOption) Observable {
 	return observable(o.parent, o, fn () Operator {
 		return &TakeUntilOperator{
-			apply: apply,
+			apply: apply
 		}
 	}, true, false, ...opts)
 }
@@ -2423,16 +2374,16 @@ pub fn (op &TakeUntilOperator) err(ctx context.Context, item Item, dst chan Item
 pub fn (op &TakeUntilOperator) end(_ context.Context, _ chan Item) {
 }
 
-pub fn (op &TakeUntilOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &TakeUntilOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
-// TakeWhile returns an Observable that emits items emitted by the source ObservableSource so long as each
+// take_while returns an Observable that emits items emitted by the source ObservableSource so long as each
 // item satisfied a specified condition, and then completes as soon as this condition is not satisfied.
 // Cannot be run in parallel.
 pub fn (o &ObservableImpl) take_while(apply Predicate, opts ...RxOption) Observable {
 	return observable(o.parent, o, fn () Operator {
 		return &TakeWhileOperator{
-			apply: apply,
+			apply: apply
 		}
 	}, true, false, ...opts)
 }
@@ -2456,25 +2407,24 @@ pub fn (op &TakeWhileOperator) err(ctx context.Context, item Item, dst chan Item
 pub fn (op &TakeWhileOperator) end(_ context.Context, _ chan Item) {
 }
 
-pub fn (op &TakeWhileOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &TakeWhileOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
-// TimeInterval converts an Observable that emits items into one that emits indications of the amount of time elapsed between those emissions.
+// time_interval converts an Observable that emits items into one that emits indications of the amount of time elapsed between those emissions.
 pub fn (o &ObservableImpl) time_interval(opts ...RxOption) Observable {
-	f := fn (ctx context.Context, next chan Item, option Option, opts ...RxOption) {
+	f := fn [o] (ctx context.Context, next chan Item, option RxOption, opts ...RxOption) {
 		defer {
 			next.close()
 		}
 		observe := o.observe(...opts)
-		latest := time.Now().UTC()
+		mut latest := time.now().unix_time()
 
+		done := ctx.done()
 		for select {
-			case <-ctx.done():
+			_ := <-done {
 				return
-			item := <-observe:
-				if !ok {
-					return
-				}
+			}
+			item := <-observe {
 				if item.is_error() {
 					if !item.send_context(ctx, next) {
 						return
@@ -2483,13 +2433,14 @@ pub fn (o &ObservableImpl) time_interval(opts ...RxOption) Observable {
 						return
 					}
 				} else {
-					now := time.Now().UTC()
-					if !of(now.Sub(latest)).send_context(ctx, next) {
+					now := time.now().unix_time()
+					if !of(now - latest).send_context(ctx, next) {
 						return
 					}
 					latest = now
 				}
 			}
+		} {
 		}
 	}
 
@@ -2507,9 +2458,9 @@ struct TimestampOperator {
 }
 
 pub fn (op &TimestampOperator) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	of(TimestampItem{
-		Timestamp: time.Now().UTC(),
-		V:         item.value,
+	of(&TimestampItem{
+		timestamp: time.now()
+		value: item.value
 	}).send_context(ctx, dst)
 }
 
@@ -2520,30 +2471,30 @@ pub fn (op &TimestampOperator) err(ctx context.Context, item Item, dst chan Item
 pub fn (op &TimestampOperator) end(_ context.Context, _ chan Item) {
 }
 
-pub fn (op &TimestampOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &TimestampOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // ToMap convert the sequence of items emitted by an Observable
 // into a map keyed by a specified key function.
 // Cannot be run in parallel.
-pub fn (o &ObservableImpl) to_map(keySelector Func, opts ...RxOption) Single {
-	return single(o.parent, o, fn () Operator {
+pub fn (o &ObservableImpl) to_map(key_selector Func, opts ...RxOption) Single {
+	return single(o.parent, o, fn [key_selector] () Operator {
 		return &ToMapOperator{
-			keySelector: keySelector,
-			m:           make(map[interface{}]interface{}),
+			key_selector: key_selector
+			m: map[voidptr]ItemValue{}
 		}
 	}, true, false, ...opts)
 }
 
 struct ToMapOperator {
-	keySelector Func
-	m           map[interface{}]interface{}
+	key_selector Func
+mut:
+	m map[voidptr]ItemValue
 }
 
-pub fn (op &ToMapOperator) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	k, err := op.keySelector(ctx, item.value)
-	if err != nil {
-		error(err).send_context(ctx, dst)
+pub fn (mut op ToMapOperator) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
+	k := op.key_selector(ctx, item.value) or {
+		from_error(err).send_context(ctx, dst)
 		operator_options.stop()
 		return
 	}
@@ -2558,39 +2509,39 @@ pub fn (op &ToMapOperator) end(ctx context.Context, dst chan Item) {
 	of(op.m).send_context(ctx, dst)
 }
 
-pub fn (op &ToMapOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &ToMapOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // ToMapWithValueSelector convert the sequence of items emitted by an Observable
 // into a map keyed by a specified key function and valued by another
 // value function.
 // Cannot be run in parallel.
-pub fn (o &ObservableImpl) to_map_with_value_selector(keySelector, valueSelector Func, opts ...RxOption) Single {
-	return single(o.parent, o, fn () Operator {
+pub fn (o &ObservableImpl) to_map_with_value_selector(key_selector Func, value_selector Func, opts ...RxOption) Single {
+	return single(o.parent, o, fn [key_selector, value_selector] () Operator {
 		return &ToMapWithValueSelector{
-			keySelector:   keySelector,
-			valueSelector: valueSelector,
-			m:             make(map[interface{}]interface{}),
+			key_selector: key_selector
+			value_selector: value_selector
+			m: map[voidptr]ItemValue{}
 		}
 	}, true, false, ...opts)
 }
 
 struct ToMapWithValueSelector {
-	keySelector, valueSelector Func
-	m                          map[interface{}]interface{}
+	key_selector   Func
+	value_selector Func
+mut:
+	m map[voidptr]ItemValue
 }
 
-pub fn (op &ToMapWithValueSelector) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	k, err := op.keySelector(ctx, item.value)
-	if err != nil {
-		error(err).send_context(ctx, dst)
+pub fn (mut op ToMapWithValueSelector) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
+	k := op.key_selector(ctx, item.value) or {
+		from_error(err).send_context(ctx, dst)
 		operator_options.stop()
 		return
 	}
 
-	v, err := op.valueSelector(ctx, item.value)
-	if err != nil {
-		error(err).send_context(ctx, dst)
+	v := op.value_selector(ctx, item.value) or {
+		from_error(err).send_context(ctx, dst)
 		operator_options.stop()
 		return
 	}
@@ -2606,50 +2557,53 @@ pub fn (op &ToMapWithValueSelector) end(ctx context.Context, dst chan Item) {
 	of(op.m).send_context(ctx, dst)
 }
 
-pub fn (op &ToMapWithValueSelector) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &ToMapWithValueSelector) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // ToSlice collects all items from an Observable and emit them in a slice and an optional error.
 // Cannot be run in parallel.
-pub fn (o &ObservableImpl) to_slice(initialCapacity int, opts ...RxOption) ([]interface{}, error) {
-	op := &toSliceOperator{
-		s: make([]interface{}, 0, initialCapacity),
+pub fn (o &ObservableImpl) to_slice(initial_capacity int, opts ...RxOption) ?[]ItemValue {
+	op := &ToSliceOperator{
+		s: []ItemValue{cap: initial_capacity}
 	}
-	<-observable(o.parent, o, fn () Operator {
+	_ := <-observable(o.parent, o, fn [op] () Operator {
 		return op
-	}, true, false, ...opts).Run()
-	return op.s, op.observableErr
+	}, true, false, ...opts).run()
+
+	if !isnil(op.observable_err) {
+		return op.observable_err
+	}
+
+	return op.s
 }
 
 struct ToSliceOperator {
-	s             []interface{}
-	observableErr error
+mut:
+	s              []ItemValue
+	observable_err IError
 }
 
-pub fn (op &ToSliceOperator) next(_ context.Context, item Item, _ chan Item, _ operator_options) {
-	op.s = append(op.s, item.value)
+pub fn (mut op ToSliceOperator) next(_ context.Context, item Item, _ chan Item, _ OperatorOptions) {
+	op.s << item.value
 }
 
-pub fn (op &ToSliceOperator) err(_ context.Context, item Item, _ chan Item, operator_options OperatorOptions) {
-	op.observableErr = item.err
+pub fn (mut op ToSliceOperator) err(_ context.Context, item Item, _ chan Item, operator_options OperatorOptions) {
+	op.observable_err = item.err
 	operator_options.stop()
 }
 
 pub fn (op &ToSliceOperator) end(_ context.Context, _ chan Item) {
 }
 
-pub fn (op &ToSliceOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &ToSliceOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // Unmarshal transforms the items emitted by an Observable by applying an unmarshalling to each item.
-pub fn (o &ObservableImpl) unmarshal(unmarshaller Unmarshaller, factory fn () interface{}, opts ...RxOption) Observable {
-	return o.Map(fn (_ context.Context, i interface{}) (interface{}, error) {
+pub fn (o &ObservableImpl) unmarshal(unmarshaller Unmarshaller, factory FactoryFn, opts ...RxOption) Observable {
+	return o.map(fn [unmarshaller, factory] (_ context.Context, i ItemValue) ?ItemValue {
 		v := factory()
-		err := unmarshaller(i.([]byte), v)
-		if err != nil {
-			return nil, err
-		}
-		return v, nil
+		unmarshaller((i as []ItemValue).map(it as byte), v)
+		return v
 	}, ...opts)
 }
 
@@ -2657,138 +2611,140 @@ pub fn (o &ObservableImpl) unmarshal(unmarshaller Unmarshaller, factory fn () in
 // rather than emitting the items one at a time.
 pub fn (o &ObservableImpl) window_with_count(count int, opts ...RxOption) Observable {
 	if count < 0 {
-		return thrown(IllegalInputError{error: "count must be positive or nil"})
+		return thrown(new_illegal_input_error('count must be positive or nil'))
 	}
 
 	option := parse_options(...opts)
-	return observable(o.parent, o, fn () Operator {
+	return observable(o.parent, o, fn [count, option] () Operator {
 		return &WindowWithCountOperator{
-			count:  count,
-			option: option,
+			count: count
+			option: option
 		}
 	}, true, false, ...opts)
 }
 
 struct WindowWithCountOperator {
-	count          int
-	iCount         int
-	currentChannel chan Item
-	option         Option
+mut:
+	count           int
+	i_count         int
+	current_channel chan Item
+	option          RxOption
 }
 
-pub fn (op &WindowWithCountOperator) pre(ctx context.Context, dst chan Item) {
-	if op.currentChannel == nil {
-		ch := op.option.buildChannel()
-		op.currentChannel = ch
-		of(FromChannel(ch)).send_context(ctx, dst)
+pub fn (mut op WindowWithCountOperator) pre(ctx context.Context, dst chan Item) {
+	if isnil(op.current_channel) {
+		ch := op.option.build_channel()
+		op.current_channel = ch
+		of(from_channel(ch)).send_context(ctx, dst)
 	}
 }
 
-pub fn (op &WindowWithCountOperator) post(ctx context.Context, dst chan Item) {
-	if op.iCount == op.count {
-		op.iCount = 0
-		close(op.currentChannel)
-		ch := op.option.buildChannel()
-		op.currentChannel = ch
-		of(FromChannel(ch)).send_context(ctx, dst)
+pub fn (mut op WindowWithCountOperator) post(ctx context.Context, dst chan Item) {
+	if op.i_count == op.count {
+		op.i_count = 0
+		op.current_channel.close()
+		ch := op.option.build_channel()
+		op.current_channel = ch
+		of(from_channel(ch)).send_context(ctx, dst)
 	}
 }
 
-pub fn (op &WindowWithCountOperator) next(ctx context.Context, item Item, dst chan Item, _ operator_options) {
+pub fn (mut op WindowWithCountOperator) next(ctx context.Context, item Item, dst chan Item, _ OperatorOptions) {
 	op.pre(ctx, dst)
-	op.currentChannel <- item
-	op.iCount++
+	op.current_channel <- item
+	op.i_count++
 	op.post(ctx, dst)
 }
 
-pub fn (op &WindowWithCountOperator) err(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
+pub fn (mut op WindowWithCountOperator) err(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
 	op.pre(ctx, dst)
-	op.currentChannel <- item
-	op.iCount++
+	op.current_channel <- item
+	op.i_count++
 	op.post(ctx, dst)
 	operator_options.stop()
 }
 
 pub fn (op &WindowWithCountOperator) end(_ context.Context, _ chan Item) {
-	if op.currentChannel != nil {
-		close(op.currentChannel)
+	if !op.current_channel.closed {
+		op.current_channel.close()
 	}
 }
 
-pub fn (op &WindowWithCountOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ operator_options) {
+pub fn (op &WindowWithCountOperator) gather_next(_ context.Context, _ Item, _ chan Item, _ OperatorOptions) {
 }
 
 // WindowWithTime periodically subdivides items from an Observable into Observables based on timed windows
 // and emit them rather than emitting the items one at a time.
 pub fn (o &ObservableImpl) window_with_time(timespan Duration, opts ...RxOption) Observable {
 	if isnil(timespan) {
-		return thrown(IllegalInputError{error: "timespan must no be nil"})
+		return thrown(new_illegal_input_error('timespan must no be nil'))
 	}
 
-	f := fn (ctx context.Context, next chan Item, option Option, opts ...RxOption) {
+	f := fn [o, timespan] (ctx context.Context, next chan Item, option RxOption, opts ...RxOption) {
 		observe := o.observe(...opts)
-		ch := option.buildChannel()
+		mut ch := option.build_channel()
 		done := chan int{cap: 1}
-		empty := true
-		mutex := sync.new_mutex()
-		if !of(FromChannel(ch)).send_context(ctx, next) {
+		mut empty := true
+		mut mutex := sync.new_mutex()
+		if !of(from_channel(ch)).send_context(ctx, next) {
 			return
 		}
 
-		go fn () {
-			defer fn () {
-				mutex.@lock()
-				close(ch)
-				mutex.unlock()
-			}()
+		go fn [mut ch, next, done, timespan, option, mut empty, mut mutex] () {
 			defer {
-				next <- 0
+				fn [mut mutex, ch] () {
+					mutex.@lock()
+					ch.close()
+					mutex.unlock()
+				}()
+			}
+			defer {
 				next.close()
 			}
-			for {
-				select {
-				case <-ctx.done():
+			for select {
+				_ := <-done {
 					return
-				case <-done:
+				}
+				_ := <-done {
 					return
-				case <-time.After(timespan.duration()):
+				}
+				timespan.duration() {
 					mutex.@lock()
 					if empty {
 						mutex.unlock()
 						continue
 					}
-					close(ch)
+					ch.close()
 					empty = true
-					ch = option.buildChannel()
-					if !of(FromChannel(ch)).send_context(ctx, next) {
-						close(done)
+					ch = option.build_channel()
+					if !of(from_channel(ch)).send_context(ctx, next) {
+						done.close()
 						return
 					}
 					mutex.unlock()
 				}
+			} {
 			}
 		}()
 
 		for select {
-			case <-ctx.done():
+			_ := <-done {
 				return
-			case <-done:
+			}
+			_ := <-done {
 				return
-			item := <-observe:
-				if !ok {
-					close(done)
-					return
-				}
+			}
+			item := <-observe {
 				if item.is_error() {
 					mutex.@lock()
 					if !item.send_context(ctx, ch) {
 						mutex.unlock()
-						close(done)
+						done.close()
 						return
 					}
 					mutex.unlock()
 					if option.get_error_strategy() == .stop_on_error {
-						close(done)
+						done.close()
 						return
 					}
 				}
@@ -2800,6 +2756,7 @@ pub fn (o &ObservableImpl) window_with_time(timespan Duration, opts ...RxOption)
 				empty = false
 				mutex.unlock()
 			}
+		} {
 		}
 	}
 
@@ -2810,76 +2767,78 @@ pub fn (o &ObservableImpl) window_with_time(timespan Duration, opts ...RxOption)
 // and emit them rather than emitting the items one at a time.
 pub fn (o &ObservableImpl) window_with_time_or_count(timespan Duration, count int, opts ...RxOption) Observable {
 	if isnil(timespan) {
-		return thrown(IllegalInputError{error: "timespan must no be nil"})
+		return thrown(new_illegal_input_error('timespan must no be nil'))
 	}
 	if count < 0 {
-		return thrown(IllegalInputError{error: "count must be positive or nil"})
+		return thrown(new_illegal_input_error('count must be positive or nil'))
 	}
 
-	f := fn (ctx context.Context, next chan Item, option Option, opts ...RxOption) {
+	f := fn [o, timespan, count] (ctx context.Context, next chan Item, option RxOption, opts ...RxOption) {
 		observe := o.observe(...opts)
-		ch := option.buildChannel()
+		mut ch := option.build_channel()
 		done := chan int{cap: 1}
-		mutex := sync.new_mutex()
-		iCount := 0
-		if !of(FromChannel(ch)).send_context(ctx, next) {
+		mut mutex := sync.new_mutex()
+		mut i_count := 0
+		if !of(from_channel(ch)).send_context(ctx, next) {
 			return
 		}
 
-		go fn () {
-			defer fn () {
-				mutex.@lock()
-				close(ch)
-				mutex.unlock()
-			}()
+		go fn [mut mutex, mut ch, next, ctx, timespan, mut i_count, option] () {
 			defer {
-				next <- 0
+				fn [mut mutex, ch] () {
+					mutex.@lock()
+					ch.close()
+					mutex.unlock()
+				}()
+			}
+			defer {
 				next.close()
 			}
-			for {
-				select {
-				case <-ctx.done():
+			done := ctx.done()
+			for select {
+				_ := <-done {
 					return
-				case <-done:
+				}
+				_ := <-done {
 					return
-				case <-time.After(timespan.duration()):
+				}
+				timespan.duration() {
 					mutex.@lock()
-					if iCount == 0 {
+					if i_count == 0 {
 						mutex.unlock()
 						continue
 					}
-					close(ch)
-					iCount = 0
-					ch = option.buildChannel()
-					if !of(FromChannel(ch)).send_context(ctx, next) {
-						close(done)
+					ch.close()
+					i_count = 0
+					ch = option.build_channel()
+					if !of(from_channel(ch)).send_context(ctx, next) {
+						done.close()
 						return
 					}
 					mutex.unlock()
 				}
+			} {
 			}
 		}()
 
 		for select {
-			case <-ctx.done():
+			_ := <-done {
 				return
-			case <-done:
+			}
+			_ := <-done {
 				return
-			item := <-observe:
-				if !ok {
-					close(done)
-					return
-				}
+			}
+			item := <-observe {
 				if item.is_error() {
 					mutex.@lock()
 					if !item.send_context(ctx, ch) {
 						mutex.unlock()
-						close(done)
+						done.close()
 						return
 					}
 					mutex.unlock()
 					if option.get_error_strategy() == .stop_on_error {
-						close(done)
+						done.close()
 						return
 					}
 				}
@@ -2888,19 +2847,20 @@ pub fn (o &ObservableImpl) window_with_time_or_count(timespan Duration, count in
 					mutex.unlock()
 					return
 				}
-				iCount++
-				if iCount == count {
-					close(ch)
-					iCount = 0
-					ch = option.buildChannel()
-					if !of(FromChannel(ch)).send_context(ctx, next) {
+				i_count++
+				if i_count == count {
+					ch.close()
+					i_count = 0
+					ch = option.build_channel()
+					if !of(from_channel(ch)).send_context(ctx, next) {
 						mutex.unlock()
-						close(done)
+						done.close()
 						return
 					}
 				}
 				mutex.unlock()
 			}
+		} {
 		}
 	}
 
@@ -2911,55 +2871,50 @@ pub fn (o &ObservableImpl) window_with_time_or_count(timespan Duration, count in
 // and emit single items for each combination based on the results of this function.
 pub fn (o &ObservableImpl) zip_from_iterable(iterable Iterable, zipper Func2, opts ...RxOption) Observable {
 	option := parse_options(...opts)
-	next := option.buildChannel()
+	next := option.build_channel()
 	ctx := option.build_context(o.parent)
 
-	go fn () {
+	go fn [next, o, ctx, iterable, option, opts, zipper] () {
 		defer {
 			next.close()
 		}
 		it1 := o.observe(...opts)
 		it2 := iterable.observe(...opts)
-	loop:
-		for select {
-			case <-ctx.done():
+
+		done := ctx.done()
+		loop: for select {
+			_ := <-done {
 				break loop
-			case i1, ok := <-it1:
-				if !ok {
-					break loop
-				}
+			}
+			i1 := <-it1 {
 				if i1.is_error() {
 					i1.send_context(ctx, next)
 					return
 				}
-				for {
-					select {
-					case <-ctx.done():
+				for select {
+					_ := <-done {
 						break loop
-					case i2, ok := <-it2:
-						if !ok {
-							break loop
-						}
+					}
+					i2 := <-it2 {
 						if i2.is_error() {
 							i2.send_context(ctx, next)
 							return
 						}
-						v, err := zipper(ctx, i1.value, i2.value)
-						if err != nil {
-							error(err).send_context(ctx, next)
+						v := zipper(ctx, i1.value, i2.value) or {
+							from_error(err).send_context(ctx, next)
 							return
 						}
 						of(v).send_context(ctx, next)
 						continue loop
 					}
+				} {
 				}
 			}
+		} {
 		}
 	}()
 
 	return &ObservableImpl{
-		iterable: newChannelIterable(next),
+		iterable: new_channel_iterable(next)
 	}
 }
-
-
