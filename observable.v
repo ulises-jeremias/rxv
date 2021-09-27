@@ -146,9 +146,12 @@ fn observable(parent context.Context, iterable Iterable, operator_factory Operat
 		if force_seq || !parallel {
 			run_sequential(ctx, next, iterable, operator_factory, option, ...opts)
 		} else {
-			run_parallel(ctx, next, iterable.observe(...opts), operator_factory, bypass_gather, option, ...opts)
+			run_parallel(ctx, next, iterable.observe(...opts), operator_factory, bypass_gather,
+				option, ...opts)
 		}
-		return &ObservableImpl{iterable: new_channel_iterable(next)}
+		return &ObservableImpl{
+			iterable: new_channel_iterable(next)
+		}
 	}
 
 	if force_seq || !parallel {
@@ -162,7 +165,7 @@ fn observable(parent context.Context, iterable Iterable, operator_factory Operat
 				ctx := option.build_context(parent)
 				run_sequential(ctx, next, iterable, operator_factory, option, ...merged_options)
 				return next
-			}),
+			})
 		}
 	}
 
@@ -193,16 +196,18 @@ fn observable(parent context.Context, iterable Iterable, operator_factory Operat
 							match value {
 								int {
 									of(value).send_context(ctx, from_ch)
-									run_parallel(ctx, next, observe, operator_factory, bypass_gather, option, ...merged_options)
+									run_parallel(ctx, next, observe, operator_factory,
+										bypass_gather, option, ...merged_options)
 								}
 								else {}
 							}
 						}
 					}
 				}()
-				run_first_item(ctx, f, first_item_id_ch, observe, next, iterable, operator_factory, option, ...merged_options)
+				run_first_item(ctx, f, first_item_id_ch, observe, next, iterable, operator_factory,
+					option, ...merged_options)
 				return next
-			}),
+			})
 		}
 		return obs.serialize(parent, f, from_ch)
 	}
@@ -215,9 +220,10 @@ fn observable(parent context.Context, iterable Iterable, operator_factory Operat
 
 			next := option.build_channel()
 			ctx := option.build_context(parent)
-			run_parallel(ctx, next, iterable.observe(...merged_options), operator_factory, bypass_gather, option, ...merged_options)
+			run_parallel(ctx, next, iterable.observe(...merged_options), operator_factory,
+				bypass_gather, option, ...merged_options)
 			return next
-		}),
+		})
 	}
 }
 

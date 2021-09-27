@@ -8,7 +8,14 @@ struct Value {
 
 fn test_send_items_variadic() {
 	ch := chan Item{cap: 3}
-	items := [ItemValue(&Value{val: 1}), ItemValue(&Value{val: 2}), ItemValue(&Value{val: 3})]
+	items := [ItemValue(&Value{
+		val: 1
+	}), ItemValue(&Value{
+		val: 2
+	}),
+		ItemValue(&Value{
+		val: 3
+	})]
 	go send_items(context.background(), ch, .close_channel, items)
 }
 
@@ -17,14 +24,25 @@ fn test_send_items_variadic_with_error() {
 	err := &Error{
 		msg: 'error'
 	}
-	items := [ItemValue(&Value{val: 1}), ItemValue(err), ItemValue(&Value{val: 3})]
+	items := [ItemValue(&Value{
+		val: 1
+	}), ItemValue(err), ItemValue(&Value{
+		val: 3
+	})]
 	go send_items(context.background(), ch, .close_channel, items)
 }
 
 fn test_send_items_slice() {
 	ch := chan Item{cap: 3}
 	mut items_slice := []ItemValue{}
-	items_slice << [ItemValue(&Value{val: 1}), ItemValue(&Value{val: 2}), ItemValue(&Value{val: 3})]
+	items_slice << [ItemValue(&Value{
+		val: 1
+	}), ItemValue(&Value{
+		val: 2
+	}),
+		ItemValue(&Value{
+		val: 3
+	})]
 	go send_items(context.background(), ch, .close_channel, items_slice)
 }
 
@@ -34,7 +52,11 @@ fn test_send_items_slice_with_error() {
 		msg: 'error'
 	}
 	mut items_slice := []ItemValue{}
-	items_slice << [ItemValue(&Value{val: 1}), ItemValue(err), ItemValue(&Value{val: 3})]
+	items_slice << [ItemValue(&Value{
+		val: 1
+	}), ItemValue(err), ItemValue(&Value{
+		val: 3
+	})]
 	go send_items(context.background(), ch, .close_channel, items_slice)
 }
 

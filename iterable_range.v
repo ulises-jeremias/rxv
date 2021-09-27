@@ -31,7 +31,7 @@ pub fn (i &RangeIterable) observe(opts ...RxOption) chan Item {
 				_ := <-done {
 					return
 				}
-				next <-of(&idx) {}
+				next <- of(&idx) {}
 			}
 		}
 		next.close()
