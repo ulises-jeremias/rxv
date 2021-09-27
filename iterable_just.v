@@ -1,7 +1,5 @@
 module rxv
 
-import context
-
 struct JustIterable {
 mut:
 	items []ItemValue
