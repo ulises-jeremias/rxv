@@ -1846,7 +1846,7 @@ pub fn (o &ObservableImpl) run(opts ...RxOption) chan int {
 			_ := <-done {
 				return
 			}
-			ok := <-observe {}
+			_ := <-observe {}
 		} {
 		}
 	}()
