@@ -50,7 +50,7 @@ pub type Supplier = fn (ctx context.Context) Item
 // pub type Disposed  = chan int
 
 // Disposable is a function to be called in order to dispose a subscription.
-pub type Disposable = fn (ctx context.Context)
+pub type Disposable = context.CancelFn
 
 // NextFunc handles a next item in a stream.
 pub type NextFunc = fn (arg ItemValue)

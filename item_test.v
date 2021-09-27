@@ -2,35 +2,39 @@ module rxv
 
 import context
 
+struct Value {
+	val int
+}
+
 fn test_send_items_variadic() {
 	ch := chan Item{cap: 3}
-	items := [ItemValue(1), 2, 3]
+	items := [ItemValue(&Value{val: 1}), ItemValue(&Value{val: 2}), ItemValue(&Value{val: 3})]
 	go send_items(context.background(), ch, .close_channel, items)
 }
 
 fn test_send_items_variadic_with_error() {
 	ch := chan Item{cap: 3}
-	err := Error{
+	err := &Error{
 		msg: 'error'
 	}
-	items := [ItemValue(1), err, 3]
+	items := [ItemValue(&Value{val: 1}), ItemValue(err), ItemValue(&Value{val: 3})]
 	go send_items(context.background(), ch, .close_channel, items)
 }
 
 fn test_send_items_slice() {
 	ch := chan Item{cap: 3}
 	mut items_slice := []ItemValue{}
-	items_slice << [ItemValue(1), 2, 3]
+	items_slice << [ItemValue(&Value{val: 1}), ItemValue(&Value{val: 2}), ItemValue(&Value{val: 3})]
 	go send_items(context.background(), ch, .close_channel, items_slice)
 }
 
 fn test_send_items_slice_with_error() {
 	ch := chan Item{cap: 3}
-	err := Error{
+	err := &Error{
 		msg: 'error'
 	}
 	mut items_slice := []ItemValue{}
-	items_slice << [ItemValue(1), err, 3]
+	items_slice << [ItemValue(&Value{val: 1}), ItemValue(err), ItemValue(&Value{val: 3})]
 	go send_items(context.background(), ch, .close_channel, items_slice)
 }
 
@@ -48,9 +52,9 @@ fn test_item_send_context_true() {
 	defer {
 		ch.close()
 	}
-	ctx := context.with_cancel(context.background())
+	ctx, cancel := context.with_cancel(context.background())
 	defer {
-		context.cancel(ctx)
+		cancel()
 	}
 	assert of(5).send_context(ctx, ch)
 }
@@ -60,8 +64,8 @@ fn test_item_send_context_false() {
 	defer {
 		ch.close()
 	}
-	ctx := context.with_cancel(context.background())
-	context.cancel(ctx)
+	ctx, cancel := context.with_cancel(context.background())
+	cancel()
 	assert !of(5).send_context(ctx, ch)
 }
 

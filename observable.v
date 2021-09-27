@@ -189,8 +189,14 @@ fn observable(parent context.Context, iterable Iterable, operator_factory Operat
 								first_item_id.send_context(ctx, from_ch)
 								return
 							}
-							of(first_item_id.value as int).send_context(ctx, from_ch)
-							run_parallel(ctx, next, observe, operator_factory, bypass_gather, option, ...merged_options)
+							value := first_item_id.value
+							match value {
+								int {
+									of(value).send_context(ctx, from_ch)
+									run_parallel(ctx, next, observe, operator_factory, bypass_gather, option, ...merged_options)
+								}
+								else {}
+							}
 						}
 					}
 				}()

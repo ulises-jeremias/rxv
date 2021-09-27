@@ -64,7 +64,8 @@ fn (fdo &FuncOption) build_channel() chan Item {
 
 fn (fdo &FuncOption) build_context(parent context.Context) context.Context {
 	if !isnil(fdo.ctx) && !isnil(parent) {
-		return onecontext.merge(fdo.ctx, parent)
+		ctx, _ := onecontext.merge(fdo.ctx, parent)
+		return ctx
 	}
 
 	if !isnil(fdo.ctx) {

@@ -4,6 +4,11 @@ import context
 import time
 import sync
 
+fn from_channel_as_item_value(next chan Item, opts ...RxOption) ItemValue {
+	o := &ObservableImpl(from_channel(next, ...opts))
+	return ItemValue(o)
+}
+
 // all determines whether all items emitted by an Observable meet some criteria
 pub fn (o &ObservableImpl) all(predicate Predicate, opts ...RxOption) Single {
 	return single(o.parent, o, fn () Operator {
@@ -39,11 +44,16 @@ fn (op &AllOperator) end(ctx context.Context, dst chan Item) {
 }
 
 fn (mut op AllOperator) gather_next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	value := item.value as bool
-	if value == false {
-		of(false).send_context(ctx, dst)
-		op.all = false
-		operator_options.stop()
+	value := item.value
+	match value {
+		bool {
+			if value == false {
+				of(false).send_context(ctx, dst)
+				op.all = false
+				operator_options.stop()
+			}
+		}
+		else {}
 	}
 }
 
@@ -96,7 +106,7 @@ fn (op &AverageF32Operator) end(ctx context.Context, dst chan Item) {
 }
 
 fn (mut op AverageF32Operator) gather_next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	value := &AverageF32Operator(item.value as voidptr)
+	value := &AverageF32Operator(item.value)
 	op.sum += value.sum
 	op.count += value.count
 }
@@ -150,7 +160,7 @@ fn (op &AverageF64Operator) end(ctx context.Context, dst chan Item) {
 }
 
 fn (mut op AverageF64Operator) gather_next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	value := &AverageF64Operator(item.value as voidptr)
+	value := &AverageF64Operator(item.value)
 	op.sum += value.sum
 	op.count += value.count
 }
@@ -203,7 +213,7 @@ fn (op &AverageIntOperator) end(ctx context.Context, dst chan Item) {
 }
 
 fn (mut op AverageIntOperator) gather_next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	value := &AverageIntOperator(item.value as voidptr)
+	value := &AverageIntOperator(item.value)
 	op.sum += value.sum
 	op.count += value.count
 }
@@ -249,7 +259,7 @@ fn (op &AverageI16Operator) end(ctx context.Context, dst chan Item) {
 }
 
 fn (mut op AverageI16Operator) gather_next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	value := &AverageI16Operator(item.value as voidptr)
+	value := &AverageI16Operator(item.value)
 	op.sum += value.sum
 	op.count += value.count
 }
@@ -295,7 +305,7 @@ fn (op &AverageI64Operator) end(ctx context.Context, dst chan Item) {
 }
 
 fn (mut op AverageI64Operator) gather_next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	value := &AverageI64Operator(item.value as voidptr)
+	value := &AverageI64Operator(item.value)
 	op.sum += value.sum
 	op.count += value.count
 }
@@ -314,7 +324,7 @@ pub fn (o &ObservableImpl) buffer_with_count(count int, opts ...RxOption) Observ
 	return observable(o.parent, o, fn [count] () Operator {
 		return &BufferWithCountOperator{
 			count: count
-			buffer: []ItemValue{len: count, init: 0}
+			buffer: []ItemValue{len: count, init: voidptr(0)}
 		}
 	}, true, false, ...opts)
 }
@@ -332,7 +342,7 @@ fn (mut op BufferWithCountOperator) next(ctx context.Context, item Item, dst cha
 	if op.i_count == op.count {
 		of(op.buffer).send_context(ctx, dst)
 		op.i_count = 0
-		op.buffer = []ItemValue{len: op.count, init: 0}
+		op.buffer = []ItemValue{len: op.count, init: voidptr(0)}
 	}
 }
 
@@ -512,10 +522,7 @@ pub fn (o &ObservableImpl) buffer_with_time_or_count(timespan Duration, count in
 
 // connect instructs a connectable Observable to begin emitting items to its subscribers.
 pub fn (o &ObservableImpl) connect(ctx context.Context) (context.Context, Disposable) {
-	cancel_ctx := context.with_cancel(ctx)
-	cancel := fn [cancel_ctx] () {
-		context.cancel(cancel_ctx)
-	}
+	cancel_ctx, cancel := context.with_cancel(ctx)
 	o.observe(with_context(cancel_ctx), connect())
 	return cancel_ctx, Disposable(cancel)
 }
@@ -1350,14 +1357,15 @@ pub fn (o &ObservableImpl) group_by_dynamic(distribution DistributionStrFn, opts
 				if idx !in chs {
 					ch := option.build_channel()
 					chs[idx] = ch
-					mut grouped := GroupedObservable
-					{
-						iterable:
-						new_channel_iterable(ch)
-						key:
-						idx
-					}
-					of(grouped).send_context(ctx, next)
+					// @todo: Fix `undefined ident GroupedObservable`
+					// grouped := &GroupedObservable
+					// {
+					// 	iterable:
+					// 	new_channel_iterable(ch)
+					// 	key:
+					// 	idx
+					// }
+					// of(grouped).send_context(ctx, next)
 				}
 				ch := chs[idx]
 				i.send_context(ctx, ch)
@@ -1529,8 +1537,13 @@ pub fn (op &MaxOperator) end(ctx context.Context, dst chan Item) {
 }
 
 pub fn (mut op MaxOperator) gather_next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	val := item.value as MaxOperator
-	op.next(ctx, of(val.max), dst, operator_options)
+	val := item.value
+	match val {
+		MaxOperator {
+			op.next(ctx, of(val.max), dst, operator_options)
+		}
+		else {}
+	}
 }
 
 // Min determines and emits the minimum-valued item emitted by an Observable according to a comparator.
@@ -1573,8 +1586,13 @@ pub fn (op &MinOperator) end(ctx context.Context, dst chan Item) {
 }
 
 pub fn (mut op MinOperator) gather_next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	val := item.value as MinOperator
-	op.next(ctx, of(val.max), dst, operator_options)
+	val := item.value
+	match val {
+		MinOperator {
+			op.next(ctx, of(val.max), dst, operator_options)
+		}
+		else {}
+	}
 }
 
 // Observe observes an Observable by returning its channel.
@@ -1700,8 +1718,13 @@ pub fn (op &ReduceOperator) end(ctx context.Context, dst chan Item) {
 }
 
 pub fn (mut op ReduceOperator) gather_next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	val := item.value as ReduceOperator
-	op.next(ctx, of(val.acc), dst, operator_options)
+	val := item.value
+	match val {
+		ReduceOperator {
+			op.next(ctx, of(val.acc), dst, operator_options)
+		}
+		else {}
+	}
 }
 
 // Repeat returns an Observable that repeats the sequence of items emitted by the source Observable
@@ -1780,14 +1803,16 @@ pub fn (o &ObservableImpl) retry(count int, should_retry RetryFn, opts ...RxOpti
 		done := ctx.done()
 		loop: for select {
 			_ := <-done {
-				break loop
+				// break loop
+				break
 			}
 			i := <-observe {
 				if i.is_error() {
 					aux_count--
 					if aux_count < 0 || !should_retry(i.err) {
 						i.send_context(ctx, next)
-						break loop
+						// break loop
+						break
 					}
 					observe = o.observe(...opts)
 				} else {
@@ -1902,7 +1927,7 @@ pub fn (o &ObservableImpl) sample(iterable Iterable, opts ...RxOption) Observabl
 // Scan apply a Func2 to each item emitted by an Observable, sequentially, and emit each successive value.
 // Cannot be run in parallel.
 pub fn (o &ObservableImpl) scan(apply Func2, opts ...RxOption) Observable {
-	return observable(o.parent, o, fn () Operator {
+	return observable(o.parent, o, fn [apply] () Operator {
 		return &ScanOperator{
 			apply: apply
 		}
@@ -1956,12 +1981,14 @@ pub fn (o &ObservableImpl) send(output chan Item, opts ...RxOption) {
 		done := ctx.done()
 		loop: for select {
 			_ := <-done {
-				break loop
+				// break loop
+				break
 			}
 			i := <-observe {
 				if i.is_error() {
 					output <- i
-					break loop
+					// break loop
+					break
 				}
 				i.send_context(ctx, output)
 			}
@@ -2182,7 +2209,8 @@ pub fn (o &ObservableImpl) start_with(iterable Iterable, opts ...RxOption) Obser
 		done := ctx.done()
 		loop1: for select {
 			_ := <-done {
-				break loop1
+				// break loop1
+				break
 			}
 			i := <-observe {
 				if i.is_error() {
@@ -2197,7 +2225,8 @@ pub fn (o &ObservableImpl) start_with(iterable Iterable, opts ...RxOption) Obser
 
 		loop2: for select {
 			_ := <-done {
-				break loop2
+				// break loop2
+				break
 			}
 			i := <-observe {
 				if i.is_error() {
@@ -2218,22 +2247,25 @@ pub fn (o &ObservableImpl) start_with(iterable Iterable, opts ...RxOption) Obser
 // sum_f32 calculates the average of f32 emitted by an Observable and emits a f32.
 pub fn (o &ObservableImpl) sum_f32(opts ...RxOption) OptionalSingle {
 	return o.reduce(fn (_ context.Context, acc ItemValue, i ItemValue) ?ItemValue {
-		sum := if isnil(acc) { f32(0) } else { acc as f32 }
+		sum := match acc {
+			f32 { *acc }
+			else { f32(0) }
+		}
 		match i {
 			int {
-				return sum + f32(i)
+				return ItemValue(sum + f32(*i))
 			}
 			i8 {
-				return sum + f32(i)
+				return ItemValue(sum + f32(*i))
 			}
 			i16 {
-				return sum + f32(i)
+				return ItemValue(sum + f32(*i))
 			}
 			i64 {
-				return sum + f32(i)
+				return ItemValue(sum + f32(*i))
 			}
 			f32 {
-				return sum + i
+				return ItemValue(sum + *i)
 			}
 			else {
 				return new_illegal_input_error('expected type: (f32|int|i8|i16|int|i64), got: $i')
@@ -2245,25 +2277,28 @@ pub fn (o &ObservableImpl) sum_f32(opts ...RxOption) OptionalSingle {
 // sum_f64 calculates the average of f64 emitted by an Observable and emits a f64.
 pub fn (o &ObservableImpl) sum_f64(opts ...RxOption) OptionalSingle {
 	return o.reduce(fn (_ context.Context, acc ItemValue, i ItemValue) ?ItemValue {
-		sum := if isnil(acc) { f64(0) } else { acc as f64 }
+		sum := match acc {
+			f64 { *acc }
+			else { f64(0) }
+		}
 		match i {
 			int {
-				return sum + f64(i)
+				return ItemValue(sum + f64(*i))
 			}
 			i8 {
-				return sum + f64(i)
+				return ItemValue(sum + f64(*i))
 			}
 			i16 {
-				return sum + f64(i)
+				return ItemValue(sum + f64(*i))
 			}
 			i64 {
-				return sum + f64(i)
+				return ItemValue(sum + f64(*i))
 			}
 			f32 {
-				return sum + f64(i)
+				return ItemValue(sum + f64(*i))
 			}
 			f64 {
-				return sum + i
+				return ItemValue(sum + *i)
 			}
 			else {
 				return new_illegal_input_error('expected type: (f32|f64|int|i8|i16|int|i64), got: $i')
@@ -2275,19 +2310,22 @@ pub fn (o &ObservableImpl) sum_f64(opts ...RxOption) OptionalSingle {
 // sum_i64 calculates the average of integers emitted by an Observable and emits an i64.
 pub fn (o &ObservableImpl) sum_i64(opts ...RxOption) OptionalSingle {
 	return o.reduce(fn (_ context.Context, acc ItemValue, i ItemValue) ?ItemValue {
-		sum := if isnil(acc) { i64(0) } else { acc as i64 }
+		sum := match acc {
+			i64 { *acc }
+			else { i64(0) }
+		}
 		match i {
 			int {
-				return sum + i64(i)
+				return ItemValue(sum + i64(*i))
 			}
 			i8 {
-				return sum + i64(i)
+				return ItemValue(sum + i64(*i))
 			}
 			i16 {
-				return sum + i64(i)
+				return ItemValue(sum + i64(*i))
 			}
 			i64 {
-				return sum + i
+				return ItemValue(sum + *i)
 			}
 			else {
 				return new_illegal_input_error('expected type: (int|i8|i16|int|i64), got: $i')
@@ -2590,7 +2628,12 @@ pub fn (op &ToSliceOperator) gather_next(_ context.Context, _ Item, _ chan Item,
 pub fn (o &ObservableImpl) unmarshal(unmarshaller Unmarshaller, factory FactoryFn, opts ...RxOption) Observable {
 	return o.map(fn [unmarshaller, factory] (_ context.Context, i ItemValue) ?ItemValue {
 		v := factory()
-		unmarshaller((i as []ItemValue).map(it as byte), v)
+		match i {
+			[]byte {
+				unmarshaller(i, v)
+			}
+			else {}
+		}
 		return v
 	}, ...opts)
 }
@@ -2623,7 +2666,7 @@ pub fn (mut op WindowWithCountOperator) pre(ctx context.Context, dst chan Item) 
 	if isnil(op.current_channel) {
 		ch := op.option.build_channel()
 		op.current_channel = ch
-		of(from_channel(ch)).send_context(ctx, dst)
+		of(from_channel_as_item_value(ch)).send_context(ctx, dst)
 	}
 }
 
@@ -2633,7 +2676,7 @@ pub fn (mut op WindowWithCountOperator) post(ctx context.Context, dst chan Item)
 		op.current_channel.close()
 		ch := op.option.build_channel()
 		op.current_channel = ch
-		of(from_channel(ch)).send_context(ctx, dst)
+		of(from_channel_as_item_value(ch)).send_context(ctx, dst)
 	}
 }
 
@@ -2674,11 +2717,11 @@ pub fn (o &ObservableImpl) window_with_time(timespan Duration, opts ...RxOption)
 		done := chan int{cap: 1}
 		mut empty := true
 		mut mutex := sync.new_mutex()
-		if !of(from_channel(ch)).send_context(ctx, next) {
+		if !of(from_channel_as_item_value(ch)).send_context(ctx, next) {
 			return
 		}
 
-		go fn [mut ch, next, done, timespan, option, mut empty, mut mutex] () {
+		go fn [mut ch, ctx, next, done, timespan, option, mut empty, mut mutex] () {
 			defer {
 				fn [mut mutex, ch] () {
 					mutex.@lock()
@@ -2705,7 +2748,7 @@ pub fn (o &ObservableImpl) window_with_time(timespan Duration, opts ...RxOption)
 					ch.close()
 					empty = true
 					ch = option.build_channel()
-					if !of(from_channel(ch)).send_context(ctx, next) {
+					if !of(from_channel_as_item_value(ch)).send_context(ctx, next) {
 						done.close()
 						return
 					}
@@ -2767,7 +2810,7 @@ pub fn (o &ObservableImpl) window_with_time_or_count(timespan Duration, count in
 		done := chan int{cap: 1}
 		mut mutex := sync.new_mutex()
 		mut i_count := 0
-		if !of(from_channel(ch)).send_context(ctx, next) {
+		if !of(from_channel_as_item_value(ch)).send_context(ctx, next) {
 			return
 		}
 
@@ -2799,7 +2842,7 @@ pub fn (o &ObservableImpl) window_with_time_or_count(timespan Duration, count in
 					ch.close()
 					i_count = 0
 					ch = option.build_channel()
-					if !of(from_channel(ch)).send_context(ctx, next) {
+					if !of(from_channel_as_item_value(ch)).send_context(ctx, next) {
 						done.close()
 						return
 					}
@@ -2840,7 +2883,7 @@ pub fn (o &ObservableImpl) window_with_time_or_count(timespan Duration, count in
 					ch.close()
 					i_count = 0
 					ch = option.build_channel()
-					if !of(from_channel(ch)).send_context(ctx, next) {
+					if !of(from_channel_as_item_value(ch)).send_context(ctx, next) {
 						mutex.unlock()
 						done.close()
 						return
@@ -2872,7 +2915,8 @@ pub fn (o &ObservableImpl) zip_from_iterable(iterable Iterable, zipper Func2, op
 		done := ctx.done()
 		loop: for select {
 			_ := <-done {
-				break loop
+				// break loop
+				break
 			}
 			i1 := <-it1 {
 				if i1.is_error() {
@@ -2881,7 +2925,8 @@ pub fn (o &ObservableImpl) zip_from_iterable(iterable Iterable, zipper Func2, op
 				}
 				for select {
 					_ := <-done {
-						break loop
+						// break loop
+						break
 					}
 					i2 := <-it2 {
 						if i2.is_error() {
@@ -2893,7 +2938,8 @@ pub fn (o &ObservableImpl) zip_from_iterable(iterable Iterable, zipper Func2, op
 							return
 						}
 						of(v).send_context(ctx, next)
-						continue loop
+						// continue loop
+						continue
 					}
 				} {
 				}
