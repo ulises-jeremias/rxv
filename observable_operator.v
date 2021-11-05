@@ -1086,7 +1086,7 @@ pub fn (mut o ObservableImpl) flat_map(apply ItemToObservable, opts ...RxOption)
 				return
 			}
 			item := <-observe {
-                                mut observable := apply(item)
+				mut observable := apply(item)
 				observe2 = observable.observe(...opts)
 			}
 			else {
@@ -1619,7 +1619,7 @@ pub fn (mut op OnErrorResumeNextOperator) next(mut ctx context.Context, item Ite
 
 pub fn (mut op OnErrorResumeNextOperator) err(mut _ context.Context, item Item, _ chan Item, operator_options OperatorOptions) {
 	mut observable := op.resume_sequence(item.err)
-        // operator_options.reset_iterable(mut &observable)
+	// operator_options.reset_iterable(mut &observable)
 }
 
 pub fn (mut op OnErrorResumeNextOperator) end(mut _ context.Context, _ chan Item) {
@@ -2594,7 +2594,7 @@ pub fn (mut o ObservableImpl) to_slice(initial_capacity int, opts ...RxOption) ?
 	op := &ToSliceOperator{
 		s: []ItemValue{cap: initial_capacity}
 	}
-        mut obser := observable(o.parent, mut o, fn [op] () Operator {
+	mut obser := observable(o.parent, mut o, fn [op] () Operator {
 		return op
 	}, true, false, ...opts)
 	_ := <-obser.run()

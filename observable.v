@@ -149,8 +149,8 @@ fn observable(parent context.Context, mut iterable Iterable, operator_factory Op
 		if force_seq || !parallel {
 			run_sequential(mut &ctx, next, mut &iterable, operator_factory, option, ...opts)
 		} else {
-			run_parallel(mut &ctx, next, iterable.observe(...opts), operator_factory, bypass_gather,
-				option, ...opts)
+			run_parallel(mut &ctx, next, iterable.observe(...opts), operator_factory,
+				bypass_gather, option, ...opts)
 		}
 		return &ObservableImpl{
 			iterable: new_channel_iterable(next)
@@ -166,7 +166,8 @@ fn observable(parent context.Context, mut iterable Iterable, operator_factory Op
 
 				next := option.build_channel()
 				mut ctx := option.build_context(parent)
-				run_sequential(mut &ctx, next, mut &iterable, operator_factory, option, ...merged_options)
+				run_sequential(mut &ctx, next, mut &iterable, operator_factory, option,
+					...merged_options)
 				return next
 			})
 		}
@@ -207,8 +208,8 @@ fn observable(parent context.Context, mut iterable Iterable, operator_factory Op
 						}
 					}
 				}()
-				run_first_item(mut &ctx, f, first_item_id_ch, observe, next, mut &iterable, operator_factory,
-					option, ...merged_options)
+				run_first_item(mut &ctx, f, first_item_id_ch, observe, next, mut &iterable,
+					operator_factory, option, ...merged_options)
 				return next
 			})
 		}
@@ -241,8 +242,8 @@ fn single(parent context.Context, mut iterable Iterable, operator_factory Operat
 		if force_seq || !parallel {
 			run_sequential(mut &ctx, next, mut &iterable, operator_factory, option, ...opts)
 		} else {
-			run_parallel(mut &ctx, next, iterable.observe(...opts), operator_factory, bypass_gather,
-				option, ...opts)
+			run_parallel(mut &ctx, next, iterable.observe(...opts), operator_factory,
+				bypass_gather, option, ...opts)
 		}
 		return &SingleImpl{
 			iterable: new_channel_iterable(next)
@@ -256,7 +257,8 @@ fn single(parent context.Context, mut iterable Iterable, operator_factory Operat
 			option = parse_options(...merged_options)
 
 			if force_seq || !parallel {
-				run_sequential(mut &ctx, next, mut &iterable, operator_factory, option, ...merged_options)
+				run_sequential(mut &ctx, next, mut &iterable, operator_factory, option,
+					...merged_options)
 			} else {
 				run_parallel(mut &ctx, next, iterable.observe(...merged_options), operator_factory,
 					bypass_gather, option, ...merged_options)
@@ -276,8 +278,8 @@ fn optional_single(parent context.Context, mut iterable Iterable, operator_facto
 		if force_seq || !parallel {
 			run_sequential(mut &ctx, next, mut &iterable, operator_factory, option, ...opts)
 		} else {
-			run_parallel(mut &ctx, next, iterable.observe(...opts), operator_factory, bypass_gather,
-				option, ...opts)
+			run_parallel(mut &ctx, next, iterable.observe(...opts), operator_factory,
+				bypass_gather, option, ...opts)
 		}
 		return &OptionalSingleImpl{
 			iterable: new_channel_iterable(next)
@@ -294,7 +296,8 @@ fn optional_single(parent context.Context, mut iterable Iterable, operator_facto
 			mut ctx := option.build_context(parent)
 
 			if force_seq || !parallel {
-				run_sequential(mut &ctx, next, mut &iterable, operator_factory, option, ...merged_options)
+				run_sequential(mut &ctx, next, mut &iterable, operator_factory, option,
+					...merged_options)
 			} else {
 				run_parallel(mut &ctx, next, iterable.observe(...merged_options), operator_factory,
 					bypass_gather, option, ...merged_options)

@@ -16,7 +16,7 @@ fn test_send_items_variadic() {
 		ItemValue(&Value{
 		val: 3
 	})]
-        mut bctx := context.background()
+	mut bctx := context.background()
 	go send_items(mut &bctx, ch, .close_channel, items)
 }
 
@@ -30,7 +30,7 @@ fn test_send_items_variadic_with_error() {
 	}), ItemValue(err), ItemValue(&Value{
 		val: 3
 	})]
-        mut bctx := context.background()
+	mut bctx := context.background()
 	go send_items(mut &bctx, ch, .close_channel, items)
 }
 
@@ -45,7 +45,7 @@ fn test_send_items_slice() {
 		ItemValue(&Value{
 		val: 3
 	})]
-        mut bctx := context.background()
+	mut bctx := context.background()
 	go send_items(mut &bctx, ch, .close_channel, items_slice)
 }
 
@@ -60,7 +60,7 @@ fn test_send_items_slice_with_error() {
 	}), ItemValue(err), ItemValue(&Value{
 		val: 3
 	})]
-        mut bctx := context.background()
+	mut bctx := context.background()
 	go send_items(mut &bctx, ch, .close_channel, items_slice)
 }
 
@@ -78,7 +78,7 @@ fn test_item_send_context_true() {
 	defer {
 		ch.close()
 	}
-        mut bctx := context.background()
+	mut bctx := context.background()
 	mut ctx, cancel := context.with_cancel(mut &bctx)
 	defer {
 		cancel()
@@ -91,7 +91,7 @@ fn test_item_send_context_false() {
 	defer {
 		ch.close()
 	}
-        mut bctx := context.background()
+	mut bctx := context.background()
 	mut ctx, cancel := context.with_cancel(mut &bctx)
 	cancel()
 	assert !of(5).send_context(mut &ctx, ch)

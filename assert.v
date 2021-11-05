@@ -218,7 +218,7 @@ pub fn test(mut ctx context.Context, mut iterable Iterable, assertions ...IRxAss
 	mut errs := []IError{}
 
 	observe := iterable.observe()
-        done := ctx.done()
+	done := ctx.done()
 
 	loop: for {
 		if select {
