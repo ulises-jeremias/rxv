@@ -8,12 +8,12 @@ struct EventSourceIterable {
 	disposed  shared bool
 }
 
-fn new_event_source_iterable(ctx context.Context, next chan Item, strategy BackpressureStrategy, opts ...RxOption) Iterable {
+fn new_event_source_iterable(mut ctx context.Context, next chan Item, strategy BackpressureStrategy, opts ...RxOption) Iterable {
 	mut iterable := &EventSourceIterable{
 		opts: opts
 	}
 
-	go fn (mut i EventSourceIterable, ctx context.Context, next chan Item, strategy BackpressureStrategy) {
+	go fn (mut i EventSourceIterable, mut ctx context.Context, next chan Item, strategy BackpressureStrategy) {
 		defer {
 			i.close_all_observers()
 		}
@@ -25,13 +25,13 @@ fn new_event_source_iterable(ctx context.Context, next chan Item, strategy Backp
 				return
 			}
 			item := <-next {
-				if i.deliver(item, ctx, next, strategy) {
+				if i.deliver(item, mut &ctx, next, strategy) {
 					return
 				}
 			}
 		} {
 		}
-	}(mut iterable, ctx, next, strategy)
+	}(mut iterable, mut &ctx, next, strategy)
 
 	return iterable
 }
@@ -45,12 +45,12 @@ fn (mut i EventSourceIterable) close_all_observers() {
 	}
 }
 
-fn (i &EventSourceIterable) deliver(item Item, ctx context.Context, next chan Item, strategy BackpressureStrategy) bool {
+fn (i &EventSourceIterable) deliver(item Item, mut ctx context.Context, next chan Item, strategy BackpressureStrategy) bool {
 	rlock i.observers {
 		match strategy {
 			.block {
 				for observer in i.observers {
-					if !item.send_context(ctx, observer) {
+					if !item.send_context(mut &ctx, observer) {
 						return true
 					}
 				}

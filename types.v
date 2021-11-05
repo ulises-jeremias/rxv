@@ -4,7 +4,7 @@ import context
 
 struct OperatorOptions {
 	stop           fn ()
-	reset_iterable fn (Iterable)
+	reset_iterable fn (mut Iterable)
 }
 
 // Comparator defines a func that returns an int:
@@ -20,10 +20,10 @@ pub type ItemToObservable = fn (item Item) Observable
 pub type ErrorToObservable = fn (err IError) Observable
 
 // Func defines a function that computes a value from an input value.
-pub type Func = fn (ctx context.Context, arg ItemValue) ?ItemValue
+pub type Func = fn (mut ctx context.Context, arg ItemValue) ?ItemValue
 
 // Func2 defines a function that computes a value from two input values.
-pub type Func2 = fn (ctx context.Context, a ItemValue, b ItemValue) ?ItemValue
+pub type Func2 = fn (mut ctx context.Context, a ItemValue, b ItemValue) ?ItemValue
 
 // FuncN defines a function that computes a value from N input values.
 pub type FuncN = fn (args ...ItemValue) ItemValue
@@ -41,10 +41,10 @@ pub type Marshaller = fn (ItemValue) ?[]byte
 pub type Unmarshaller = fn ([]byte, ItemValue) string
 
 // Producer defines a producer implementation.
-pub type Producer = fn (ctx context.Context, next chan Item)
+pub type Producer = fn (mut ctx context.Context, next chan Item)
 
 // Supplier defines a function that supplies a result from nothing.
-pub type Supplier = fn (ctx context.Context) Item
+pub type Supplier = fn (mut ctx context.Context) Item
 
 // Disposed is a notification channel indicating when an Observable is closed.
 // pub type Disposed  = chan int

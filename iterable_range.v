@@ -21,10 +21,10 @@ pub fn (i &RangeIterable) observe(opts ...RxOption) chan Item {
 	mut options := i.opts.clone()
 	options << opts.clone()
 	option := parse_options(...options)
-	ctx := option.build_context(empty_context)
+	mut ctx := option.build_context(empty_context)
 	next := option.build_channel()
 
-	go fn (i &RangeIterable, next chan Item, ctx context.Context) {
+	go fn (i &RangeIterable, next chan Item, mut ctx context.Context) {
 		for idx in i.start .. i.start + i.count {
 			done := ctx.done()
 			select {
@@ -35,6 +35,6 @@ pub fn (i &RangeIterable) observe(opts ...RxOption) chan Item {
 			}
 		}
 		next.close()
-	}(i, next, ctx)
+	}(i, next, mut &ctx)
 	return next
 }

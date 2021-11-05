@@ -5,10 +5,10 @@ import sync
 
 type OperatorFactoryFn = fn () Operator
 
-fn run_sequential(ctx context.Context, next chan Item, iterable Iterable, operator_factory OperatorFactoryFn, option RxOption, opts ...RxOption) {
+fn run_sequential(mut ctx context.Context, next chan Item, mut iterable Iterable, operator_factory OperatorFactoryFn, option RxOption, opts ...RxOption) {
 	mut observe := iterable.observe(...opts)
-	go fn [mut observe, opts] (ctx context.Context, next chan Item, operator_factory OperatorFactoryFn, option RxOption) {
-		op := operator_factory()
+	go fn [mut observe, opts] (mut ctx context.Context, next chan Item, operator_factory OperatorFactoryFn, option RxOption) {
+		mut op := operator_factory()
 		mut stopped := false
 		operator := OperatorOptions{
 			stop: fn [option, mut stopped] () {
@@ -16,7 +16,7 @@ fn run_sequential(ctx context.Context, next chan Item, iterable Iterable, operat
 					stopped = true
 				}
 			}
-			reset_iterable: fn [mut observe, opts] (new_iterable Iterable) {
+			reset_iterable: fn [mut observe, opts] (mut new_iterable Iterable) {
 				observe = new_iterable.observe(...opts)
 			}
 		}
@@ -29,19 +29,19 @@ fn run_sequential(ctx context.Context, next chan Item, iterable Iterable, operat
 				}
 				item := <-observe {
 					if item.is_error() {
-						op.err(ctx, item, next, operator)
+						op.err(mut &ctx, item, next, operator)
 					} else {
-						op.gather_next(ctx, item, next, operator)
+						op.gather_next(mut &ctx, item, next, operator)
 					}
 				}
 			}
 		}
-		op.end(ctx, next)
+		op.end(mut &ctx, next)
 		next.close()
-	}(ctx, next, operator_factory, option)
+	}(mut &ctx, next, operator_factory, option)
 }
 
-fn run_parallel(ctx context.Context, next chan Item, observe chan Item, operator_factory OperatorFactoryFn, bypass_gather bool, option RxOption, opts ...RxOption) {
+fn run_parallel(mut ctx context.Context, next chan Item, observe chan Item, operator_factory OperatorFactoryFn, bypass_gather bool, option RxOption, opts ...RxOption) {
 	mut wg := sync.new_waitgroup()
 	mut observe_ := observe
 	pool := option.get_pool() or { 0 }
@@ -54,8 +54,8 @@ fn run_parallel(ctx context.Context, next chan Item, observe chan Item, operator
 		gather = chan Item{cap: 1}
 
 		// gather
-		go fn [mut observe_, opts] (ctx context.Context, next chan Item, gather chan Item, operator_factory OperatorFactoryFn, bypass_gather bool, option RxOption) {
-			op := operator_factory()
+		go fn [mut observe_, opts] (mut ctx context.Context, next chan Item, gather chan Item, operator_factory OperatorFactoryFn, bypass_gather bool, option RxOption) {
+			mut op := operator_factory()
 			mut stopped := false
 			operator := OperatorOptions{
 				stop: fn [option, mut stopped] () {
@@ -63,7 +63,7 @@ fn run_parallel(ctx context.Context, next chan Item, observe chan Item, operator
 						stopped = true
 					}
 				}
-				reset_iterable: fn [mut observe_, opts] (new_iterable Iterable) {
+				reset_iterable: fn [mut observe_, opts] (mut new_iterable Iterable) {
 					observe_ = new_iterable.observe(...opts)
 				}
 			}
@@ -74,22 +74,22 @@ fn run_parallel(ctx context.Context, next chan Item, observe chan Item, operator
 						break
 					}
 					if item.is_error() {
-						op.err(ctx, item, next, operator)
+						op.err(mut &ctx, item, next, operator)
 					} else {
-						op.gather_next(ctx, item, next, operator)
+						op.gather_next(mut &ctx, item, next, operator)
 					}
 				}
 			} {
 			}
-			op.end(ctx, next)
+			op.end(mut &ctx, next)
 			next.close()
-		}(ctx, next, gather, operator_factory, bypass_gather, option)
+		}(mut &ctx, next, gather, operator_factory, bypass_gather, option)
 	}
 
 	// scatter
 	for i in 0 .. pool {
-		go fn [mut observe_, opts] (mut wg sync.WaitGroup, ctx context.Context, gather chan Item, operator_factory OperatorFactoryFn, option RxOption) {
-			op := operator_factory()
+		go fn [mut observe_, opts] (mut wg sync.WaitGroup, mut ctx context.Context, gather chan Item, operator_factory OperatorFactoryFn, option RxOption) {
+			mut op := operator_factory()
 			mut stopped := false
 			operator := OperatorOptions{
 				stop: fn [option, mut stopped] () {
@@ -97,7 +97,7 @@ fn run_parallel(ctx context.Context, next chan Item, observe chan Item, operator
 						stopped = true
 					}
 				}
-				reset_iterable: fn [mut observe_, opts] (new_iterable Iterable) {
+				reset_iterable: fn [mut observe_, opts] (mut new_iterable Iterable) {
 					observe_ = new_iterable.observe(...opts)
 				}
 			}
@@ -114,14 +114,14 @@ fn run_parallel(ctx context.Context, next chan Item, observe chan Item, operator
 					}
 					item := <-observe_ {
 						if item.is_error() {
-							op.err(ctx, item, gather, operator)
+							op.err(mut &ctx, item, gather, operator)
 						} else {
-							op.gather_next(ctx, item, gather, operator)
+							op.gather_next(mut &ctx, item, gather, operator)
 						}
 					}
 				}
 			}
-		}(mut wg, ctx, gather, operator_factory, option)
+		}(mut wg, mut &ctx, gather, operator_factory, option)
 	}
 
 	go fn (mut wg sync.WaitGroup, gather chan Item) {
@@ -130,10 +130,10 @@ fn run_parallel(ctx context.Context, next chan Item, observe chan Item, operator
 	}(mut wg, gather)
 }
 
-fn run_first_item(ctx context.Context, f IdentifierFn, notif chan Item, observe chan Item, next chan Item, iterable Iterable, operator_factory OperatorFactoryFn, option RxOption, opts ...RxOption) {
+fn run_first_item(mut ctx context.Context, f IdentifierFn, notif chan Item, observe chan Item, next chan Item, mut iterable Iterable, operator_factory OperatorFactoryFn, option RxOption, opts ...RxOption) {
 	mut observe_ := observe
-	go fn [mut observe_, opts] (ctx context.Context, f IdentifierFn, notif chan Item, next chan Item, operator_factory OperatorFactoryFn, option RxOption) {
-		op := operator_factory()
+	go fn [mut observe_, opts] (mut ctx context.Context, f IdentifierFn, notif chan Item, next chan Item, operator_factory OperatorFactoryFn, option RxOption) {
+		mut op := operator_factory()
 		mut stopped := false
 		operator := OperatorOptions{
 			stop: fn [option, mut stopped] () {
@@ -141,7 +141,7 @@ fn run_first_item(ctx context.Context, f IdentifierFn, notif chan Item, observe 
 					stopped = true
 				}
 			}
-			reset_iterable: fn [mut observe_, opts] (new_iterable Iterable) {
+			reset_iterable: fn [mut observe_, opts] (mut new_iterable Iterable) {
 				observe_ = new_iterable.observe(...opts)
 			}
 		}
@@ -154,16 +154,16 @@ fn run_first_item(ctx context.Context, f IdentifierFn, notif chan Item, observe 
 				}
 				item := <-observe_ {
 					if item.is_error() {
-						op.err(ctx, item, next, operator)
-						item.send_context(ctx, notif)
+						op.err(mut &ctx, item, next, operator)
+						item.send_context(mut &ctx, notif)
 					} else {
-						op.gather_next(ctx, item, next, operator)
-						of(f(item.value)).send_context(ctx, notif)
+						op.gather_next(mut &ctx, item, next, operator)
+						of(f(item.value)).send_context(mut &ctx, notif)
 					}
 				}
 			}
 		}
-		op.end(ctx, next)
+		op.end(mut &ctx, next)
 		next.close()
-	}(ctx, f, notif, next, operator_factory, option)
+	}(mut &ctx, f, notif, next, operator_factory, option)
 }

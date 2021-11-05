@@ -129,8 +129,8 @@ pub fn with_buffered_channel(capacity int) RxOption {
 }
 
 // with_context allows to pass a context.
-pub fn with_context(ctx context.Context) RxOption {
-	return new_func_option(fn [ctx] (mut options FuncOption) {
+pub fn with_context(mut ctx context.Context) RxOption {
+	return new_func_option(fn [mut ctx] (mut options FuncOption) {
 		options.ctx = ctx
 	})
 }

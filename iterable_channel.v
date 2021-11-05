@@ -38,14 +38,14 @@ pub fn (mut i ChannelIterable) observe(opts ...RxOption) chan Item {
 	return ch
 }
 
-fn (mut i ChannelIterable) connect(ctx context.Context) {
+fn (mut i ChannelIterable) connect(mut ctx context.Context) {
 	lock i.producer_already_created {
 		go i.produce(ctx)
 		i.producer_already_created = true
 	}
 }
 
-fn (mut i ChannelIterable) produce(ctx context.Context) {
+fn (mut i ChannelIterable) produce(mut ctx context.Context) {
 	defer {
 		rlock i.subscribers {
 			for subscriber in i.subscribers {

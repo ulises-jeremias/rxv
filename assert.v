@@ -212,15 +212,15 @@ fn parse_assertions(assertions ...IRxAssert) IRxAssert {
 }
 
 // test asserts the result of an iterable against a list of assertions.
-pub fn test(ctx context.Context, iterable Iterable, assertions ...IRxAssert) {
+pub fn test(mut ctx context.Context, mut iterable Iterable, assertions ...IRxAssert) {
 	ass := parse_assertions(...assertions)
 	mut got := []ItemValue{}
 	mut errs := []IError{}
 
-	observe := iterable.observe(...[])
+	observe := iterable.observe()
+        done := ctx.done()
 
 	loop: for {
-		done := ctx.done()
 		if select {
 			_ := <-done {
 				break loop

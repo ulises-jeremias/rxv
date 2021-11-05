@@ -13,7 +13,7 @@ pub fn thrown(err IError) Observable {
 // from_channel creates a cold observable from a channel.
 pub fn from_channel(next chan Item, opts ...RxOption) Observable {
 	option := parse_options(...opts)
-	ctx := option.build_context(empty_context)
+	mut ctx := option.build_context(empty_context)
 	return &ObservableImpl{
 		parent: ctx
 		iterable: new_channel_iterable(next, ...opts)

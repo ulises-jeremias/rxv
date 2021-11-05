@@ -9,7 +9,8 @@ pub const (
 
 // OptionalSingle is an optional single
 pub interface OptionalSingle {
-	Iterable
+        Iterable
+mut:
 	get(opts ...RxOption) ?Item
 	map(apply Func, opts ...RxOption) Single
 	run(opts ...RxOption) chan int
@@ -17,20 +18,21 @@ pub interface OptionalSingle {
 
 // OptionalSingleImpl is the default implementation for OptionalSingle
 pub struct OptionalSingleImpl {
+mut:
 	iterable Iterable
 	parent   context.Context
 }
 
 // observe observes an OptionalSingle by returning its channel.
-fn (o &OptionalSingleImpl) observe(opts ...RxOption) chan Item {
+fn (mut o OptionalSingleImpl) observe(opts ...RxOption) chan Item {
 	return o.iterable.observe(...opts)
 }
 
 // get returns the item or rxv.optional_empty. The error returned is if the context has been canceled.
 // this method is blocking.
-pub fn (o &OptionalSingleImpl) get(opts ...RxOption) ?Item {
+pub fn (mut o OptionalSingleImpl) get(opts ...RxOption) ?Item {
 	option := parse_options(...opts)
-	ctx := option.build_context(o.parent)
+	mut ctx := option.build_context(o.parent)
 
 	observe := o.observe(...opts)
 	done := ctx.done()
@@ -56,8 +58,8 @@ struct MapOperatorOptionalSingle {
 	apply Func
 }
 
-fn (op &MapOperatorOptionalSingle) next(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	if res := op.apply(ctx, item.value) {
+fn (op &MapOperatorOptionalSingle) next(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
+	if res := op.apply(mut &ctx, item.value) {
 		dst <- of(res)
 	} else {
 		dst <- from_error(err)
@@ -65,13 +67,13 @@ fn (op &MapOperatorOptionalSingle) next(ctx context.Context, item Item, dst chan
 	}
 }
 
-fn (op &MapOperatorOptionalSingle) err(ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	default_error_func_operator(ctx, item, dst, operator_options)
+fn (op &MapOperatorOptionalSingle) err(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
+	default_error_func_operator(mut &ctx, item, dst, operator_options)
 }
 
-fn (op &MapOperatorOptionalSingle) end(_ context.Context, _ chan Item) {}
+fn (op &MapOperatorOptionalSingle) end(mut _ context.Context, _ chan Item) {}
 
-fn (op &MapOperatorOptionalSingle) gather_next(_ context.Context, item Item, dst chan Item, _ OperatorOptions) {
+fn (op &MapOperatorOptionalSingle) gather_next(mut _ context.Context, item Item, dst chan Item, _ OperatorOptions) {
 	if item.value is MapOperatorOptionalSingle {
 		return
 	}
@@ -79,8 +81,8 @@ fn (op &MapOperatorOptionalSingle) gather_next(_ context.Context, item Item, dst
 }
 
 // map transforms the items emitted by an optional_single by applying a function to each item
-pub fn (o &OptionalSingleImpl) map(apply Func, opts ...RxOption) Single {
-	return single(o.parent, o, fn () Operator {
+pub fn (mut o OptionalSingleImpl) map(apply Func, opts ...RxOption) Single {
+	return single(o.parent, mut o, fn () Operator {
 		return &MapOperatorOptionalSingle{
 			apply: unsafe { voidptr(0) } // apply
 		}
@@ -88,14 +90,14 @@ pub fn (o &OptionalSingleImpl) map(apply Func, opts ...RxOption) Single {
 }
 
 // run creates an observer without consuming the emitted items
-pub fn (o &OptionalSingleImpl) run(opts ...RxOption) chan int {
+pub fn (mut o OptionalSingleImpl) run(opts ...RxOption) chan int {
 	dispose := chan int{}
 	option := parse_options(...opts)
-	ctx := option.build_context(o.parent)
+	mut ctx := option.build_context(o.parent)
 
 	observe := o.observe(...opts)
 
-	go fn (dispose chan int, ctx context.Context, observe chan Item) {
+	go fn (dispose chan int, mut ctx context.Context, observe chan Item) {
 		defer {
 			dispose.close()
 		}
@@ -109,7 +111,7 @@ pub fn (o &OptionalSingleImpl) run(opts ...RxOption) chan int {
 				_ := <-observe {}
 			}
 		}
-	}(dispose, ctx, observe)
+	}(dispose, mut &ctx, observe)
 
 	return dispose
 }

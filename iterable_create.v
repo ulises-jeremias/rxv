@@ -12,17 +12,17 @@ struct CreateIterable {
 fn new_create_iterable(fs []Producer, opts ...RxOption) Iterable {
 	mut options := opts.clone()
 	option := parse_options(...options)
-	ctx := option.build_context(empty_context)
+	mut ctx := option.build_context(empty_context)
 	next := option.build_channel()
 
-	go fn (fs []Producer, next chan Item, ctx context.Context) {
+	go fn (fs []Producer, next chan Item, mut ctx context.Context) {
 		defer {
 			next.close()
 		}
 		for f in fs {
-			f(ctx, next)
+			f(mut &ctx, next)
 		}
-	}(fs, next, ctx)
+	}(fs, next, mut &ctx)
 
 	return &CreateIterable{
 		next: next
@@ -52,14 +52,14 @@ pub fn (mut i CreateIterable) observe(opts ...RxOption) chan Item {
 	return ch
 }
 
-fn (mut i CreateIterable) connect(ctx context.Context) {
+fn (mut i CreateIterable) connect(mut ctx context.Context) {
 	lock i.producer_already_created {
 		go i.produce(ctx)
 		i.producer_already_created = true
 	}
 }
 
-fn (mut i CreateIterable) produce(ctx context.Context) {
+fn (mut i CreateIterable) produce(mut ctx context.Context) {
 	defer {
 		rlock i.subscribers {
 			for subscriber in i.subscribers {

@@ -48,20 +48,20 @@ pub fn from_error(err IError) Item {
 
 // send_items is an utility funtion that send a list of ItemValue and indicate
 // the strategy on whether to close the channel once the function completes
-pub fn send_items(ctx context.Context, ch chan Item, strategy CloseChannelStrategy, items []ItemValue) {
+pub fn send_items(mut ctx context.Context, ch chan Item, strategy CloseChannelStrategy, items []ItemValue) {
 	if strategy == .close_channel {
 		defer {
 			ch.close()
 		}
 	}
-	send(ctx, ch, ...items)
+	send(mut &ctx, ch, ...items)
 }
 
-fn send(ctx context.Context, ch chan Item, items ...ItemValue) {
+fn send(mut ctx context.Context, ch chan Item, items ...ItemValue) {
 	for item in items {
 		match item {
 			Error {
-				error(item).send_context(ctx, ch)
+				error(item).send_context(mut &ctx, ch)
 			}
 			chan ItemValue {
 				loop: for {
@@ -69,10 +69,10 @@ fn send(ctx context.Context, ch chan Item, items ...ItemValue) {
 						i := <-item {
 							match i {
 								Error {
-									error(i).send_context(ctx, ch)
+									error(i).send_context(mut &ctx, ch)
 								}
 								else {
-									of(i).send_context(ctx, ch)
+									of(i).send_context(mut &ctx, ch)
 								}
 							}
 						}
@@ -84,11 +84,11 @@ fn send(ctx context.Context, ch chan Item, items ...ItemValue) {
 			}
 			[]ItemValue {
 				for i in item {
-					send(ctx, ch, i)
+					send(mut &ctx, ch, i)
 				}
 			}
 			else {
-				of(item).send_context(ctx, ch)
+				of(item).send_context(mut &ctx, ch)
 			}
 		}
 	}
@@ -112,7 +112,7 @@ pub fn (i Item) send_blocking(ch chan Item) {
 
 // send_context sends an item and blocks until it is sent or a context canceled.
 // It returns a boolean to indicate wheter the item was sent.
-pub fn (i Item) send_context(ctx context.Context, ch chan Item) bool {
+pub fn (i Item) send_context(mut ctx context.Context, ch chan Item) bool {
 	idone := ctx.done()
 	select {
 		_ := <-idone {
