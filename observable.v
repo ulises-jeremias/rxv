@@ -213,7 +213,7 @@ fn observable(parent context.Context, mut iterable Iterable, operator_factory Op
 				return next
 			})
 		}
-		return obs.serialize(parent, f, from_ch)
+		return obs.serialize(parent, f)
 	}
 
 	return &ObservableImpl{
