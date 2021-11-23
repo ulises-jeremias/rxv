@@ -1493,9 +1493,10 @@ pub fn (mut op MapOperator) gather_next(mut ctx context.Context, item Item, dst 
 
 // Marshal transforms the items emitted by an Observable by applying a marshalling to each item.
 pub fn (mut o ObservableImpl) marshal(marshaller Marshaller, opts ...RxOption) Observable {
-	return o.map(fn [marshaller] (mut _ context.Context, i ItemValue) ?ItemValue {
+	transform_fn := fn [marshaller] (mut _ context.Context, i ItemValue) ?ItemValue {
 		return i // (marshaller(i) ?).map(ItemValue(it))
-	}, ...opts)
+	}
+	return o.map(Func(transform_fn), ...opts)
 }
 
 // Max determines and emits the maximum-valued item emitted by an Observable according to a comparator.
@@ -2248,7 +2249,7 @@ pub fn (mut o ObservableImpl) start_with(mut iterable Iterable, opts ...RxOption
 
 // sum_f32 calculates the average of f32 emitted by an Observable and emits a f32.
 pub fn (mut o ObservableImpl) sum_f32(opts ...RxOption) OptionalSingle {
-	return o.reduce(fn (mut _ context.Context, acc ItemValue, i ItemValue) ?ItemValue {
+	reducer_fn := fn (mut _ context.Context, acc ItemValue, i ItemValue) ?ItemValue {
 		sum := match acc {
 			f32 { *acc }
 			else { f32(0) }
@@ -2273,12 +2274,13 @@ pub fn (mut o ObservableImpl) sum_f32(opts ...RxOption) OptionalSingle {
 				return new_illegal_input_error('expected type: (f32|int|i8|i16|int|i64), got: $i')
 			}
 		}
-	}, ...opts)
+	}
+	return o.reduce(Func2(reducer_fn), ...opts)
 }
 
 // sum_f64 calculates the average of f64 emitted by an Observable and emits a f64.
 pub fn (mut o ObservableImpl) sum_f64(opts ...RxOption) OptionalSingle {
-	return o.reduce(fn (mut _ context.Context, acc ItemValue, i ItemValue) ?ItemValue {
+	reducer_fn := fn (mut _ context.Context, acc ItemValue, i ItemValue) ?ItemValue {
 		sum := match acc {
 			f64 { *acc }
 			else { f64(0) }
@@ -2306,12 +2308,13 @@ pub fn (mut o ObservableImpl) sum_f64(opts ...RxOption) OptionalSingle {
 				return new_illegal_input_error('expected type: (f32|f64|int|i8|i16|int|i64), got: $i')
 			}
 		}
-	}, ...opts)
+	}
+	return o.reduce(Func2(reducer_fn), ...opts)
 }
 
 // sum_i64 calculates the average of integers emitted by an Observable and emits an i64.
 pub fn (mut o ObservableImpl) sum_i64(opts ...RxOption) OptionalSingle {
-	return o.reduce(fn (mut _ context.Context, acc ItemValue, i ItemValue) ?ItemValue {
+	reducer_fn := fn (mut _ context.Context, acc ItemValue, i ItemValue) ?ItemValue {
 		sum := match acc {
 			i64 { *acc }
 			else { i64(0) }
@@ -2333,7 +2336,8 @@ pub fn (mut o ObservableImpl) sum_i64(opts ...RxOption) OptionalSingle {
 				return new_illegal_input_error('expected type: (int|i8|i16|int|i64), got: $i')
 			}
 		}
-	}, ...opts)
+	}
+	return o.reduce(Func2(reducer_fn), ...opts)
 }
 
 // take emits only the first n items emitted by an Observable.
@@ -2629,7 +2633,7 @@ pub fn (mut op ToSliceOperator) gather_next(mut _ context.Context, _ Item, _ cha
 
 // Unmarshal transforms the items emitted by an Observable by applying an unmarshalling to each item.
 pub fn (mut o ObservableImpl) unmarshal(unmarshaller Unmarshaller, factory FactoryFn, opts ...RxOption) Observable {
-	return o.map(fn [unmarshaller, factory] (mut _ context.Context, i ItemValue) ?ItemValue {
+	transform_fn := fn [unmarshaller, factory] (mut _ context.Context, i ItemValue) ?ItemValue {
 		v := factory()
 		match i {
 			// []byte {
@@ -2638,7 +2642,8 @@ pub fn (mut o ObservableImpl) unmarshal(unmarshaller Unmarshaller, factory Facto
 			else {}
 		}
 		return v
-	}, ...opts)
+	}
+	return o.map(Func(transform_fn), ...opts)
 }
 
 // WindowWithCount periodically subdivides items from an Observable into Observable windows of a given size and emit these windows

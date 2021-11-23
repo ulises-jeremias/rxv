@@ -121,13 +121,15 @@ fn custom_observable_operator(parent context.Context, f IterableFactoryFn, opts 
 		}
 	}
 
+	factory_fn := fn [mut ctx, next, option, opts, f] (propagated_options ...RxOption) chan Item {
+		mut merged_options := opts.clone()
+		merged_options << propagated_options
+		go f(mut &ctx, next, option, ...merged_options)
+		return chan Item{}
+	}
+
 	return &ObservableImpl{
-		iterable: new_factory_iterable(fn [mut ctx, next, option, opts, f] (propagated_options ...RxOption) chan Item {
-			mut merged_options := opts.clone()
-			merged_options << propagated_options
-			go f(mut &ctx, next, option, ...merged_options)
-			return chan Item{}
-		})
+		iterable: new_factory_iterable(FactoryFn(factory_fn))
 	}
 }
 
@@ -158,76 +160,82 @@ fn observable(parent context.Context, mut iterable Iterable, operator_factory Op
 	}
 
 	if force_seq || !parallel {
-		return &ObservableImpl{
-			iterable: new_factory_iterable(fn [opts, parent, mut iterable, operator_factory] (propagated_options ...RxOption) chan Item {
-				mut merged_options := opts.clone()
-				merged_options << propagated_options
-				option := parse_options(...merged_options)
-
-				next := option.build_channel()
-				mut ctx := option.build_context(parent)
-				run_sequential(mut &ctx, next, mut &iterable, operator_factory, option,
-					...merged_options)
-				return next
-			})
-		}
-	}
-
-	if f := option.is_serialized() {
-		first_item_id_ch := chan Item{cap: 1}
-		from_ch := chan Item{cap: 1}
-		mut obs := &ObservableImpl{
-			iterable: new_factory_iterable(fn [f, operator_factory, parent, opts, first_item_id_ch, from_ch, bypass_gather, parent, mut iterable, operator_factory] (propagated_options ...RxOption) chan Item {
-				mut merged_options := opts.clone()
-				merged_options << propagated_options
-				option := parse_options(...merged_options)
-
-				next := option.build_channel()
-				mut ctx := option.build_context(parent)
-				observe := iterable.observe(...opts)
-				go fn [mut ctx, first_item_id_ch, from_ch, next, observe, operator_factory, bypass_gather, option, merged_options] () {
-					done := ctx.done()
-					select {
-						_ := <-done {
-							return
-						}
-						first_item_id := <-first_item_id_ch {
-							if first_item_id.is_error() {
-								first_item_id.send_context(mut &ctx, from_ch)
-								return
-							}
-							value := first_item_id.value
-							match value {
-								int {
-									of(value).send_context(mut &ctx, from_ch)
-									run_parallel(mut &ctx, next, observe, operator_factory,
-										bypass_gather, option, ...merged_options)
-								}
-								else {}
-							}
-						}
-					}
-				}()
-				run_first_item(mut &ctx, f, first_item_id_ch, observe, next, mut &iterable,
-					operator_factory, option, ...merged_options)
-				return next
-			})
-		}
-		return obs.serialize(parent, f)
-	}
-
-	return &ObservableImpl{
-		iterable: new_factory_iterable(fn [opts, mut iterable, parent, operator_factory, bypass_gather] (propagated_options ...RxOption) chan Item {
+		factory_fn := fn [opts, parent, mut iterable, operator_factory] (propagated_options ...RxOption) chan Item {
 			mut merged_options := opts.clone()
 			merged_options << propagated_options
 			option := parse_options(...merged_options)
 
 			next := option.build_channel()
 			mut ctx := option.build_context(parent)
-			run_parallel(mut &ctx, next, iterable.observe(...merged_options), operator_factory,
-				bypass_gather, option, ...merged_options)
+			run_sequential(mut &ctx, next, mut &iterable, operator_factory, option, ...merged_options)
 			return next
-		})
+		}
+
+		return &ObservableImpl{
+			iterable: new_factory_iterable(FactoryFn(factory_fn))
+		}
+	}
+
+	if f := option.is_serialized() {
+		first_item_id_ch := chan Item{cap: 1}
+		from_ch := chan Item{cap: 1}
+
+		factory_fn := fn [f, operator_factory, parent, opts, first_item_id_ch, from_ch, bypass_gather, parent, mut iterable, operator_factory] (propagated_options ...RxOption) chan Item {
+			mut merged_options := opts.clone()
+			merged_options << propagated_options
+			option := parse_options(...merged_options)
+
+			next := option.build_channel()
+			mut ctx := option.build_context(parent)
+			observe := iterable.observe(...opts)
+			go fn [mut ctx, first_item_id_ch, from_ch, next, observe, operator_factory, bypass_gather, option, merged_options] () {
+				done := ctx.done()
+				select {
+					_ := <-done {
+						return
+					}
+					first_item_id := <-first_item_id_ch {
+						if first_item_id.is_error() {
+							first_item_id.send_context(mut &ctx, from_ch)
+							return
+						}
+						value := first_item_id.value
+						match value {
+							int {
+								of(value).send_context(mut &ctx, from_ch)
+								run_parallel(mut &ctx, next, observe, operator_factory,
+									bypass_gather, option, ...merged_options)
+							}
+							else {}
+						}
+					}
+				}
+			}()
+			run_first_item(mut &ctx, f, first_item_id_ch, observe, next, mut &iterable,
+				operator_factory, option, ...merged_options)
+			return next
+		}
+
+		mut obs := &ObservableImpl{
+			iterable: new_factory_iterable(FactoryFn(factory_fn))
+		}
+		return obs.serialize(parent, f)
+	}
+
+	factory_fn := fn [opts, mut iterable, parent, operator_factory, bypass_gather] (propagated_options ...RxOption) chan Item {
+		mut merged_options := opts.clone()
+		merged_options << propagated_options
+		option := parse_options(...merged_options)
+
+		next := option.build_channel()
+		mut ctx := option.build_context(parent)
+		run_parallel(mut &ctx, next, iterable.observe(...merged_options), operator_factory,
+			bypass_gather, option, ...merged_options)
+		return next
+	}
+
+	return &ObservableImpl{
+		iterable: new_factory_iterable(FactoryFn(factory_fn))
 	}
 }
 
@@ -250,21 +258,22 @@ fn single(parent context.Context, mut iterable Iterable, operator_factory Operat
 		}
 	}
 
-	return &SingleImpl{
-		iterable: new_factory_iterable(fn [mut ctx, next, mut iterable, operator_factory, bypass_gather, mut option, opts, force_seq, parallel] (propagated_options ...RxOption) chan Item {
-			mut merged_options := opts.clone()
-			merged_options << propagated_options
-			option = parse_options(...merged_options)
+	factory_fn := fn [mut ctx, next, mut iterable, operator_factory, bypass_gather, mut option, opts, force_seq, parallel] (propagated_options ...RxOption) chan Item {
+		mut merged_options := opts.clone()
+		merged_options << propagated_options
+		option = parse_options(...merged_options)
 
-			if force_seq || !parallel {
-				run_sequential(mut &ctx, next, mut &iterable, operator_factory, option,
-					...merged_options)
-			} else {
-				run_parallel(mut &ctx, next, iterable.observe(...merged_options), operator_factory,
-					bypass_gather, option, ...merged_options)
-			}
-			return next
-		})
+		if force_seq || !parallel {
+			run_sequential(mut &ctx, next, mut &iterable, operator_factory, option, ...merged_options)
+		} else {
+			run_parallel(mut &ctx, next, iterable.observe(...merged_options), operator_factory,
+				bypass_gather, option, ...merged_options)
+		}
+		return next
+	}
+
+	return &SingleImpl{
+		iterable: new_factory_iterable(FactoryFn(factory_fn))
 	}
 }
 
@@ -286,23 +295,24 @@ fn optional_single(parent context.Context, mut iterable Iterable, operator_facto
 		}
 	}
 
+	factory_fn := fn [parent, mut iterable, operator_factory, bypass_gather, mut option, opts, force_seq, parallel] (propagated_options ...RxOption) chan Item {
+		mut merged_options := opts.clone()
+		merged_options << propagated_options
+		option = parse_options(...merged_options)
+
+		next := option.build_channel()
+		mut ctx := option.build_context(parent)
+
+		if force_seq || !parallel {
+			run_sequential(mut &ctx, next, mut &iterable, operator_factory, option, ...merged_options)
+		} else {
+			run_parallel(mut &ctx, next, iterable.observe(...merged_options), operator_factory,
+				bypass_gather, option, ...merged_options)
+		}
+		return next
+	}
+
 	return &OptionalSingleImpl{
-		iterable: new_factory_iterable(fn [parent, mut iterable, operator_factory, bypass_gather, mut option, opts, force_seq, parallel] (propagated_options ...RxOption) chan Item {
-			mut merged_options := opts.clone()
-			merged_options << propagated_options
-			option = parse_options(...merged_options)
-
-			next := option.build_channel()
-			mut ctx := option.build_context(parent)
-
-			if force_seq || !parallel {
-				run_sequential(mut &ctx, next, mut &iterable, operator_factory, option,
-					...merged_options)
-			} else {
-				run_parallel(mut &ctx, next, iterable.observe(...merged_options), operator_factory,
-					bypass_gather, option, ...merged_options)
-			}
-			return next
-		})
+		iterable: new_factory_iterable(FactoryFn(factory_fn))
 	}
 }

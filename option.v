@@ -122,71 +122,81 @@ fn parse_options(opts ...RxOption) RxOption {
 
 // with_buffered_channel allows to configure the capacity of a buffered channel.
 pub fn with_buffered_channel(capacity int) RxOption {
-	return new_func_option(fn [capacity] (mut options FuncOption) {
+	func := fn [capacity] (mut options FuncOption) {
 		options.is_buffer = true
 		options.buffer = capacity
-	})
+	}
+	return new_func_option(FuncOptionMutation(func))
 }
 
 // with_context allows to pass a context.
 pub fn with_context(mut ctx context.Context) RxOption {
-	return new_func_option(fn [mut ctx] (mut options FuncOption) {
+	func := fn [mut ctx] (mut options FuncOption) {
 		options.ctx = ctx
-	})
+	}
+	return new_func_option(FuncOptionMutation(func))
 }
 
 // with_observation_strategy uses the eager observation mode meaning consuming the items even with_out subscription.
 pub fn with_observation_strategy(strategy ObservationStrategy) RxOption {
-	return new_func_option(fn [strategy] (mut options FuncOption) {
+	func := fn [strategy] (mut options FuncOption) {
 		options.observation = strategy
-	})
+	}
+	return new_func_option(FuncOptionMutation(func))
 }
 
 // with_pool allows to specify an execution pool.
 pub fn with_pool(pool int) RxOption {
-	return new_func_option(fn [pool] (mut options FuncOption) {
+	func := fn [pool] (mut options FuncOption) {
 		options.pool = pool
-	})
+	}
+	return new_func_option(FuncOptionMutation(func))
 }
 
 // with_cpu_pool allows to specify an execution pool based on the number of logical CPUs.
 pub fn with_cpu_pool() RxOption {
-	return new_func_option(fn (mut options FuncOption) {
+	func := fn (mut options FuncOption) {
 		options.pool = runtime.nr_cpus()
-	})
+	}
+	return new_func_option(FuncOptionMutation(func))
 }
 
 // with_back_pressure_strategy sets the back pressure strategy: drop or block.
 pub fn with_back_pressure_strategy(strategy BackpressureStrategy) RxOption {
-	return new_func_option(fn [strategy] (mut options FuncOption) {
+	func := fn [strategy] (mut options FuncOption) {
 		options.back_pressure_strategy = strategy
-	})
+	}
+	return new_func_option(FuncOptionMutation(func))
 }
 
 // with_error_strategy defines how an observable should deal with_ error.
 // This strategy is propagated to the parent observable.
 pub fn with_error_strategy(strategy OnErrorStrategy) RxOption {
-	return new_func_option(fn [strategy] (mut options FuncOption) {
+	func := fn [strategy] (mut options FuncOption) {
 		options.on_error_strategy = strategy
-	})
+	}
+	return new_func_option(FuncOptionMutation(func))
 }
 
 // with_publish_strategy converts an ordinary Observable into a connectable Observable.
 pub fn with_publish_strategy() RxOption {
-	return new_func_option(fn (mut options FuncOption) {
+	func := fn (mut options FuncOption) {
 		options.connectable = true
-	})
+	}
+	return new_func_option(FuncOptionMutation(func))
 }
 
 // serialize forces an Observable to make serialized calls and to be well-behaved.
 pub fn serialize(identifier SerializedFn) RxOption {
-	return new_func_option(fn [identifier] (mut options FuncOption) {
+	func := fn [identifier] (mut options FuncOption) {
 		options.serialized = identifier
-	})
+	}
+	return new_func_option(FuncOptionMutation(func))
 }
 
 fn connect() RxOption {
-	return new_func_option(fn (mut options FuncOption) {
+	func := fn (mut options FuncOption) {
 		options.connect_operation = true
-	})
+	}
+	return new_func_option(FuncOptionMutation(func))
 }

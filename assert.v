@@ -130,7 +130,7 @@ pub fn has_items(items ...ItemValue) IRxAssert {
 		a.check_has_items = true
 		a.items = items
 	}
-        return new_assertion(AssertApplyFn(assertion_fn))
+	return new_assertion(AssertApplyFn(assertion_fn))
 }
 
 // has_item checks if a single or optional single has a specific item.
@@ -139,7 +139,7 @@ pub fn has_item(i ItemValue) IRxAssert {
 		a.check_has_item = true
 		a.item = i
 	}
-        return new_assertion(AssertApplyFn(assertion_fn))
+	return new_assertion(AssertApplyFn(assertion_fn))
 }
 
 // has_items_no_order checks that an observable produces the corresponding items regardless of the order.
@@ -148,7 +148,7 @@ pub fn has_items_no_order(items ...ItemValue) IRxAssert {
 		a.check_has_items_no_order = true
 		a.items_no_order = items
 	}
-        return new_assertion(AssertApplyFn(assertion_fn))
+	return new_assertion(AssertApplyFn(assertion_fn))
 }
 
 // is_not_empty checks that the observable produces some items.
@@ -156,7 +156,7 @@ pub fn is_not_empty() IRxAssert {
 	assertion_fn := fn (mut a RxAssert) {
 		a.check_has_some_items = true
 	}
-        return new_assertion(AssertApplyFn(assertion_fn))
+	return new_assertion(AssertApplyFn(assertion_fn))
 }
 
 // is_empty checks that the observable has not produce any item.
@@ -164,7 +164,7 @@ pub fn is_empty() IRxAssert {
 	assertion_fn := fn (mut a RxAssert) {
 		a.check_has_no_items = true
 	}
-        return new_assertion(AssertApplyFn(assertion_fn))
+	return new_assertion(AssertApplyFn(assertion_fn))
 }
 
 // has_error checks that the observable has produce a specific error.
@@ -173,7 +173,7 @@ pub fn has_error(err IError) IRxAssert {
 		a.check_has_raised_error = true
 		a.err = err
 	}
-        return new_assertion(AssertApplyFn(assertion_fn))
+	return new_assertion(AssertApplyFn(assertion_fn))
 }
 
 // has_an_error checks that the observable has produce an error.
@@ -181,7 +181,7 @@ pub fn has_an_error() IRxAssert {
 	assertion_fn := fn (mut a RxAssert) {
 		a.check_has_raised_an_error = true
 	}
-        return new_assertion(AssertApplyFn(assertion_fn))
+	return new_assertion(AssertApplyFn(assertion_fn))
 }
 
 // has_errors checks that the observable has produce a set of errors.
@@ -190,7 +190,7 @@ pub fn has_errors(errs ...IError) IRxAssert {
 		a.check_has_raised_errors = true
 		a.errs = errs
 	}
-        return new_assertion(AssertApplyFn(assertion_fn))
+	return new_assertion(AssertApplyFn(assertion_fn))
 }
 
 // has_no_error checks that the observable has not raised any error.
@@ -198,7 +198,7 @@ pub fn has_no_error() IRxAssert {
 	assertion_fn := fn (mut a RxAssert) {
 		a.check_has_raised_error = true
 	}
-        return new_assertion(AssertApplyFn(assertion_fn))
+	return new_assertion(AssertApplyFn(assertion_fn))
 }
 
 // custom_predicate checks a custom predicate.
@@ -210,7 +210,7 @@ pub fn custom_predicate(predicate AssertPredicate) IRxAssert {
 		}
 		a.custom_predicates << predicate
 	}
-        return new_assertion(AssertApplyFn(assertion_fn))
+	return new_assertion(AssertApplyFn(assertion_fn))
 }
 
 fn parse_assertions(assertions ...IRxAssert) IRxAssert {
