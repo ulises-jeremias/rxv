@@ -1,8 +1,8 @@
 module rxv
 
 import context
+import context.onecontext
 import runtime
-import ulises_jeremias.onecontext
 
 type SerializedFn = fn (ItemValue) int
 
