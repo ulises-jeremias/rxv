@@ -2635,12 +2635,12 @@ pub fn (mut op ToSliceOperator) gather_next(mut _ context.Context, _ Item, _ cha
 pub fn (mut o ObservableImpl) unmarshal(unmarshaller Unmarshaller, factory FactoryFn, opts ...RxOption) Observable {
 	transform_fn := fn [unmarshaller, factory] (mut _ context.Context, i ItemValue) ?ItemValue {
 		v := factory()
-		match i {
-			// []byte {
-			// 	unmarshaller(i, v)
-			// }
-			else {}
-		}
+		// match i {
+		// 	[]byte {
+		// 		unmarshaller(i, v)
+		// 	}
+		// 	else {}
+		// }
 		return v
 	}
 	return o.map(Func(transform_fn), ...opts)
