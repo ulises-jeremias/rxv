@@ -1282,8 +1282,8 @@ This strategy is propagated to the parent observable.</p>
 						<section id="Item" class="doc-node">
 							<div class="title"><h2>struct Item <a href="#Item">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/item.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">Item</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
-	value ItemValue
-	err   <span class="token builtin">IError</span>
+	value ItemValue <span class="token operator">=</span> <span class="token builtin">voidptr</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+	err   <span class="token builtin">IError</span>    <span class="token operator">=</span> <span class="token builtin">voidptr</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
 <span class="token punctuation">}</span></code></pre>
 <p>Item is a wrapper having either a value or an error.</p>
 
@@ -1314,7 +1314,7 @@ It returns a boolean to indicate whether the item was sent.</p>
 							<div class="title"><h2>struct ObservableImpl <a href="#ObservableImpl">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L101"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">ObservableImpl</span> <span class="token punctuation">{</span>
 <span class="token keyword">mut</span><span class="token punctuation">:</span>
 	iterable Iterable
-	parent   context<span class="token punctuation">.</span>Context
+	parent   context<span class="token punctuation">.</span>Context <span class="token operator">=</span> <span class="token builtin">voidptr</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
 <span class="token punctuation">}</span></code></pre>
 <p>ObservableImpl implements Observable.</p>
 
@@ -1732,7 +1732,7 @@ and emit single items for each combination based on the results of this function
 							<div class="title"><h2>struct OptionalSingleImpl <a href="#OptionalSingleImpl">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/optionalsingle.v#L20"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">OptionalSingleImpl</span> <span class="token punctuation">{</span>
 <span class="token keyword">mut</span><span class="token punctuation">:</span>
 	iterable Iterable
-	parent   context<span class="token punctuation">.</span>Context
+	parent   context<span class="token punctuation">.</span>Context <span class="token operator">=</span> <span class="token builtin">voidptr</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
 <span class="token punctuation">}</span></code></pre>
 <p>OptionalSingleImpl is the default implementation for OptionalSingle</p>
 
@@ -1764,13 +1764,13 @@ this method is blocking.</p>
 	check_has_items_no_order   <span class="token builtin">bool</span>
 	items_no_order             <span class="token punctuation">[</span><span class="token punctuation">]</span>ItemValue
 	check_has_raised_error     <span class="token builtin">bool</span>
-	err                        <span class="token builtin">IError</span>
+	err                        <span class="token builtin">IError</span> <span class="token operator">=</span> <span class="token builtin">voidptr</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
 	check_has_raised_errors    <span class="token builtin">bool</span>
 	errs                       <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">IError</span>
 	check_has_raised_an_error  <span class="token builtin">bool</span>
 	check_has_not_raised_error <span class="token builtin">bool</span>
 	check_has_item             <span class="token builtin">bool</span>
-	item                       ItemValue
+	item                       ItemValue <span class="token operator">=</span> <span class="token builtin">voidptr</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
 	check_has_no_item          <span class="token builtin">bool</span>
 	check_has_custom_predicate <span class="token builtin">bool</span>
 	custom_predicates          <span class="token punctuation">[</span><span class="token punctuation">]</span>AssertPredicate
@@ -1782,7 +1782,7 @@ this method is blocking.</p>
 							<div class="title"><h2>struct SingleImpl <a href="#SingleImpl">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/single.v#L16"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">SingleImpl</span> <span class="token punctuation">{</span>
 <span class="token keyword">mut</span><span class="token punctuation">:</span>
 	iterable Iterable
-	parent   context<span class="token punctuation">.</span>Context
+	parent   context<span class="token punctuation">.</span>Context <span class="token operator">=</span> <span class="token builtin">voidptr</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
 <span class="token punctuation">}</span></code></pre>
 <p>SingleImpl implements Single</p>
 
@@ -1818,7 +1818,7 @@ This method is blocking.</p>
 </section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 11 Dec 2021 03:55:42
+							Powered by vdoc. Generated on: 16 Dec 2021 04:52:39
 						</div>
 					</div>
 					
