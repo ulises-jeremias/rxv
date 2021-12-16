@@ -8,8 +8,8 @@ pub interface ItemValue {}
 // Item is a wrapper having either a value or an error.
 pub struct Item {
 pub:
-	value ItemValue
-	err   IError
+	value ItemValue = voidptr(0)
+	err   IError = voidptr(0)
 }
 
 // TimestampItem attach a timestamp to an item.

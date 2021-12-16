@@ -740,7 +740,7 @@ pub fn (mut o ObservableImpl) distinct_until_changed(apply Func, opts ...RxOptio
 struct DistinctUntilChangedOperator {
 	apply Func
 mut:
-	current ItemValue
+	current ItemValue = voidptr(0)
 }
 
 pub fn (mut op DistinctUntilChangedOperator) next(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
@@ -1513,7 +1513,7 @@ struct MaxOperator {
 	comparator Comparator
 mut:
 	empty bool
-	max   ItemValue
+	max   ItemValue = voidptr(0)
 }
 
 pub fn (mut op MaxOperator) next(mut _ context.Context, item Item, _ chan Item, _ OperatorOptions) {
@@ -1562,7 +1562,7 @@ struct MinOperator {
 	comparator Comparator
 mut:
 	empty bool
-	max   ItemValue
+	max   ItemValue = voidptr(0)
 }
 
 pub fn (mut op MinOperator) next(mut _ context.Context, item Item, _ chan Item, _ OperatorOptions) {
@@ -1693,7 +1693,7 @@ pub fn (mut o ObservableImpl) reduce(apply Func2, opts ...RxOption) OptionalSing
 struct ReduceOperator {
 	apply Func2
 mut:
-	acc   ItemValue
+	acc   ItemValue = voidptr(0)
 	empty bool
 }
 
@@ -1940,7 +1940,7 @@ pub fn (mut o ObservableImpl) scan(apply Func2, opts ...RxOption) Observable {
 struct ScanOperator {
 	apply Func2
 mut:
-	current ItemValue
+	current ItemValue = voidptr(0)
 }
 
 pub fn (mut op ScanOperator) next(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
@@ -2613,7 +2613,7 @@ pub fn (mut o ObservableImpl) to_slice(initial_capacity int, opts ...RxOption) ?
 struct ToSliceOperator {
 mut:
 	s              []ItemValue
-	observable_err IError
+	observable_err IError = voidptr(0)
 }
 
 pub fn (mut op ToSliceOperator) next(mut _ context.Context, item Item, _ chan Item, _ OperatorOptions) {

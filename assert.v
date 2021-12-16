@@ -34,13 +34,13 @@ mut:
 	check_has_items_no_order   bool
 	items_no_order             []ItemValue
 	check_has_raised_error     bool
-	err                        IError
+	err                        IError = voidptr(0)
 	check_has_raised_errors    bool
 	errs                       []IError
 	check_has_raised_an_error  bool
 	check_has_not_raised_error bool
 	check_has_item             bool
-	item                       ItemValue
+	item                       ItemValue = voidptr(0)
 	check_has_no_item          bool
 	check_has_custom_predicate bool
 	custom_predicates          []AssertPredicate

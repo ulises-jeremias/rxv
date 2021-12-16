@@ -20,7 +20,7 @@ mut:
 pub struct OptionalSingleImpl {
 mut:
 	iterable Iterable
-	parent   context.Context
+	parent   context.Context = voidptr(0)
 }
 
 // observe observes an OptionalSingle by returning its channel.

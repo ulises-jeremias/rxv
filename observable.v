@@ -101,7 +101,7 @@ mut:
 pub struct ObservableImpl {
 mut:
 	iterable Iterable
-	parent   context.Context
+	parent   context.Context = voidptr(0)
 }
 
 pub fn default_error_func_operator(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
