@@ -1,7 +1,9 @@
 module rxv
 
+import context
+
 const (
-	empty_context = 0
+	empty_context = context.EmptyContext(2)
 )
 
 // Iterable is the basic type that can be observed
