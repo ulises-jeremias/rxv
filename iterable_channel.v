@@ -26,7 +26,7 @@ pub fn (mut i ChannelIterable) observe(opts ...RxOption) chan Item {
 	}
 
 	if option.is_connect_operation() {
-                mut ctx := option.build_context(empty_context)
+		mut ctx := option.build_context(empty_context)
 		i.connect(mut &ctx)
 	}
 
