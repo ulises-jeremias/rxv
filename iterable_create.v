@@ -3,8 +3,8 @@ module rxv
 import context
 
 struct CreateIterable {
-	next                     chan Item
-	opts                     []RxOption
+	next chan Item
+	opts []RxOption
 mut:
 	subscribers              []chan Item
 	producer_already_created bool
@@ -55,7 +55,7 @@ pub fn (shared i CreateIterable) observe(opts ...RxOption) chan Item {
 }
 
 fn (shared i CreateIterable) connect(mut ctx context.Context) {
-        go i.produce(ctx)
+	go i.produce(ctx)
 	lock i {
 		i.producer_already_created = true
 	}
