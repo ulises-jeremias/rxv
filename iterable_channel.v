@@ -5,8 +5,9 @@ import context
 struct ChannelIterable {
 	next                     chan Item
 	opts                     []RxOption
-	subscribers              shared []chan Item
-	producer_already_created shared bool
+mut:
+	subscribers              []chan Item
+	producer_already_created bool
 }
 
 fn new_channel_iterable(next chan Item, opts ...RxOption) Iterable {
@@ -16,7 +17,7 @@ fn new_channel_iterable(next chan Item, opts ...RxOption) Iterable {
 	}
 }
 
-pub fn (mut i ChannelIterable) observe(opts ...RxOption) chan Item {
+pub fn (shared i ChannelIterable) observe(opts ...RxOption) chan Item {
 	mut options := i.opts.clone()
 	options << opts.clone()
 	option := parse_options(...options)
@@ -32,23 +33,23 @@ pub fn (mut i ChannelIterable) observe(opts ...RxOption) chan Item {
 
 	ch := option.build_channel()
 
-	lock i.subscribers {
+	lock i {
 		i.subscribers << ch
 	}
 
 	return ch
 }
 
-fn (mut i ChannelIterable) connect(mut ctx context.Context) {
-	lock i.producer_already_created {
-		go i.produce(ctx)
+fn (shared i ChannelIterable) connect(mut ctx context.Context) {
+        go i.produce(ctx)
+	lock i {
 		i.producer_already_created = true
 	}
 }
 
-fn (mut i ChannelIterable) produce(mut ctx context.Context) {
+fn (shared i ChannelIterable) produce(mut ctx context.Context) {
 	defer {
-		rlock i.subscribers {
+		rlock i {
 			for subscriber in i.subscribers {
 				subscriber.close()
 			}
@@ -62,7 +63,7 @@ fn (mut i ChannelIterable) produce(mut ctx context.Context) {
 			return
 		}
 		item := <-i.next {
-			rlock i.subscribers {
+			rlock i {
 				for subscriber in i.subscribers {
 					subscriber <- item
 				}
