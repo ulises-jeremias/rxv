@@ -9,7 +9,7 @@ pub interface ItemValue {}
 pub struct Item {
 pub:
 	value ItemValue = voidptr(0)
-	err   IError = none
+	err   IError    = none
 }
 
 // TimestampItem attach a timestamp to an item.
