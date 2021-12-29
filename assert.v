@@ -112,7 +112,7 @@ pub fn new_assertion(f AssertApplyFn) RxAssert {
 }
 
 // has_items checks that the observable produces the corresponding items.
-pub fn has_items(items []ItemValue) RxAssert {
+pub fn has_items(items ...ItemValue) RxAssert {
 	assertion_fn := fn [items] (mut a RxAssert) {
 		a.check_has_items = true
 		a.items = items

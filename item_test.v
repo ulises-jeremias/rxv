@@ -19,7 +19,7 @@ fn test_send_items_variadic() {
 	mut bctx := context.background()
 	mut iter := new_channel_iterable(ch)
 	go send_items(mut &bctx, ch, .close_channel, items)
-	test(mut &bctx, mut &iter, has_items(items), has_no_error())
+	test(mut &bctx, mut &iter, has_items(...items), has_no_error())
 }
 
 fn test_send_items_variadic_with_error() {
