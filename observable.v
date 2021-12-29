@@ -3,13 +3,17 @@ module rxv
 import context
 import time
 
-pub type DistributionFn = fn (item Item) int
+pub struct IntValue {
+	val int
+}
+
+pub type DistributionFn = fn (item Item) IntValue
 
 pub type DistributionStrFn = fn (item Item) string
 
 pub type FactoryFn = fn () ItemValue
 
-pub type IdentifierFn = fn (value ItemValue) int
+pub type IdentifierFn = fn (value ItemValue) IntValue
 
 pub type IterableFactoryFn = fn (mut ctx context.Context, next chan Item, option RxOption, opts ...RxOption)
 
