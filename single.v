@@ -70,9 +70,9 @@ fn (op &FilterOperatorSingle) gather_next(mut _ context.Context, item Item, dst 
 
 // filter amits only those items from an Observable that pass a predicate test
 // pub fn (mut s SingleImpl) filter(apply Predicate, opts ...RxOption) OptionalSingle {
-// 	return optional_single(s.parent, mut s, fn () Operator {
+// 	return optional_single(s.parent, mut s, fn [apply] () Operator {
 // 		return &FilterOperatorSingle{
-// 			apply: unsafe { voidptr(0) } // apply
+// 			apply: apply
 // 		}
 // 	}, true, true, ...opts)
 // }
@@ -105,9 +105,9 @@ fn (op &MapOperatorSingle) gather_next(mut _ context.Context, item Item, dst cha
 
 // map transforms the items emitted by an optional_single by applying a function to each item
 // pub fn (mut o SingleImpl) map(apply Func, opts ...RxOption) Single {
-// 	return single(o.parent, mut o, fn () Operator {
+// 	return single(o.parent, mut o, fn [apply] () Operator {
 // 		return &MapOperatorSingle{
-// 			apply: unsafe { voidptr(0) } // apply
+// 			apply: apply
 // 		}
 // 	}, false, true, ...opts)
 // }
