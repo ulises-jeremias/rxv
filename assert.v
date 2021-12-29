@@ -8,22 +8,6 @@ pub type AssertPredicate = fn (items []ItemValue) ?
 // AssertApplyFn is a custom function to apply modifications to a RxAssert.
 pub type AssertApplyFn = fn (mut do RxAssert)
 
-// RxAssert lists the Observable assertions.
-pub interface IRxAssert {
-	apply(mut do RxAssert)
-	items_to_be_checked() ?[]ItemValue
-	items_no_ordered_to_be_checked() ?[]ItemValue
-	no_items_to_be_checked() bool
-	some_items_to_be_checked() bool
-	raised_error_to_be_checked() ?IError
-	raised_errors_to_be_checked() ?[]IError
-	raised_an_error_to_be_checked() ?IError
-	not_raised_error_to_be_checked() bool
-	item_to_be_checked() ?ItemValue
-	no_item_to_be_checked() ?ItemValue
-	custom_predicates_to_be_checked() ?[]AssertPredicate
-}
-
 pub struct RxAssert {
 	f AssertApplyFn
 mut:
@@ -46,89 +30,89 @@ mut:
 	custom_predicates          []AssertPredicate
 }
 
-fn (ass &RxAssert) apply(mut do RxAssert) {
-	f := ass.f
-	if !isnil(f) {
-		f(mut do)
+fn (ass RxAssert) apply(mut do RxAssert) {
+	func := ass.f
+	if !isnil(func) {
+		func(mut do)
 	}
 }
 
-fn (ass &RxAssert) items_to_be_checked() ?[]ItemValue {
+fn (ass RxAssert) items_to_be_checked() ?[]ItemValue {
 	if !ass.check_has_items {
 		return none
 	}
 	return ass.items
 }
 
-fn (ass &RxAssert) items_no_ordered_to_be_checked() ?[]ItemValue {
+fn (ass RxAssert) items_no_ordered_to_be_checked() ?[]ItemValue {
 	if !ass.check_has_items_no_order {
 		return none
 	}
 	return ass.items_no_order
 }
 
-fn (ass &RxAssert) no_items_to_be_checked() bool {
+fn (ass RxAssert) no_items_to_be_checked() bool {
 	return ass.check_has_no_items
 }
 
-fn (ass &RxAssert) some_items_to_be_checked() bool {
+fn (ass RxAssert) some_items_to_be_checked() bool {
 	return ass.check_has_some_items
 }
 
-fn (ass &RxAssert) raised_error_to_be_checked() ?IError {
+fn (ass RxAssert) raised_error_to_be_checked() ?IError {
 	if !ass.check_has_raised_error {
 		return none
 	}
 	return ass.err
 }
 
-fn (ass &RxAssert) raised_errors_to_be_checked() ?[]IError {
+fn (ass RxAssert) raised_errors_to_be_checked() ?[]IError {
 	if !ass.check_has_raised_errors {
 		return none
 	}
 	return ass.errs
 }
 
-fn (ass &RxAssert) raised_an_error_to_be_checked() ?IError {
+fn (ass RxAssert) raised_an_error_to_be_checked() ?IError {
 	if !ass.check_has_raised_an_error {
 		return none
 	}
 	return ass.err
 }
 
-fn (ass &RxAssert) not_raised_error_to_be_checked() bool {
+fn (ass RxAssert) not_raised_error_to_be_checked() bool {
 	return ass.check_has_not_raised_error
 }
 
-fn (ass &RxAssert) item_to_be_checked() ?ItemValue {
+fn (ass RxAssert) item_to_be_checked() ?ItemValue {
 	if !ass.check_has_item {
 		return none
 	}
 	return ass.item
 }
 
-fn (ass &RxAssert) no_item_to_be_checked() ?ItemValue {
+fn (ass RxAssert) no_item_to_be_checked() ?ItemValue {
 	if !ass.check_has_no_item {
 		return none
 	}
 	return ass.item
 }
 
-fn (ass &RxAssert) custom_predicates_to_be_checked() ?[]AssertPredicate {
+fn (ass RxAssert) custom_predicates_to_be_checked() ?[]AssertPredicate {
 	if !ass.check_has_custom_predicate {
 		return none
 	}
 	return ass.custom_predicates
 }
 
-pub fn new_assertion(f AssertApplyFn) IRxAssert {
-	return &RxAssert{
+pub fn new_assertion(f AssertApplyFn) RxAssert {
+	return RxAssert{
 		f: f
 	}
 }
 
 // has_items checks that the observable produces the corresponding items.
-pub fn has_items(items ...ItemValue) IRxAssert {
+pub fn has_items(items []ItemValue) RxAssert {
 	assertion_fn := fn [items] (mut a RxAssert) {
 		a.check_has_items = true
 		a.items = items
@@ -137,7 +121,7 @@ pub fn has_items(items ...ItemValue) IRxAssert {
 }
 
 // has_item checks if a single or optional single has a specific item.
-pub fn has_item(i ItemValue) IRxAssert {
+pub fn has_item(i ItemValue) RxAssert {
 	assertion_fn := fn [i] (mut a RxAssert) {
 		a.check_has_item = true
 		a.item = i
@@ -146,7 +130,7 @@ pub fn has_item(i ItemValue) IRxAssert {
 }
 
 // has_items_no_order checks that an observable produces the corresponding items regardless of the order.
-pub fn has_items_no_order(items ...ItemValue) IRxAssert {
+pub fn has_items_no_order(items []ItemValue) RxAssert {
 	assertion_fn := fn [items] (mut a RxAssert) {
 		a.check_has_items_no_order = true
 		a.items_no_order = items
@@ -155,7 +139,7 @@ pub fn has_items_no_order(items ...ItemValue) IRxAssert {
 }
 
 // is_not_empty checks that the observable produces some items.
-pub fn is_not_empty() IRxAssert {
+pub fn is_not_empty() RxAssert {
 	assertion_fn := fn (mut a RxAssert) {
 		a.check_has_some_items = true
 	}
@@ -163,7 +147,7 @@ pub fn is_not_empty() IRxAssert {
 }
 
 // is_empty checks that the observable has not produce any item.
-pub fn is_empty() IRxAssert {
+pub fn is_empty() RxAssert {
 	assertion_fn := fn (mut a RxAssert) {
 		a.check_has_no_items = true
 	}
@@ -171,7 +155,7 @@ pub fn is_empty() IRxAssert {
 }
 
 // has_error checks that the observable has produce a specific error.
-pub fn has_error(err IError) IRxAssert {
+pub fn has_error(err IError) RxAssert {
 	assertion_fn := fn [err] (mut a RxAssert) {
 		a.check_has_raised_error = true
 		a.err = err
@@ -180,7 +164,7 @@ pub fn has_error(err IError) IRxAssert {
 }
 
 // has_an_error checks that the observable has produce an error.
-pub fn has_an_error() IRxAssert {
+pub fn has_an_error() RxAssert {
 	assertion_fn := fn (mut a RxAssert) {
 		a.check_has_raised_an_error = true
 	}
@@ -188,7 +172,7 @@ pub fn has_an_error() IRxAssert {
 }
 
 // has_errors checks that the observable has produce a set of errors.
-pub fn has_errors(errs ...IError) IRxAssert {
+pub fn has_errors(errs ...IError) RxAssert {
 	assertion_fn := fn [errs] (mut a RxAssert) {
 		a.check_has_raised_errors = true
 		a.errs = errs
@@ -197,7 +181,7 @@ pub fn has_errors(errs ...IError) IRxAssert {
 }
 
 // has_no_error checks that the observable has not raised any error.
-pub fn has_no_error() IRxAssert {
+pub fn has_no_error() RxAssert {
 	assertion_fn := fn (mut a RxAssert) {
 		a.check_has_raised_error = true
 	}
@@ -205,7 +189,7 @@ pub fn has_no_error() IRxAssert {
 }
 
 // custom_predicate checks a custom predicate.
-pub fn custom_predicate(predicate AssertPredicate) IRxAssert {
+pub fn custom_predicate(predicate AssertPredicate) RxAssert {
 	assertion_fn := fn [predicate] (mut a RxAssert) {
 		if !a.check_has_custom_predicate {
 			a.check_has_custom_predicate = true
@@ -216,8 +200,8 @@ pub fn custom_predicate(predicate AssertPredicate) IRxAssert {
 	return new_assertion(AssertApplyFn(assertion_fn))
 }
 
-fn parse_assertions(assertions ...IRxAssert) IRxAssert {
-	mut ass := &RxAssert{}
+fn parse_assertions(assertions ...RxAssert) RxAssert {
+	mut ass := RxAssert{}
 	for assertion in assertions {
 		assertion.apply(mut ass)
 	}
@@ -225,7 +209,7 @@ fn parse_assertions(assertions ...IRxAssert) IRxAssert {
 }
 
 // test asserts the result of an iterable against a list of assertions.
-pub fn test(mut ctx context.Context, mut iterable Iterable, assertions ...IRxAssert) {
+pub fn test(mut ctx context.Context, mut iterable Iterable, assertions ...RxAssert) {
 	ass := parse_assertions(...assertions)
 	mut got := []ItemValue{}
 	mut errs := []IError{}

@@ -1,23 +1,26 @@
 module rxv
 
 import context
+import sync
 
 struct ChannelIterable {
 	next chan Item
 	opts []RxOption
 mut:
+	mutex                    &sync.Mutex
 	subscribers              []chan Item
 	producer_already_created bool
 }
 
 fn new_channel_iterable(next chan Item, opts ...RxOption) Iterable {
 	return &ChannelIterable{
+		mutex: sync.new_mutex()
 		next: next
 		opts: opts
 	}
 }
 
-pub fn (shared i ChannelIterable) observe(opts ...RxOption) chan Item {
+pub fn (mut i ChannelIterable) observe(opts ...RxOption) chan Item {
 	mut options := i.opts.clone()
 	options << opts.clone()
 	option := parse_options(...options)
@@ -33,26 +36,24 @@ pub fn (shared i ChannelIterable) observe(opts ...RxOption) chan Item {
 
 	ch := option.build_channel()
 
-	lock i {
-		i.subscribers << ch
-	}
+	i.mutex.@lock()
+	i.subscribers << ch
+	i.mutex.unlock()
 
 	return ch
 }
 
-fn (shared i ChannelIterable) connect(mut ctx context.Context) {
+fn (mut i ChannelIterable) connect(mut ctx context.Context) {
 	go i.produce(ctx)
-	lock i {
-		i.producer_already_created = true
-	}
+	i.mutex.@lock()
+	i.producer_already_created = true
+	i.mutex.unlock()
 }
 
-fn (shared i ChannelIterable) produce(mut ctx context.Context) {
+fn (mut i ChannelIterable) produce(mut ctx context.Context) {
 	defer {
-		rlock i {
-			for subscriber in i.subscribers {
-				subscriber.close()
-			}
+		for subscriber in i.subscribers {
+			subscriber.close()
 		}
 	}
 
@@ -63,11 +64,11 @@ fn (shared i ChannelIterable) produce(mut ctx context.Context) {
 			return
 		}
 		item := <-i.next {
-			rlock i {
-				for subscriber in i.subscribers {
-					subscriber <- item
-				}
+			// i.mutex.@lock()
+			for subscriber in i.subscribers {
+				subscriber <- item
 			}
+			// i.mutex.unlock()
 		}
 	} {
 	}

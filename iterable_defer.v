@@ -26,7 +26,7 @@ pub fn (i &DeferIterable) observe(opts ...RxOption) chan Item {
 			next.close()
 		}
 		for f in i.fs {
-			f(mut &ctx, next)
+			f(mut ctx, next)
 		}
 	}(i, next, mut &ctx)
 	return next
