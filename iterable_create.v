@@ -1,11 +1,13 @@
 module rxv
 
 import context
+import sync
 
 struct CreateIterable {
 	next chan Item
 	opts []RxOption
 mut:
+	mutex                    &sync.Mutex
 	subscribers              []chan Item
 	producer_already_created bool
 }
@@ -26,12 +28,13 @@ fn new_create_iterable(fs []Producer, opts ...RxOption) Iterable {
 	}(fs, next, mut &ctx)
 
 	return &CreateIterable{
+		mutex: sync.new_mutex()
 		next: next
 		opts: opts
 	}
 }
 
-pub fn (shared i CreateIterable) observe(opts ...RxOption) chan Item {
+pub fn (mut i CreateIterable) observe(opts ...RxOption) chan Item {
 	mut options := i.opts.clone()
 	options << opts.clone()
 	option := parse_options(...options)
@@ -47,26 +50,24 @@ pub fn (shared i CreateIterable) observe(opts ...RxOption) chan Item {
 
 	ch := option.build_channel()
 
-	lock i {
-		i.subscribers << ch
-	}
+	i.mutex.@lock()
+	i.subscribers << ch
+	i.mutex.unlock()
 
 	return ch
 }
 
-fn (shared i CreateIterable) connect(mut ctx context.Context) {
+fn (mut i CreateIterable) connect(mut ctx context.Context) {
 	go i.produce(ctx)
-	lock i {
-		i.producer_already_created = true
-	}
+	i.mutex.@lock()
+	i.producer_already_created = true
+	i.mutex.unlock()
 }
 
-fn (shared i CreateIterable) produce(mut ctx context.Context) {
+fn (mut i CreateIterable) produce(mut ctx context.Context) {
 	defer {
-		rlock i {
-			for subscriber in i.subscribers {
-				subscriber.close()
-			}
+		for subscriber in i.subscribers {
+			subscriber.close()
 		}
 	}
 
@@ -77,10 +78,8 @@ fn (shared i CreateIterable) produce(mut ctx context.Context) {
 			return
 		}
 		item := <-i.next {
-			rlock i {
-				for subscriber in i.subscribers {
-					subscriber <- item
-				}
+			for subscriber in i.subscribers {
+				subscriber <- item
 			}
 		}
 	} {
