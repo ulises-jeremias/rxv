@@ -7,3 +7,4 @@ vsl.tmp.c
 fns.txt
 
 /docs/build
+*.so
