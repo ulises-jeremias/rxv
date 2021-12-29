@@ -101,10 +101,42 @@ mut:
 pub struct ObservableImpl {
 mut:
 	iterable Iterable
-	parent   context.Context
+	parent   context.Context = voidptr(0)
 }
 
 pub fn default_error_func_operator(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
 	item.send_context(mut &ctx, dst)
 	operator_options.stop()
+}
+
+// fn custom_observable_operator(parent context.Context, f IterableFactoryFn, opts ...RxOption) Observable {
+// 	option := parse_options(...opts)
+// 	next := option.build_channel()
+// 	mut ctx := option.build_context(parent)
+
+// 	if option.is_eager_observation() {
+// 		go f(mut &ctx, next, option, ...opts)
+// 		return &ObservableImpl{
+// 			iterable: new_channel_iterable(next)
+// 		}
+// 	}
+
+// 	factory_fn := fn [mut ctx, next, option, opts, f] (propagated_options ...RxOption) chan Item {
+// 		mut merged_options := opts.clone()
+// 		merged_options << propagated_options
+// 		go f(mut &ctx, next, option, ...merged_options)
+// 		return chan Item{}
+// 	}
+
+// 	return &ObservableImpl{
+// 		iterable: new_factory_iterable(FactoryFn(factory_fn))
+// 	}
+// }
+
+interface Operator {
+mut:
+	err(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions)
+	next(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions)
+	end(mut ctx context.Context, dst chan Item)
+	gather_next(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions)
 }
