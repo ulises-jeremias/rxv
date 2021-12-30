@@ -6,10 +6,12 @@ mut:
 	opts  []RxOption
 }
 
-fn new_just_iterable(items []ItemValue, opts ...RxOption) Iterable {
-	return &JustIterable{
-		items: items
-		opts: opts
+fn new_just_iterable(items ...ItemValue) fn (opts ...RxOption) Iterable {
+	return fn [items] (opts ...RxOption) Iterable {
+		return &JustIterable{
+			items: items
+			opts: opts
+		}
 	}
 }
 

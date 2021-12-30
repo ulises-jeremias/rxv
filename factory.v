@@ -34,6 +34,36 @@ pub fn from_channel(next chan Item, opts ...RxOption) Observable {
 	}
 }
 
+// from_event_source creates a hot observable from an event source.
+pub fn from_event_source(next chan Item, opts ...RxOption) Observable {
+	option := parse_options(...opts)
+	back_pressure_strategy := option.get_back_pressure_strategy()
+	mut ctx := option.build_context(empty_context)
+	return &ObservableImpl{
+		iterable: new_event_source_iterable(mut &ctx, next, back_pressure_strategy)
+	}
+}
+
+// just creates an Observable with the provided items.
+pub fn just(items ...ItemValue) fn (opts ...RxOption) Observable {
+	return fn [items] (opts ...RxOption) Observable {
+		iterable_creator := new_just_iterable(...items)
+		return &ObservableImpl{
+			iterable: iterable_creator(...opts)
+		}
+	}
+}
+
+// just_item creates an Observable with the provided item.
+pub fn just_item(item ItemValue) fn (opts ...RxOption) Observable {
+	return fn [item] (opts ...RxOption) Observable {
+		iterable_creator := new_just_iterable(item)
+		return &ObservableImpl{
+			iterable: iterable_creator(...opts)
+		}
+	}
+}
+
 // thrown creates an Observable that emits no items and terminates with an error.
 pub fn thrown(err IError) Observable {
 	next := chan Item{cap: 1}
