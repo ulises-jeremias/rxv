@@ -3,17 +3,13 @@ module rxv
 import context
 import time
 
-pub struct IntValue {
-	val int
-}
+pub type DistributionFn = fn (item Item) ItemValueImpl<int>
 
-pub type DistributionFn = fn (item Item) IntValue
-
-pub type DistributionStrFn = fn (item Item) string
+pub type DistributionStrFn = fn (item Item) ItemValueImpl<string>
 
 pub type FactoryFn = fn () ItemValue
 
-pub type IdentifierFn = fn (value ItemValue) IntValue
+pub type IdentifierFn = fn (value ItemValue) ItemValueImpl<int>
 
 pub type IterableFactoryFn = fn (mut ctx context.Context, next chan Item, option RxOption, opts ...RxOption)
 
@@ -23,9 +19,10 @@ pub type TimeExtractorFn = fn (value ItemValue) time.Time
 
 // Observable is the standard interface for Observables.
 pub interface Observable {
-	Iterable // mut:
-	// 	all(predicate Predicate, opts ...RxOption) Single
-	// 	average_f32(opts ...RxOption) Single
+	Iterable
+mut:
+	all(predicate Predicate, opts ...RxOption) Single
+	// average_f32(opts ...RxOption) Single
 	// 	average_f64(opts ...RxOption) Single
 	// 	average_int(opts ...RxOption) Single
 	// 	// average_i8(opts ...RxOption) Single
@@ -185,7 +182,7 @@ fn observable(parent context.Context, mut iterable Iterable, operator_factory Op
 						}
 						value := first_item_id.value
 						match value {
-							IntValue {
+							ItemValueImpl<int> {
 								of(value).send_context(mut &ctx, from_ch)
 								run_parallel(mut &ctx, next, observe, operator_factory,
 									bypass_gather, option, ...merged_options)

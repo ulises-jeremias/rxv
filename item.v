@@ -5,11 +5,21 @@ import time
 
 pub interface ItemValue {}
 
+pub struct ItemValueImpl<T> {
+	val T
+}
+
+pub fn new_item_value<T>(val T) ItemValue {
+	return ItemValue(&ItemValueImpl<T>{
+		val: val
+	})
+}
+
 // Item is a wrapper having either a value or an error.
 pub struct Item {
 pub:
-	value ItemValue = voidptr(0)
-	err   IError    = none
+	value ItemValue
+	err   IError = none
 }
 
 // TimestampItem attach a timestamp to an item.
