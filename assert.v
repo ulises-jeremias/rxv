@@ -208,8 +208,87 @@ fn parse_assertions(assertions ...RxAssert) RxAssert {
 	return ass
 }
 
-// test asserts the result of an iterable against a list of assertions.
-pub fn test(mut ctx context.Context, mut iterable Iterable, assertions ...RxAssert) {
+// assert_iterable asserts the result of an iterable against a list of assertions.
+pub fn assert_iterable(mut ctx context.Context, mut iterable Iterable, assertions ...RxAssert) {
+	ass := parse_assertions(...assertions)
+	mut got := []ItemValue{}
+	mut errs := []IError{}
+	opts := []RxOption{}
+
+	observe := iterable.observe(...opts)
+	done := ctx.done()
+
+	loop: for {
+		if select {
+			_ := <-done {
+				break loop
+			}
+			item := <-observe {
+				if item.is_error() {
+					errs << item.err
+				} else {
+					got << item.value
+				}
+			}
+		} {
+		} else {
+			break loop
+		}
+	}
+
+	if predicates := ass.custom_predicates_to_be_checked() {
+		for predicate in predicates {
+			predicate(got) or { panic(err) }
+		}
+	}
+
+	// @todo: Fix this
+	// if expected_items := ass.items_to_be_checked() {
+	// 	assert expected_items == got
+	// }
+
+	// TODO: assert using `items_no_order := ass.items_no_ordered_to_be_checked()`
+
+	// @todo: Fix this
+	// if value := ass.item_to_be_checked() {
+	// 	assert got.len == 1
+	// 	assert value == got[0]
+	// }
+
+	if ass.no_items_to_be_checked() {
+		assert got.len == 0
+	}
+
+	if ass.some_items_to_be_checked() {
+		assert got.len != 0
+	}
+
+	if expected_error := ass.raised_error_to_be_checked() {
+		if expected_error is none {
+			assert errs.len == 0
+		} else {
+			if errs.len == 0 {
+				panic('No error raised')
+			}
+			assert expected_error == errs[0]
+		}
+	}
+
+	if expected_errors := ass.raised_errors_to_be_checked() {
+		assert expected_errors == errs
+	}
+
+	if expected_error := ass.raised_an_error_to_be_checked() {
+		assert expected_error is none
+	}
+
+	if ass.not_raised_error_to_be_checked() {
+		assert errs.len == 0
+	}
+}
+
+// assert_single asserts the result of an iterable against a list of assertions.
+pub fn assert_single(mut ctx context.Context, mut iterable Single, assertions ...RxAssert) {
 	ass := parse_assertions(...assertions)
 	mut got := []ItemValue{}
 	mut errs := []IError{}

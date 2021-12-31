@@ -115,6 +115,8 @@ fn (mut op AverageF32Operator) gather_next(mut ctx context.Context, item Item, d
 
 // average_f64 calculates the average of numbers emitted by an Observable and emits the average f64
 pub fn (mut o ObservableImpl) average_f64(opts ...RxOption) Single {
+	println('AAAAAAAAAAAAAAAAAA1')
+
 	return single(o.parent, mut o, fn () Operator {
 		return &AverageF64Operator{}
 	}, false, false, ...opts)
@@ -128,6 +130,7 @@ mut:
 
 fn (mut op AverageF64Operator) next(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
 	value := item.value
+	println('AAAAAAAAAAAAAAAAAA')
 	match value {
 		ItemValueImpl<int> {
 			op.sum += f64(value.val)
