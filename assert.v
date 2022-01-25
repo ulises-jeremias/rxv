@@ -301,11 +301,9 @@ pub fn assert_single(mut ctx context.Context, mut iterable Single, assertions ..
 	// loop: for {
 	//         if select {
 	//                 _ := <-done {
-	//                         println('DONE LOOP')
 	//                         break loop
 	//                 }
 	//                 item := <-observe {
-	//                         println('OBSERVE LOOP')
 	//                         if item.is_error() {
 	//                                 errs << item.err
 	//                         } else {
@@ -313,9 +311,7 @@ pub fn assert_single(mut ctx context.Context, mut iterable Single, assertions ..
 	//                         }
 	//                 }
 	//         } {
-	//                 println('SELECT LOOP')
 	//         } else {
-	//                 println('BREAK LOOP')
 	//                 break loop
 	//         }
 	// }
