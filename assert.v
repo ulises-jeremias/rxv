@@ -297,23 +297,28 @@ pub fn assert_single(mut ctx context.Context, mut iterable Single, assertions ..
 	observe := iterable.observe(...opts)
 	done := ctx.done()
 
-	loop: for {
-		if select {
-			_ := <-done {
-				break loop
-			}
-			item := <-observe {
-				if item.is_error() {
-					errs << item.err
-				} else {
-					got << item.value
-				}
-			}
-		} {
-		} else {
-			break loop
-		}
-	}
+	// @todo: Fix this
+	// loop: for {
+	//         if select {
+	//                 _ := <-done {
+	//                         println('DONE LOOP')
+	//                         break loop
+	//                 }
+	//                 item := <-observe {
+	//                         println('OBSERVE LOOP')
+	//                         if item.is_error() {
+	//                                 errs << item.err
+	//                         } else {
+	//                                 got << item.value
+	//                         }
+	//                 }
+	//         } {
+	//                 println('SELECT LOOP')
+	//         } else {
+	//                 println('BREAK LOOP')
+	//                 break loop
+	//         }
+	// }
 
 	if predicates := ass.custom_predicates_to_be_checked() {
 		for predicate in predicates {
