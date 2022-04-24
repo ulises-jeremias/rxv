@@ -58,7 +58,7 @@ pub fn (mut i CreateIterable) observe(opts ...RxOption) chan Item {
 }
 
 fn (mut i CreateIterable) connect(mut ctx context.Context) {
-	go i.produce(ctx)
+	go i.produce(mut ctx)
 	i.mutex.@lock()
 	i.producer_already_created = true
 	i.mutex.unlock()

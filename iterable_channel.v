@@ -44,7 +44,7 @@ pub fn (mut i ChannelIterable) observe(opts ...RxOption) chan Item {
 }
 
 fn (mut i ChannelIterable) connect(mut ctx context.Context) {
-	go i.produce(ctx)
+	go i.produce(mut ctx)
 	i.mutex.@lock()
 	i.producer_already_created = true
 	i.mutex.unlock()
