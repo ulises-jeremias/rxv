@@ -300,7 +300,7 @@ pub fn assert_single(mut ctx context.Context, mut iterable Single, assertions ..
 	done := ctx.done()
 
 	loop: for {
-		select {
+		if select {
 			_ := <-done {
 				break loop
 			}
@@ -311,6 +311,9 @@ pub fn assert_single(mut ctx context.Context, mut iterable Single, assertions ..
 					got << item.value
 				}
 			}
+		} {
+		} else {
+			break loop
 		}
 	}
 

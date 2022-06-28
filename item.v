@@ -71,7 +71,10 @@ fn send(mut ctx context.Context, ch chan Item, items ...ItemValue) {
 	for item in items {
 		match item {
 			Error {
-				error(item).send_context(mut &ctx, ch)
+                                from_error(item).send_context(mut &ctx, ch)
+                        }
+                        MessageError {
+				from_error(item).send_context(mut &ctx, ch)
 			}
 			chan ItemValue {
 				loop: for {
@@ -79,7 +82,10 @@ fn send(mut ctx context.Context, ch chan Item, items ...ItemValue) {
 						i := <-item {
 							match i {
 								Error {
-									error(i).send_context(mut &ctx, ch)
+                                                                        from_error(i).send_context(mut &ctx, ch)
+                                                                }
+                                                                MessageError {
+									from_error(i).send_context(mut &ctx, ch)
 								}
 								else {
 									of(i).send_context(mut &ctx, ch)

@@ -21,7 +21,7 @@ mut:
 }
 
 pub fn (o SingleImpl) str() string {
-	return 'SingleImpl'
+        return "SingleImpl"
 }
 
 // observe observes an OptionalSingle by returning its channel.

@@ -9,7 +9,7 @@ fn main() {
 		cancel()
 	}
 
-	ch := chan rxv.Item{cap: 4}
+	ch := chan rxv.Item{cap: 3}
 
 	ch <- rxv.of(rxv.new_item_value(0.0))
 	ch <- rxv.of(rxv.new_item_value(1.0))

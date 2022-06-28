@@ -40,9 +40,9 @@ fn run_sequential(mut ctx context.Context, next chan Item, mut iterable Iterable
 						op.next(mut &ctx, item, next, operator)
 					}
 				}
-				else {
-					break loop
-				}
+                                else {
+                                        break loop
+                                }
 			}
 		}
 		op.end(mut &ctx, next)
