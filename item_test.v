@@ -14,7 +14,7 @@ fn test_send_items_variadic() {
 fn test_send_items_variadic_with_error() {
 	ch := chan Item{cap: 3}
 	err := error('error')
-	items := [new_item_value(1), ItemValue(err), new_item_value(3)]
+	items := [new_item_value(1), Error{}, new_item_value(3)]
 	mut bctx := context.background()
 	mut iter := new_channel_iterable(ch)
 	go send_items(mut &bctx, ch, .close_channel, items)
@@ -35,7 +35,7 @@ fn test_send_items_slice_with_error() {
 	ch := chan Item{cap: 3}
 	err := error('error')
 	mut items_slice := []ItemValue{}
-	items_slice << [new_item_value(1), ItemValue(err), new_item_value(3)]
+	items_slice << [new_item_value(1), Error{}, new_item_value(3)]
 	mut iter := new_channel_iterable(ch)
 	mut bctx := context.background()
 	go send_items(mut &bctx, ch, .close_channel, items_slice)
@@ -49,6 +49,7 @@ fn test_item_send_blocking() {
 	}
 	of(5).send_blocking(ch)
 	v := (<-ch).value
+	assert true
 }
 
 fn test_item_send_context_true() {

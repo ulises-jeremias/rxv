@@ -123,22 +123,16 @@ pub fn (i Item) send_blocking(ch chan Item) {
 // send_context sends an item and blocks until it is sent or a context canceled.
 // It returns a boolean to indicate wheter the item was sent.
 pub fn (i Item) send_context(mut ctx context.Context, ch chan Item) bool {
-	idone := ctx.done()
+	done := ctx.done()
 	select {
-		_ := <-idone {
-			// Context's done channel has the highest priority
+		_ := <-done {
 			return false
 		}
-		else {
-			idone_ := ctx.done()
-			select {
-				_ := <-idone_ {
-					return false
-				}
-				ch <- i {
-					return true
-				}
-			}
+		else {}
+	}
+	select {
+		ch <- i {
+			return true
 		}
 	}
 	return false
@@ -148,11 +142,11 @@ pub fn (i Item) send_context(mut ctx context.Context, ch chan Item) bool {
 // It returns a boolean to indicate whether the item was sent.
 pub fn (i Item) send_non_blocking(ch chan Item) bool {
 	select {
-		else {
-			return false
-		}
 		ch <- i {
 			return true
+		}
+		else {
+			return false
 		}
 	}
 	return false

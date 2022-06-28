@@ -1,6 +1,7 @@
 module rxv
 
 import context
+import time
 
 // AssertPredicate is a custom predicate based on the items.
 pub type AssertPredicate = fn (items []ItemValue) ?
@@ -243,17 +244,18 @@ pub fn assert_iterable(mut ctx context.Context, mut iterable Iterable, assertion
 	}
 
 	// @todo: Fix this
-	// if expected_items := ass.items_to_be_checked() {
-	// 	assert expected_items == got
-	// }
+	if expected_items := ass.items_to_be_checked() {
+		assert expected_items.len == got.len
+		// assert expected_items == got
+	}
 
 	// TODO: assert using `items_no_order := ass.items_no_ordered_to_be_checked()`
 
 	// @todo: Fix this
-	// if value := ass.item_to_be_checked() {
-	// 	assert got.len == 1
-	// 	assert value == got[0]
-	// }
+	if value := ass.item_to_be_checked() {
+		assert got.len == 1
+		// assert value == got[0]
+	}
 
 	if ass.no_items_to_be_checked() {
 		assert got.len == 0
@@ -297,24 +299,20 @@ pub fn assert_single(mut ctx context.Context, mut iterable Single, assertions ..
 	observe := iterable.observe(...opts)
 	done := ctx.done()
 
-	// @todo: Fix this
-	// loop: for {
-	//         if select {
-	//                 _ := <-done {
-	//                         break loop
-	//                 }
-	//                 item := <-observe {
-	//                         if item.is_error() {
-	//                                 errs << item.err
-	//                         } else {
-	//                                 got << item.value
-	//                         }
-	//                 }
-	//         } {
-	//         } else {
-	//                 break loop
-	//         }
-	// }
+	loop: for {
+		select {
+			_ := <-done {
+				break loop
+			}
+			item := <-observe {
+				if item.is_error() {
+					errs << item.err
+				} else {
+					got << item.value
+				}
+			}
+		}
+	}
 
 	if predicates := ass.custom_predicates_to_be_checked() {
 		for predicate in predicates {
@@ -323,17 +321,18 @@ pub fn assert_single(mut ctx context.Context, mut iterable Single, assertions ..
 	}
 
 	// @todo: Fix this
-	// if expected_items := ass.items_to_be_checked() {
-	// 	assert expected_items == got
-	// }
+	if expected_items := ass.items_to_be_checked() {
+		assert expected_items.len == got.len
+		// assert expected_items == got
+	}
 
 	// TODO: assert using `items_no_order := ass.items_no_ordered_to_be_checked()`
 
 	// @todo: Fix this
-	// if value := ass.item_to_be_checked() {
-	// 	assert got.len == 1
-	// 	assert value == got[0]
-	// }
+	if value := ass.item_to_be_checked() {
+		assert got.len == 1
+		// assert value == got[0]
+	}
 
 	if ass.no_items_to_be_checked() {
 		assert got.len == 0

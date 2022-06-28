@@ -29,6 +29,7 @@ fn run_sequential(mut ctx context.Context, next chan Item, mut iterable Iterable
 		done := ctx.done()
 		loop: for !stopped {
 			select {
+				// FIXME
 				_ := <-done {
 					break loop
 				}
@@ -36,8 +37,11 @@ fn run_sequential(mut ctx context.Context, next chan Item, mut iterable Iterable
 					if item.is_error() {
 						op.err(mut &ctx, item, next, operator)
 					} else {
-						op.gather_next(mut &ctx, item, next, operator)
+						op.next(mut &ctx, item, next, operator)
 					}
+				}
+				else {
+					break loop
 				}
 			}
 		}

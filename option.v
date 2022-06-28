@@ -40,6 +40,10 @@ mut:
 	serialized             SerializedFn
 }
 
+pub fn (o FuncOption) str() string {
+	return 'FuncOption'
+}
+
 fn (fdo &FuncOption) to_propagate() bool {
 	return fdo.propagate
 }
@@ -59,7 +63,7 @@ fn (fdo &FuncOption) build_channel() chan Item {
 	if fdo.is_buffer {
 		return chan Item{cap: fdo.buffer}
 	}
-	return chan Item{}
+	return chan Item{cap: 1}
 }
 
 fn (fdo &FuncOption) build_context(parent context.Context) context.Context {

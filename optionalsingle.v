@@ -23,6 +23,10 @@ mut:
 	parent   context.Context
 }
 
+pub fn (o OptionalSingleImpl) str() string {
+	return 'OptionalSingleImpl'
+}
+
 // observe observes an OptionalSingle by returning its channel.
 fn (mut o OptionalSingleImpl) observe(opts ...RxOption) chan Item {
 	return o.iterable.observe(...opts)

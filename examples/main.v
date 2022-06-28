@@ -1,7 +1,7 @@
 import context
 import rxv
 
-fn test_main() {
+fn main() {
 	mut bctx := context.background()
 	mut ctx, cancel := context.with_cancel(mut &bctx)
 
@@ -9,7 +9,7 @@ fn test_main() {
 		cancel()
 	}
 
-	ch := chan rxv.Item{cap: 3}
+	ch := chan rxv.Item{cap: 4}
 
 	ch <- rxv.of(rxv.new_item_value(0.0))
 	ch <- rxv.of(rxv.new_item_value(1.0))
