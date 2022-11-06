@@ -21,7 +21,7 @@ mut:
 }
 
 pub fn (o SingleImpl) str() string {
-        return "SingleImpl"
+	return 'SingleImpl'
 }
 
 // observe observes an OptionalSingle by returning its channel.
@@ -125,7 +125,7 @@ pub fn (mut o SingleImpl) run(opts ...RxOption) chan int {
 
 	observe := o.observe(...opts)
 
-	go fn (dispose chan int, mut ctx context.Context, observe chan Item) {
+	spawn fn (dispose chan int, mut ctx context.Context, observe chan Item) {
 		defer {
 			dispose.close()
 		}

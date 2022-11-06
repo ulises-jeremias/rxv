@@ -11,7 +11,7 @@ mut:
 }
 
 fn run_sequential(mut ctx context.Context, next chan Item, mut iterable Iterable, operator_factory OperatorFactoryFn, option RxOption, opts ...RxOption) {
-	go fn (mut ctx context.Context, next chan Item, mut iterable Iterable, operator_factory OperatorFactoryFn, option RxOption, opts []RxOption) {
+	spawn fn (mut ctx context.Context, next chan Item, mut iterable Iterable, operator_factory OperatorFactoryFn, option RxOption, opts []RxOption) {
 		mut observe := iterable.observe(...opts)
 		mut op := operator_factory()
 		mut stopped := false
@@ -40,9 +40,9 @@ fn run_sequential(mut ctx context.Context, next chan Item, mut iterable Iterable
 						op.next(mut &ctx, item, next, operator)
 					}
 				}
-                                else {
-                                        break loop
-                                }
+				else {
+					break loop
+				}
 			}
 		}
 		op.end(mut &ctx, next)
@@ -65,7 +65,7 @@ fn run_parallel(mut ctx context.Context, next chan Item, observe chan Item, oper
 		gather = chan Item{cap: 1}
 
 		// gather
-		go fn (mut observe_container ObserveContainer, mut ctx context.Context, next chan Item, gather chan Item, operator_factory OperatorFactoryFn, bypass_gather bool, option RxOption, opts []RxOption) {
+		spawn fn (mut observe_container ObserveContainer, mut ctx context.Context, next chan Item, gather chan Item, operator_factory OperatorFactoryFn, bypass_gather bool, option RxOption, opts []RxOption) {
 			mut op := operator_factory()
 			mut stopped := false
 			operator := OperatorOptions{
@@ -101,7 +101,7 @@ fn run_parallel(mut ctx context.Context, next chan Item, observe chan Item, oper
 
 	// scatter
 	for i in 0 .. pool {
-		go fn (mut observe_container ObserveContainer, mut wg sync.WaitGroup, mut ctx context.Context, gather chan Item, operator_factory OperatorFactoryFn, option RxOption, opts []RxOption) {
+		spawn fn (mut observe_container ObserveContainer, mut wg sync.WaitGroup, mut ctx context.Context, gather chan Item, operator_factory OperatorFactoryFn, option RxOption, opts []RxOption) {
 			observe := observe_container.observe
 			mut op := operator_factory()
 			mut stopped := false
@@ -138,14 +138,14 @@ fn run_parallel(mut ctx context.Context, next chan Item, observe chan Item, oper
 		}(mut observe_container, mut wg, mut &ctx, gather, operator_factory, option, opts)
 	}
 
-	go fn (mut wg sync.WaitGroup, gather chan Item) {
+	spawn fn (mut wg sync.WaitGroup, gather chan Item) {
 		wg.wait()
 		gather.close()
 	}(mut wg, gather)
 }
 
 fn run_first_item(mut ctx context.Context, f IdentifierFn, notif chan Item, observe chan Item, next chan Item, mut iterable Iterable, operator_factory OperatorFactoryFn, option RxOption, opts ...RxOption) {
-	go fn (mut ctx context.Context, f IdentifierFn, notif chan Item, observe chan Item, next chan Item, operator_factory OperatorFactoryFn, option RxOption, opts []RxOption) {
+	spawn fn (mut ctx context.Context, f IdentifierFn, notif chan Item, observe chan Item, next chan Item, operator_factory OperatorFactoryFn, option RxOption, opts []RxOption) {
 		mut observe_ := observe
 		mut op := operator_factory()
 		mut stopped := false

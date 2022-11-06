@@ -17,7 +17,7 @@ fn new_event_source_iterable(mut ctx context.Context, next chan Item, strategy B
 		opts: opts
 	}
 
-	go fn (mut i EventSourceIterable, mut ctx context.Context, next chan Item, strategy BackpressureStrategy) {
+	spawn fn (mut i EventSourceIterable, mut ctx context.Context, next chan Item, strategy BackpressureStrategy) {
 		defer {
 			i.close_all_observers()
 		}

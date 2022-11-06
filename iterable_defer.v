@@ -21,7 +21,7 @@ pub fn (i &DeferIterable) observe(opts ...RxOption) chan Item {
 	mut ctx := option.build_context(empty_context)
 	next := option.build_channel()
 
-	go fn (i &DeferIterable, next chan Item, mut ctx context.Context) {
+	spawn fn (i &DeferIterable, next chan Item, mut ctx context.Context) {
 		defer {
 			next.close()
 		}

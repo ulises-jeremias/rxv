@@ -169,7 +169,7 @@ fn observable(parent context.Context, mut iterable Iterable, operator_factory Op
 			next := option.build_channel()
 			mut ctx := option.build_context(parent)
 			observe := iterable.observe(...opts)
-			go fn (mut ctx context.Context, parent context.Context, first_item_id_ch chan Item, from_ch chan Item, next chan Item, observe chan Item, operator_factory OperatorFactoryFn, force_seq bool, bypass_gather bool, option RxOption, merged_options []RxOption) {
+			spawn fn (mut ctx context.Context, parent context.Context, first_item_id_ch chan Item, from_ch chan Item, next chan Item, observe chan Item, operator_factory OperatorFactoryFn, force_seq bool, bypass_gather bool, option RxOption, merged_options []RxOption) {
 				done := ctx.done()
 				select {
 					_ := <-done {
