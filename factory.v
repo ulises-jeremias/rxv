@@ -40,7 +40,7 @@ pub fn from_event_source(next chan Item, opts ...RxOption) Observable {
 	back_pressure_strategy := option.get_back_pressure_strategy()
 	mut ctx := option.build_context(empty_context)
 	return &ObservableImpl{
-		iterable: new_event_source_iterable(mut &ctx, next, back_pressure_strategy)
+		iterable: new_event_source_iterable(mut ctx, next, back_pressure_strategy)
 	}
 }
 

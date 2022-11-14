@@ -24,7 +24,7 @@ pub fn (i &RangeIterable) observe(opts ...RxOption) chan Item {
 	mut ctx := option.build_context(empty_context)
 	next := option.build_channel()
 
-	spawn fn (i &RangeIterable, next chan Item, mut ctx context.Context) {
+	spawn fn (i &RangeIterable, next chan Item, mut ctx &context.Context) {
 		for idx in i.start .. i.start + i.count {
 			done := ctx.done()
 			select {

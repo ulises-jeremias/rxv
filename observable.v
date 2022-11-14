@@ -110,7 +110,7 @@ pub fn (mut o ObservableImpl) observe(opts ...RxOption) chan Item {
 }
 
 pub fn default_error_func_operator(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	item.send_context(mut &ctx, dst)
+	item.send_context(mut ctx, dst)
 	operator_options.stop()
 }
 
@@ -130,9 +130,9 @@ fn observable(parent context.Context, mut iterable Iterable, operator_factory Op
 		next := option.build_channel()
 		mut ctx := option.build_context(parent)
 		if force_seq || !parallel {
-			run_sequential(mut &ctx, next, mut &iterable, operator_factory, option, ...opts)
+			run_sequential(mut ctx, next, mut &iterable, operator_factory, option, ...opts)
 		} else {
-			run_parallel(mut &ctx, next, iterable.observe(...opts), operator_factory,
+			run_parallel(mut ctx, next, iterable.observe(...opts), operator_factory,
 				bypass_gather, option, ...opts)
 		}
 		return &ObservableImpl{
@@ -148,7 +148,7 @@ fn observable(parent context.Context, mut iterable Iterable, operator_factory Op
 
 			next := option.build_channel()
 			mut ctx := option.build_context(parent)
-			run_sequential(mut &ctx, next, mut &iterable, operator_factory, option, ...merged_options)
+			run_sequential(mut ctx, next, mut &iterable, operator_factory, option, ...merged_options)
 			return next
 		}
 
@@ -169,7 +169,7 @@ fn observable(parent context.Context, mut iterable Iterable, operator_factory Op
 			next := option.build_channel()
 			mut ctx := option.build_context(parent)
 			observe := iterable.observe(...opts)
-			spawn fn (mut ctx context.Context, parent context.Context, first_item_id_ch chan Item, from_ch chan Item, next chan Item, observe chan Item, operator_factory OperatorFactoryFn, force_seq bool, bypass_gather bool, option RxOption, merged_options []RxOption) {
+			spawn fn (mut ctx &context.Context, parent context.Context, first_item_id_ch chan Item, from_ch chan Item, next chan Item, observe chan Item, operator_factory OperatorFactoryFn, force_seq bool, bypass_gather bool, option RxOption, merged_options []RxOption) {
 				done := ctx.done()
 				select {
 					_ := <-done {
@@ -177,14 +177,14 @@ fn observable(parent context.Context, mut iterable Iterable, operator_factory Op
 					}
 					first_item_id := <-first_item_id_ch {
 						if first_item_id.is_error() {
-							first_item_id.send_context(mut &ctx, from_ch)
+							first_item_id.send_context(mut ctx, from_ch)
 							return
 						}
 						value := first_item_id.value
 						match value {
 							ItemValueImpl<int> {
-								of(value).send_context(mut &ctx, from_ch)
-								run_parallel(mut &ctx, next, observe, operator_factory,
+								of(value).send_context(mut ctx, from_ch)
+								run_parallel(mut ctx, next, observe, operator_factory,
 									bypass_gather, option, ...merged_options)
 							}
 							else {}
@@ -194,7 +194,7 @@ fn observable(parent context.Context, mut iterable Iterable, operator_factory Op
 			}(mut &ctx, parent, first_item_id_ch, from_ch, next, observe, operator_factory,
 				force_seq, bypass_gather, option, merged_options)
 			// @todo: Fix this
-			// run_first_item(mut &ctx, f, first_item_id_ch, observe, next, mut &iterable,
+			// run_first_item(mut ctx, f, first_item_id_ch, observe, next, mut &iterable,
 			// 	operator_factory, option, ...merged_options)
 			return next
 		}
@@ -212,7 +212,7 @@ fn observable(parent context.Context, mut iterable Iterable, operator_factory Op
 
 		next := option.build_channel()
 		mut ctx := option.build_context(parent)
-		run_parallel(mut &ctx, next, iterable.observe(...merged_options), operator_factory,
+		run_parallel(mut ctx, next, iterable.observe(...merged_options), operator_factory,
 			bypass_gather, option, ...merged_options)
 		return next
 	}
@@ -231,9 +231,9 @@ fn single(parent context.Context, mut iterable Iterable, operator_factory Operat
 
 	if option.is_eager_observation() {
 		if force_seq || !parallel {
-			run_sequential(mut &ctx, next, mut &iterable, operator_factory, option, ...opts)
+			run_sequential(mut ctx, next, mut &iterable, operator_factory, option, ...opts)
 		} else {
-			run_parallel(mut &ctx, next, iterable.observe(...opts), operator_factory,
+			run_parallel(mut ctx, next, iterable.observe(...opts), operator_factory,
 				bypass_gather, option, ...opts)
 		}
 		return &SingleImpl{
@@ -247,9 +247,9 @@ fn single(parent context.Context, mut iterable Iterable, operator_factory Operat
 		option = parse_options(...merged_options)
 
 		if force_seq || !parallel {
-			run_sequential(mut &ctx, next, mut &iterable, operator_factory, option, ...merged_options)
+			run_sequential(mut ctx, next, mut &iterable, operator_factory, option, ...merged_options)
 		} else {
-			run_parallel(mut &ctx, next, iterable.observe(...merged_options), operator_factory,
+			run_parallel(mut ctx, next, iterable.observe(...merged_options), operator_factory,
 				bypass_gather, option, ...merged_options)
 		}
 		return next
@@ -268,9 +268,9 @@ fn optional_single(parent context.Context, mut iterable Iterable, operator_facto
 	if option.is_eager_observation() {
 		next := option.build_channel()
 		if force_seq || !parallel {
-			run_sequential(mut &ctx, next, mut &iterable, operator_factory, option, ...opts)
+			run_sequential(mut ctx, next, mut &iterable, operator_factory, option, ...opts)
 		} else {
-			run_parallel(mut &ctx, next, iterable.observe(...opts), operator_factory,
+			run_parallel(mut ctx, next, iterable.observe(...opts), operator_factory,
 				bypass_gather, option, ...opts)
 		}
 		return &OptionalSingleImpl{
@@ -287,9 +287,9 @@ fn optional_single(parent context.Context, mut iterable Iterable, operator_facto
 		mut ctx := option.build_context(parent)
 
 		if force_seq || !parallel {
-			run_sequential(mut &ctx, next, mut &iterable, operator_factory, option, ...merged_options)
+			run_sequential(mut ctx, next, mut &iterable, operator_factory, option, ...merged_options)
 		} else {
-			run_parallel(mut &ctx, next, iterable.observe(...merged_options), operator_factory,
+			run_parallel(mut ctx, next, iterable.observe(...merged_options), operator_factory,
 				bypass_gather, option, ...merged_options)
 		}
 		return next

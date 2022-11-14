@@ -62,7 +62,7 @@ fn test_item_send_context_true() {
 	defer {
 		cancel()
 	}
-	assert of(5).send_context(mut &ctx, ch)
+	assert of(5).send_context(mut ctx, ch)
 }
 
 fn test_item_send_context_false() {
@@ -73,7 +73,7 @@ fn test_item_send_context_false() {
 	mut bctx := context.background()
 	mut ctx, cancel := context.with_cancel(mut &bctx)
 	cancel()
-	assert !of(5).send_context(mut &ctx, ch)
+	assert !of(5).send_context(mut ctx, ch)
 }
 
 fn test_item_send_non_blocking() {

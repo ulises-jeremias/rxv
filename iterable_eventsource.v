@@ -35,7 +35,7 @@ fn new_event_source_iterable(mut ctx context.Context, next chan Item, strategy B
 			}
 		} {
 		}
-	}(mut iterable, mut &ctx, next, strategy)
+	}(mut iterable, mut ctx, next, strategy)
 
 	return iterable
 }
@@ -54,7 +54,7 @@ fn (mut i EventSourceIterable) deliver(item Item, mut ctx context.Context, next 
 	match strategy {
 		.block {
 			for observer in i.observers {
-				if !item.send_context(mut &ctx, observer) {
+				if !item.send_context(mut ctx, observer) {
 					return true
 				}
 			}

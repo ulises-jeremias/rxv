@@ -64,17 +64,17 @@ pub fn send_items(mut ctx context.Context, ch chan Item, strategy CloseChannelSt
 			ch.close()
 		}
 	}
-	send(mut &ctx, ch, ...items)
+	send(mut ctx, ch, ...items)
 }
 
 fn send(mut ctx context.Context, ch chan Item, items ...ItemValue) {
 	for item in items {
 		match item {
 			Error {
-				from_error(item).send_context(mut &ctx, ch)
+				from_error(item).send_context(mut ctx, ch)
 			}
 			MessageError {
-				from_error(item).send_context(mut &ctx, ch)
+				from_error(item).send_context(mut ctx, ch)
 			}
 			chan ItemValue {
 				loop: for {
@@ -82,13 +82,13 @@ fn send(mut ctx context.Context, ch chan Item, items ...ItemValue) {
 						i := <-item {
 							match i {
 								Error {
-									from_error(i).send_context(mut &ctx, ch)
+									from_error(i).send_context(mut ctx, ch)
 								}
 								MessageError {
-									from_error(i).send_context(mut &ctx, ch)
+									from_error(i).send_context(mut ctx, ch)
 								}
 								else {
-									of(i).send_context(mut &ctx, ch)
+									of(i).send_context(mut ctx, ch)
 								}
 							}
 						}
@@ -100,11 +100,11 @@ fn send(mut ctx context.Context, ch chan Item, items ...ItemValue) {
 			}
 			[]ItemValue {
 				for i in item {
-					send(mut &ctx, ch, i)
+					send(mut ctx, ch, i)
 				}
 			}
 			else {
-				of(item).send_context(mut &ctx, ch)
+				of(item).send_context(mut ctx, ch)
 			}
 		}
 	}

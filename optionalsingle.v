@@ -55,7 +55,7 @@ pub fn (mut o OptionalSingleImpl) get(opts ...RxOption) ?Item {
 			}
 		}
 	}
-	return rxv.optional_single_empty
+	return optional_single_empty
 }
 
 struct MapOperatorOptionalSingle {
@@ -63,7 +63,7 @@ struct MapOperatorOptionalSingle {
 }
 
 fn (op &MapOperatorOptionalSingle) next(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	if res := op.apply(mut &ctx, item.value) {
+	if res := op.apply(mut ctx, item.value) {
 		dst <- of(res)
 	} else {
 		dst <- from_error(err)
@@ -72,7 +72,7 @@ fn (op &MapOperatorOptionalSingle) next(mut ctx context.Context, item Item, dst 
 }
 
 fn (op &MapOperatorOptionalSingle) err(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	default_error_func_operator(mut &ctx, item, dst, operator_options)
+	default_error_func_operator(mut ctx, item, dst, operator_options)
 }
 
 fn (op &MapOperatorOptionalSingle) end(mut _ context.Context, _ chan Item) {}
@@ -101,7 +101,7 @@ pub fn (mut o OptionalSingleImpl) run(opts ...RxOption) chan int {
 
 	observe := o.observe(...opts)
 
-	spawn fn (dispose chan int, mut ctx context.Context, observe chan Item) {
+	spawn fn (dispose chan int, mut ctx &context.Context, observe chan Item) {
 		defer {
 			dispose.close()
 		}

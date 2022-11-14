@@ -21,19 +21,19 @@ mut:
 
 fn (mut op AllOperator) next(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
 	if !op.predicate(item.value) {
-		of(false).send_context(mut &ctx, dst)
+		of(false).send_context(mut ctx, dst)
 		op.all = false
 		operator_options.stop()
 	}
 }
 
 fn (mut op AllOperator) err(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	default_error_func_operator(mut &ctx, item, dst, operator_options)
+	default_error_func_operator(mut ctx, item, dst, operator_options)
 }
 
 fn (mut op AllOperator) end(mut ctx context.Context, dst chan Item) {
 	if op.all {
-		of(true).send_context(mut &ctx, dst)
+		of(true).send_context(mut ctx, dst)
 	}
 }
 
@@ -43,7 +43,7 @@ fn (mut op AllOperator) gather_next(mut ctx context.Context, item Item, dst chan
 		bool {
 			if value == false {
 				false_value := new_item_value(false)
-				of(false_value).send_context(mut &ctx, dst)
+				of(false_value).send_context(mut ctx, dst)
 				op.all = false
 				operator_options.stop()
 			}
@@ -82,23 +82,23 @@ fn (mut op AverageF32Operator) next(mut ctx context.Context, item Item, dst chan
 		}
 		else {
 			err := new_illegal_input_error('expected type: f32, f64 or int, got ${typeof(item.value).name}')
-			from_error(err).send_context(mut &ctx, dst)
+			from_error(err).send_context(mut ctx, dst)
 			operator_options.stop()
 		}
 	}
 }
 
 fn (mut op AverageF32Operator) err(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	default_error_func_operator(mut &ctx, item, dst, operator_options)
+	default_error_func_operator(mut ctx, item, dst, operator_options)
 }
 
 fn (mut op AverageF32Operator) end(mut ctx context.Context, dst chan Item) {
 	if op.count == 0 {
 		zero := new_item_value(f32(0))
-		of(zero).send_context(mut &ctx, dst)
+		of(zero).send_context(mut ctx, dst)
 	} else {
 		avg := new_item_value(f32(op.sum / op.count))
-		of(avg).send_context(mut &ctx, dst)
+		of(avg).send_context(mut ctx, dst)
 	}
 }
 
@@ -143,23 +143,23 @@ fn (mut op AverageF64Operator) next(mut ctx context.Context, item Item, dst chan
 		}
 		else {
 			err := new_illegal_input_error('expected type: f32, f64 or int, got ${typeof(item.value).name}')
-			from_error(err).send_context(mut &ctx, dst)
+			from_error(err).send_context(mut ctx, dst)
 			operator_options.stop()
 		}
 	}
 }
 
 fn (mut op AverageF64Operator) err(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	default_error_func_operator(mut &ctx, item, dst, operator_options)
+	default_error_func_operator(mut ctx, item, dst, operator_options)
 }
 
 fn (mut op AverageF64Operator) end(mut ctx context.Context, dst chan Item) {
 	if op.count == 0 {
 		zero := new_item_value(0.0)
-		of(zero).send_context(mut &ctx, dst)
+		of(zero).send_context(mut ctx, dst)
 	} else {
 		avg := new_item_value(op.sum / op.count)
-		of(avg).send_context(mut &ctx, dst)
+		of(avg).send_context(mut ctx, dst)
 	}
 }
 
@@ -203,23 +203,23 @@ fn (mut op AverageIntOperator) next(mut ctx context.Context, item Item, dst chan
 		}
 		else {
 			err := new_illegal_input_error('expected type: int, got ${typeof(item.value).name}')
-			from_error(err).send_context(mut &ctx, dst)
+			from_error(err).send_context(mut ctx, dst)
 			operator_options.stop()
 		}
 	}
 }
 
 fn (mut op AverageIntOperator) err(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	default_error_func_operator(mut &ctx, item, dst, operator_options)
+	default_error_func_operator(mut ctx, item, dst, operator_options)
 }
 
 fn (mut op AverageIntOperator) end(mut ctx context.Context, dst chan Item) {
 	if op.count == 0 {
 		zero := new_item_value(0)
-		of(zero).send_context(mut &ctx, dst)
+		of(zero).send_context(mut ctx, dst)
 	} else {
 		avg := new_item_value(int(op.sum / op.count))
-		of(avg).send_context(mut &ctx, dst)
+		of(avg).send_context(mut ctx, dst)
 	}
 }
 
@@ -256,23 +256,23 @@ fn (mut op AverageI16Operator) next(mut ctx context.Context, item Item, dst chan
 		}
 		else {
 			err := new_illegal_input_error('expected type: i16, got ${typeof(item.value).name}')
-			from_error(err).send_context(mut &ctx, dst)
+			from_error(err).send_context(mut ctx, dst)
 			operator_options.stop()
 		}
 	}
 }
 
 fn (mut op AverageI16Operator) err(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	default_error_func_operator(mut &ctx, item, dst, operator_options)
+	default_error_func_operator(mut ctx, item, dst, operator_options)
 }
 
 fn (mut op AverageI16Operator) end(mut ctx context.Context, dst chan Item) {
 	if op.count == 0 {
 		zero := new_item_value(0)
-		of(zero).send_context(mut &ctx, dst)
+		of(zero).send_context(mut ctx, dst)
 	} else {
 		avg := new_item_value(i16(op.sum / op.count))
-		of(avg).send_context(mut &ctx, dst)
+		of(avg).send_context(mut ctx, dst)
 	}
 }
 
@@ -309,23 +309,23 @@ fn (mut op AverageI64Operator) next(mut ctx context.Context, item Item, dst chan
 		}
 		else {
 			err := new_illegal_input_error('expected type: i64, got ${typeof(item.value).name}')
-			from_error(err).send_context(mut &ctx, dst)
+			from_error(err).send_context(mut ctx, dst)
 			operator_options.stop()
 		}
 	}
 }
 
 fn (mut op AverageI64Operator) err(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	default_error_func_operator(mut &ctx, item, dst, operator_options)
+	default_error_func_operator(mut ctx, item, dst, operator_options)
 }
 
 fn (mut op AverageI64Operator) end(mut ctx context.Context, dst chan Item) {
 	if op.count == 0 {
 		zero := new_item_value(0)
-		of(zero).send_context(mut &ctx, dst)
+		of(zero).send_context(mut ctx, dst)
 	} else {
 		avg := new_item_value(i64(op.sum / op.count))
-		of(avg).send_context(mut &ctx, dst)
+		of(avg).send_context(mut ctx, dst)
 	}
 }
 

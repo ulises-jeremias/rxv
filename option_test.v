@@ -13,7 +13,7 @@ fn test_with_buffered_channel() {
 
 fn test_with_context() {
 	mut ctx := context.background()
-	option := with_context(mut &ctx)
+	option := with_context(mut ctx)
 	assert !option.to_propagate()
 	assert !option.is_eager_observation()
 	assert !option.is_connectable()

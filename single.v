@@ -61,12 +61,12 @@ struct FilterOperatorSingle {
 
 fn (op &FilterOperatorSingle) next(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
 	if op.apply(item.value) {
-		item.send_context(mut &ctx, dst)
+		item.send_context(mut ctx, dst)
 	}
 }
 
 fn (op &FilterOperatorSingle) err(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	default_error_func_operator(mut &ctx, item, dst, operator_options)
+	default_error_func_operator(mut ctx, item, dst, operator_options)
 }
 
 fn (op &FilterOperatorSingle) end(mut _ context.Context, _ chan Item) {}
@@ -87,7 +87,7 @@ struct MapOperatorSingle {
 }
 
 fn (op &MapOperatorSingle) next(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	if res := op.apply(mut &ctx, item.value) {
+	if res := op.apply(mut ctx, item.value) {
 		dst <- of(res)
 	} else {
 		dst <- from_error(err)
@@ -96,7 +96,7 @@ fn (op &MapOperatorSingle) next(mut ctx context.Context, item Item, dst chan Ite
 }
 
 fn (op &MapOperatorSingle) err(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
-	default_error_func_operator(mut &ctx, item, dst, operator_options)
+	default_error_func_operator(mut ctx, item, dst, operator_options)
 }
 
 fn (op &MapOperatorSingle) end(mut _ context.Context, _ chan Item) {}
@@ -125,7 +125,7 @@ pub fn (mut o SingleImpl) run(opts ...RxOption) chan int {
 
 	observe := o.observe(...opts)
 
-	spawn fn (dispose chan int, mut ctx context.Context, observe chan Item) {
+	spawn fn (dispose chan int, mut ctx &context.Context, observe chan Item) {
 		defer {
 			dispose.close()
 		}

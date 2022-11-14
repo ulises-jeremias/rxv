@@ -18,12 +18,12 @@ fn new_create_iterable(fs []Producer, opts ...RxOption) Iterable {
 	mut ctx := option.build_context(empty_context)
 	next := option.build_channel()
 
-	spawn fn (fs []Producer, next chan Item, mut ctx context.Context) {
+	spawn fn (fs []Producer, next chan Item, mut ctx &context.Context) {
 		defer {
 			next.close()
 		}
 		for f in fs {
-			f(mut &ctx, next)
+			f(mut ctx, next)
 		}
 	}(fs, next, mut &ctx)
 
@@ -45,7 +45,7 @@ pub fn (mut i CreateIterable) observe(opts ...RxOption) chan Item {
 
 	if option.is_connect_operation() {
 		mut ctx := option.build_context(empty_context)
-		i.connect(mut &ctx)
+		i.connect(mut ctx)
 	}
 
 	ch := option.build_channel()
