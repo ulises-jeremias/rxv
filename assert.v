@@ -19,7 +19,6 @@ mut:
 	check_has_items_no_order   bool
 	items_no_order             []ItemValue
 	check_has_raised_error     bool
-	err                        IError = none
 	check_has_raised_errors    bool
 	errs                       []IError
 	check_has_raised_an_error  bool
@@ -64,7 +63,7 @@ fn (ass RxAssert) raised_error_to_be_checked() ?IError {
 	if !ass.check_has_raised_error {
 		return none
 	}
-	return ass.err
+	return ass.errs[0]
 }
 
 fn (ass RxAssert) raised_errors_to_be_checked() ?[]IError {
@@ -78,7 +77,7 @@ fn (ass RxAssert) raised_an_error_to_be_checked() ?IError {
 	if !ass.check_has_raised_an_error {
 		return none
 	}
-	return ass.err
+	return ass.errs[0]
 }
 
 fn (ass RxAssert) not_raised_error_to_be_checked() bool {
@@ -159,7 +158,7 @@ pub fn is_empty() RxAssert {
 pub fn has_error(err IError) RxAssert {
 	assertion_fn := fn [err] (mut a RxAssert) {
 		a.check_has_raised_error = true
-		a.err = err
+		a.errs = [err]
 	}
 	return new_assertion(AssertApplyFn(assertion_fn))
 }

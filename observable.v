@@ -101,7 +101,7 @@ mut:
 pub struct ObservableImpl {
 mut:
 	iterable Iterable
-	parent   context.Context
+	parent   context.Context = context.background()
 }
 
 // Observe observes an Observable by returning its channel.

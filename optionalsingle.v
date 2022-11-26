@@ -55,7 +55,7 @@ pub fn (mut o OptionalSingleImpl) get(opts ...RxOption) ?Item {
 			}
 		}
 	}
-	return optional_single_empty
+	return .optional_single_empty
 }
 
 struct MapOperatorOptionalSingle {
