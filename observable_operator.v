@@ -68,15 +68,15 @@ mut:
 fn (mut op AverageF32Operator) next(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
 	value := item.value
 	match value {
-		ItemValueImpl<int> {
+		ItemValueImpl[int] {
 			op.sum += f32(value.val)
 			op.count++
 		}
-		ItemValueImpl<f32> {
+		ItemValueImpl[f32] {
 			op.sum += value.val
 			op.count++
 		}
-		ItemValueImpl<f64> {
+		ItemValueImpl[f64] {
 			op.sum += f32(value.val)
 			op.count++
 		}
@@ -129,15 +129,15 @@ mut:
 fn (mut op AverageF64Operator) next(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
 	value := item.value
 	match value {
-		ItemValueImpl<int> {
+		ItemValueImpl[int] {
 			op.sum += f64(value.val)
 			op.count++
 		}
-		ItemValueImpl<f32> {
+		ItemValueImpl[f32] {
 			op.sum += f64(value.val)
 			op.count++
 		}
-		ItemValueImpl<f64> {
+		ItemValueImpl[f64] {
 			op.sum += value.val
 			op.count++
 		}
@@ -197,7 +197,7 @@ mut:
 fn (mut op AverageIntOperator) next(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
 	value := item.value
 	match value {
-		ItemValueImpl<int> {
+		ItemValueImpl[int] {
 			op.sum += value.val
 			op.count++
 		}
@@ -250,7 +250,7 @@ mut:
 fn (mut op AverageI16Operator) next(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
 	value := item.value
 	match value {
-		ItemValueImpl<i16> {
+		ItemValueImpl[i16] {
 			op.sum += value.val
 			op.count++
 		}
@@ -303,7 +303,7 @@ mut:
 fn (mut op AverageI64Operator) next(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
 	value := item.value
 	match value {
-		ItemValueImpl<i64> {
+		ItemValueImpl[i64] {
 			op.sum += value.val
 			op.count++
 		}

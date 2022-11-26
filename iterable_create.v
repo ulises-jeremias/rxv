@@ -18,7 +18,7 @@ fn new_create_iterable(fs []Producer, opts ...RxOption) Iterable {
 	mut ctx := option.build_context(empty_context)
 	next := option.build_channel()
 
-	spawn fn (fs []Producer, next chan Item, mut ctx &context.Context) {
+	spawn fn (fs []Producer, next chan Item, mut ctx context.Context) {
 		defer {
 			next.close()
 		}

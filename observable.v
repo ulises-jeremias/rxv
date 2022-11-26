@@ -3,13 +3,13 @@ module rxv
 import context
 import time
 
-pub type DistributionFn = fn (item Item) ItemValueImpl<int>
+pub type DistributionFn = fn (item Item) ItemValueImpl[int]
 
-pub type DistributionStrFn = fn (item Item) ItemValueImpl<string>
+pub type DistributionStrFn = fn (item Item) ItemValueImpl[string]
 
 pub type FactoryFn = fn () ItemValue
 
-pub type IdentifierFn = fn (value ItemValue) ItemValueImpl<int>
+pub type IdentifierFn = fn (value ItemValue) ItemValueImpl[int]
 
 pub type IterableFactoryFn = fn (mut ctx context.Context, next chan Item, option RxOption, opts ...RxOption)
 
@@ -132,8 +132,8 @@ fn observable(parent context.Context, mut iterable Iterable, operator_factory Op
 		if force_seq || !parallel {
 			run_sequential(mut ctx, next, mut &iterable, operator_factory, option, ...opts)
 		} else {
-			run_parallel(mut ctx, next, iterable.observe(...opts), operator_factory,
-				bypass_gather, option, ...opts)
+			run_parallel(mut ctx, next, iterable.observe(...opts), operator_factory, bypass_gather,
+				option, ...opts)
 		}
 		return &ObservableImpl{
 			iterable: new_channel_iterable(next)
@@ -169,7 +169,7 @@ fn observable(parent context.Context, mut iterable Iterable, operator_factory Op
 			next := option.build_channel()
 			mut ctx := option.build_context(parent)
 			observe := iterable.observe(...opts)
-			spawn fn (mut ctx &context.Context, parent context.Context, first_item_id_ch chan Item, from_ch chan Item, next chan Item, observe chan Item, operator_factory OperatorFactoryFn, force_seq bool, bypass_gather bool, option RxOption, merged_options []RxOption) {
+			spawn fn (mut ctx context.Context, parent context.Context, first_item_id_ch chan Item, from_ch chan Item, next chan Item, observe chan Item, operator_factory OperatorFactoryFn, force_seq bool, bypass_gather bool, option RxOption, merged_options []RxOption) {
 				done := ctx.done()
 				select {
 					_ := <-done {
@@ -182,7 +182,7 @@ fn observable(parent context.Context, mut iterable Iterable, operator_factory Op
 						}
 						value := first_item_id.value
 						match value {
-							ItemValueImpl<int> {
+							ItemValueImpl[int] {
 								of(value).send_context(mut ctx, from_ch)
 								run_parallel(mut ctx, next, observe, operator_factory,
 									bypass_gather, option, ...merged_options)
@@ -233,8 +233,8 @@ fn single(parent context.Context, mut iterable Iterable, operator_factory Operat
 		if force_seq || !parallel {
 			run_sequential(mut ctx, next, mut &iterable, operator_factory, option, ...opts)
 		} else {
-			run_parallel(mut ctx, next, iterable.observe(...opts), operator_factory,
-				bypass_gather, option, ...opts)
+			run_parallel(mut ctx, next, iterable.observe(...opts), operator_factory, bypass_gather,
+				option, ...opts)
 		}
 		return &SingleImpl{
 			iterable: new_channel_iterable(next)
@@ -270,8 +270,8 @@ fn optional_single(parent context.Context, mut iterable Iterable, operator_facto
 		if force_seq || !parallel {
 			run_sequential(mut ctx, next, mut &iterable, operator_factory, option, ...opts)
 		} else {
-			run_parallel(mut ctx, next, iterable.observe(...opts), operator_factory,
-				bypass_gather, option, ...opts)
+			run_parallel(mut ctx, next, iterable.observe(...opts), operator_factory, bypass_gather,
+				option, ...opts)
 		}
 		return &OptionalSingleImpl{
 			iterable: new_channel_iterable(next)

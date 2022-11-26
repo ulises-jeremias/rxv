@@ -125,7 +125,7 @@ pub fn (mut o SingleImpl) run(opts ...RxOption) chan int {
 
 	observe := o.observe(...opts)
 
-	spawn fn (dispose chan int, mut ctx &context.Context, observe chan Item) {
+	spawn fn (dispose chan int, mut ctx context.Context, observe chan Item) {
 		defer {
 			dispose.close()
 		}

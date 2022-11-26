@@ -5,12 +5,12 @@ import time
 
 pub interface ItemValue {}
 
-pub struct ItemValueImpl<T> {
+pub struct ItemValueImpl[T] {
 	val T
 }
 
-pub fn new_item_value<T>(val T) ItemValue {
-	return ItemValue(&ItemValueImpl<T>{
+pub fn new_item_value[T](val T) ItemValue {
+	return ItemValue(&ItemValueImpl[T]{
 		val: val
 	})
 }
