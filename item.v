@@ -43,12 +43,6 @@ pub fn of(value ItemValue) Item {
 	}
 }
 
-// error creates an item from an error
-[inline]
-pub fn error(err IError) Item {
-	return from_error(err)
-}
-
 // from_error creates an item from an error
 pub fn from_error(err IError) Item {
 	return Item{
