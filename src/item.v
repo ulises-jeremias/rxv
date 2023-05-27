@@ -3,6 +3,7 @@ module rxv
 import context
 import time
 
+// ItemValue is a type that can be used as a value in a reactive expression.
 pub interface ItemValue {}
 
 // Item is a wrapper around a value that can be used as a value in a reactive
