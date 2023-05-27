@@ -3,7 +3,7 @@ test
 test.exe
 
 # Temporary files
-vsl.tmp.c
+rxv.tmp.c
 fns.txt
 
 /docs/build

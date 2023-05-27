@@ -1,25 +1,115 @@
-name: Build and Test with deps
-on: [push, pull_request]
+name: Continuous Integration
+
+concurrency:
+   group: ci-${{ github.event.number }}
+   cancel-in-progress: true
+
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+  schedule:
+    - cron: "31 1,12 * * *"
+
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  ubuntu:
+  shellcheck:
+    name: Shellcheck
+    uses: ./.github/workflows/shellcheck.yml
+
+  todo:
+    if: github.event_name == 'push'
+    name: TODO
+    uses: ./.github/workflows/todo.yml
+
+  validate-docs:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Latest V
-        uses: actions/checkout@v2
-        with:
-          repository: vlang/v
-      - name: Checkout RXV
-        uses: actions/checkout@v2
+      - name: Checkout RxV
+        uses: actions/checkout@v3
         with:
           path: rxv
-      - name: Build V
-        run: |
-          make
-          sudo ./v symlink
+
+      - name: Setup V
+        uses: vlang/setup-v@v1
+        with:
+          check-latest: true
+
       - name: V doctor
         run: v doctor
-      - name: Move rxv source code to V Modules
+
+      - name: Copy source code to V Modules
+        run: cp -rf ./rxv ~/.vmodules
+
+      - name: Validate Docs
+        run: |
+          cd ./rxv
+          v check-md .
+
+  fmt-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout RxV
+        uses: actions/checkout@v3
+        with:
+          path: rxv
+
+      - name: Setup V
+        uses: vlang/setup-v@v1
+        with:
+          check-latest: true
+
+      - name: V doctor
+        run: v doctor
+
+      - name: Move source code to V Modules
         run: mv ./rxv ~/.vmodules
-      - name: Execute Tests
-        run: ~/.vmodules/rxv/bin/test
+
+      - name: Verify Fmt
+        run: |
+          cd ~
+          v fmt -verify ~/.vmodules/rxv
+
+  run-tests:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - ubuntu-20.04
+          - ubuntu-18.04
+        flags: 
+          - ""
+          - "--prod"
+
+    steps:
+      - name: Checkout RxV
+        uses: actions/checkout@v3
+        with:
+          path: rxv
+
+      - name: Setup V
+        uses: vlang/setup-v@v1
+        with:
+          check-latest: true
+
+      - name: V doctor
+        run: v doctor
+
+      - name: Move RxV source code to V Modules
+        run: mv ./rxv ~/.vmodules
+
+      - name: Execute Tests using Pure V Backend
+        run: ~/.vmodules/rxv/bin/test ${{ matrix.flags }}
+
+      - name: Execute Tests using Pure V Backend and Garbage Collection enabled
+        run: ~/.vmodules/rxv/bin/test ${{ matrix.flags }} --use-gc boehm

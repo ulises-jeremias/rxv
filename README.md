@@ -9,8 +9,8 @@
 </div>
 <div align="center">
 
-[![Build Status][workflowbadge]][workflowurl]
-[![Docs Validation][validatedocsbadge]][validatedocsurl]
+[![Continuous Integration][workflowbadge]][workflowurl]
+[![Deploy Documentation][deploydocsbadge]][deploydocsurl]
 [![License: MIT][licensebadge]][licenseurl]
 
 </div>
@@ -41,9 +41,10 @@ To test the module, just type the following command:
 $ ./bin/test # execute `./bin/test -h` to know more about the test command
 ```
 
-[workflowbadge]: https://github.com/ulises-jeremias/rxv/workflows/Build%20and%20Test%20with%20deps/badge.svg
-[validatedocsbadge]: https://github.com/ulises-jeremias/rxv/workflows/Validate%20Docs/badge.svg
+[workflowbadge]: https://github.com/ulises-jeremias/rxv/actions/workflows/ci.yml/badge.svg
+[deploydocsbadge]: https://github.com/ulises-jeremias/rxv/actions/workflows/deploy-docs.yml/badge.svg
 [licensebadge]: https://img.shields.io/badge/License-MIT-blue.svg
-[workflowurl]: https://github.com/ulises-jeremias/rxv/commits/main
-[validatedocsurl]: https://github.com/ulises-jeremias/rxv/commits/main
+[workflowurl]: https://github.com/ulises-jeremias/rxv/actions/workflows/ci.yml
+[deploydocsurl]: https://github.com/ulises-jeremias/rxv/actions/workflows/deploy-docs.yml
 [licenseurl]: https://github.com/ulises-jeremias/rxv/blob/main/LICENSE
+
