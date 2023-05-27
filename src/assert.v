@@ -213,7 +213,7 @@ fn parse_assertions(assertions ...RxAssert) RxAssert {
 pub fn assert_iterable(mut ctx context.Context, mut iterable Iterable, assertions ...RxAssert) {
 	ass := parse_assertions(...assertions)
 	mut got := []ItemValue{}
-	mut errs := []voidptr{}
+	mut errs := []IError{}
 	opts := []RxOption{}
 
 	observe := iterable.observe(...opts)
