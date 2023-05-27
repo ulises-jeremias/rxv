@@ -46,17 +46,17 @@ pub fn from_error(err IError) Item {
 }
 
 // send_items is a helper function to send items to a channel.
-pub fn send_items(mut ctx context.Context, ch chan Item, strategy CloseChannelStrategy, items ...ItemValue) {
+pub fn send_items(mut ctx context.Context, ch chan Item, strategy CloseChannelStrategy, items []ItemValue) {
 	if strategy == .close_channel {
 		defer {
 			ch.close()
 		}
 	}
 
-	send(mut ctx, ch, ...items)
+	send(mut ctx, ch, items)
 }
 
-fn send(mut ctx context.Context, ch chan Item, items ...ItemValue) {
+fn send(mut ctx context.Context, ch chan Item, items []ItemValue) {
 	for item in items {
 		match item {
 			Error {
@@ -83,7 +83,7 @@ fn send(mut ctx context.Context, ch chan Item, items ...ItemValue) {
 			}
 			[]ItemValue {
 				for i in item {
-					send(mut ctx, ch, i)
+					send(mut ctx, ch, [i])
 				}
 			}
 			else {

@@ -73,5 +73,6 @@ fn (mut i ChannelIterable) produce(mut ctx context.Context) {
 			}
 		}
 	} {
+		// nothing to do here
 	}
 }

@@ -113,7 +113,7 @@ pub fn new_assertion(f AssertApplyFn) RxAssert {
 }
 
 // has_items checks that the observable produces the corresponding items.
-pub fn has_items(items ...ItemValue) RxAssert {
+pub fn has_items(items []ItemValue) RxAssert {
 	assertion_fn := fn [items] (mut a RxAssert) {
 		a.check_has_items = true
 		a.items = items
@@ -173,7 +173,7 @@ pub fn has_an_error() RxAssert {
 }
 
 // has_errors checks that the observable has produce a set of errors.
-pub fn has_errors(errs ...IError) RxAssert {
+pub fn has_errors(errs []IError) RxAssert {
 	assertion_fn := fn [errs] (mut a RxAssert) {
 		a.check_has_raised_errors = true
 		a.errs = errs
@@ -207,4 +207,48 @@ fn parse_assertions(assertions ...RxAssert) RxAssert {
 		assertion.apply(mut ass)
 	}
 	return ass
+}
+
+// assert_iterable asserts the result of an iterable against a list of assertions.
+pub fn assert_iterable(mut ctx context.Context, mut iterable Iterable, assertions ...RxAssert) {
+	ass := parse_assertions(...assertions)
+	mut got := []ItemValue{}
+	mut errs := []voidptr{}
+	opts := []RxOption{}
+
+	observe := iterable.observe(...opts)
+	cdone := ctx.done()
+
+	for select {
+		_ := <-cdone {
+			break
+		}
+		item := <-observe {
+			if item.is_error() {
+				// errs << item.err
+			} else {
+				// got << item.value
+			}
+		}
+	} {
+		// nothing to do here
+	}
+
+	if predicates := ass.custom_predicates_to_be_checked() {
+		for predicate in predicates {
+			predicate(got) or { panic(err) }
+		}
+	}
+
+	if expected_items := ass.items_to_be_checked() {
+		assert expected_items.len == got.len
+		assert expected_items == got
+	}
+
+	// TODO: assert using `items_no_order := ass.items_no_ordered_to_be_checked()`
+
+	if value := ass.item_to_be_checked() {
+		assert got.len == 1
+		assert value == got[0]
+	}
 }
