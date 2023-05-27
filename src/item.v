@@ -8,7 +8,6 @@ pub interface ItemValue {}
 // Item is a wrapper around a value that can be used as a value in a reactive
 // expression. It is a reference type, so it can be used to wrap values that
 // are not reference types.
-[heap]
 pub struct Item {
 pub:
 	value ItemValue
@@ -18,7 +17,6 @@ pub:
 // TimestampedItem is a wrapper around a value that can be used as a value in
 // a reactive expression. It is a reference type, so it can be used to wrap
 // values that are not reference types.
-[heap]
 pub struct TimestampedItem {
 pub:
 	value     ItemValue
