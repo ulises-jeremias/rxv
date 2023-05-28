@@ -7,13 +7,16 @@
 ##
 ## Options:
 ##     -h, --help                            Prints usage and example
-##         --stats                           Exeute with stats
+##         --stats                           Execute with stats
+##         --prod                            Execute with prod build
 ##         --use-autofree                    Execute tests using atofree
+##         --use-gc=STRATEGY                 Execute tests using garbage collector
+##         --skip-examples                   Skip examples compilation
 ##
 
-ROOT=$(dirname "$0")
+ROOT=$(realpath "$(dirname "$0")")
 
-source "${ROOT}/util/opts/opts.sh" || exit
+source "${ROOT}/util/easyoptions/easyoptions.sh" || exit
 source "${ROOT}/util/logs.sh" || exit
 
 set -eo pipefail
@@ -27,12 +30,40 @@ if [[ -n "${use_autofree}" ]]; then
     flags="${flags} -autofree"
 fi
 
+if [[ -n "${use_gc}" ]]; then
+    echo "Running tests using V Math"
+    flags="${flags} -gc ${use_gc}"
+fi
+
 if [[ -n "${stats}" ]]; then
     echo "Running tests with stats"
     flags="${flags} -stats"
+fi
+
+if [[ -n "${prod}" ]]; then
+    echo "Running tests with prod"
+    flags="${flags} -prod"
 fi
 
 echo "Executing tests with command: \"v ${flags} test .\""
 v ${flags} test ${rxv_dir_path}
 
 find ${rxv_dir_path} -name '*_test' -exec rm -f {} +
+
+if [[ -z "${skip_examples}" ]]; then
+    echo "Compiling examples"
+    echo "Compiling Examples with flags ${flags}"
+    for file in $(find "${rxv_dir_path}" -wholename '*/examples/*.v'); do
+        if [[ "${file}" == *"not_ci"* ]]; then
+            echo "Skipping ${file}"
+            continue
+        fi
+        echo "Compiling ${file}"
+        v ${flags} -o "${file}.o" "${file}"
+        echo "${file}.o created"
+        echo "Removing ${file}.o"
+        rm -f "${file}.o"
+    done
+else
+    echo "Skipping examples compilation"
+fi
