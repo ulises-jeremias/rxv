@@ -91,12 +91,11 @@ fn (op &MapOperatorOptionalSingle) gather_next(mut _ context.Context, item Item,
 
 // map transforms the items emitted by an optional_single by applying a function to each item
 pub fn (mut o OptionalSingleImpl) map(apply Func, opts ...RxOption) Single {
-	// return single(o.parent, mut o, fn [apply] () Operator {
-	// 	return &MapOperatorOptionalSingle{
-	// 		apply: apply
-	// 	}
-	// }, false, true, ...opts)
-	return &SingleImpl{}
+	return single(o.parent, mut o, fn [apply] () Operator {
+		return &MapOperatorOptionalSingle{
+			apply: apply
+		}
+	}, false, true, ...opts)
 }
 
 // run creates an observer without consuming the emitted items

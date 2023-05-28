@@ -7,7 +7,7 @@ pub interface Single {
 	Iterable
 mut:
 	observe(opts ...RxOption) chan Item
-	// filter(apply Predicate, opts ...RxOption) OptionalSingle
+	filter(apply Predicate, opts ...RxOption) OptionalSingle
 	get(opts ...RxOption) ?Item
 	map(apply Func, opts ...RxOption) Single
 	run(opts ...RxOption) chan int
@@ -80,13 +80,13 @@ fn (op &FilterOperatorSingle) end(mut _ context.Context, _ chan Item) {}
 fn (op &FilterOperatorSingle) gather_next(mut _ context.Context, item Item, dst chan Item, _ OperatorOptions) {}
 
 // filter amits only those items from an Observable that pass a predicate test
-// pub fn (mut s SingleImpl) filter(apply Predicate, opts ...RxOption) OptionalSingle {
-// 	return optional_single(s.parent, mut s, fn [apply] () Operator {
-// 		return &FilterOperatorSingle{
-// 			apply: apply
-// 		}
-// 	}, true, true, ...opts)
-// }
+pub fn (mut s SingleImpl) filter(apply Predicate, opts ...RxOption) OptionalSingle {
+	return optional_single(s.parent, mut s, fn [apply] () Operator {
+		return &FilterOperatorSingle{
+			apply: apply
+		}
+	}, true, true, ...opts)
+}
 
 struct MapOperatorSingle {
 	apply Func
@@ -125,12 +125,11 @@ fn (op &MapOperatorSingle) gather_next(mut _ context.Context, item Item, dst cha
 
 // map transforms the items emitted by an optional_single by applying a function to each item
 pub fn (mut o SingleImpl) map(apply Func, opts ...RxOption) Single {
-	// return single(o.parent, mut o, fn [apply] () Operator {
-	// 	return &MapOperatorSingle{
-	// 		apply: apply
-	// 	}
-	// }, false, true, ...opts)
-	return &SingleImpl{}
+	return single(o.parent, mut o, fn [apply] () Operator {
+		return &MapOperatorSingle{
+			apply: apply
+		}
+	}, false, true, ...opts)
 }
 
 // run creates an observer without consuming the emitted items
