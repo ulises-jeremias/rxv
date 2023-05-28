@@ -252,14 +252,23 @@ pub fn assert_iterable(mut ctx context.Context, mut iterable Iterable, assertion
 
 	if expected_items := ass.items_to_be_checked() {
 		assert expected_items.len == got.len
-		// assert expected_items == got
+		assert '${expected_items}' == '${got}'
 	}
 
-	// TODO: assert using `items_no_order := ass.items_no_ordered_to_be_checked()`
+	if items_no_order := ass.items_no_ordered_to_be_checked() {
+		mut m := map[string]bool{}
+		for value in items_no_order {
+			m['${value}'] = true
+		}
+		for value in got {
+			m.delete('${value}')
+		}
+		assert m.len != 0, 'missing elements'
+	}
 
-	if _ := ass.item_to_be_checked() {
-		assert got.len == 1
-		// assert value == got[0]
+	if value := ass.item_to_be_checked() {
+		assert got.len == 1, 'wrong number of items'
+		assert '${value}' == '${got[0]}'
 	}
 
 	if ass.no_items_to_be_checked() {
@@ -277,7 +286,7 @@ pub fn assert_iterable(mut ctx context.Context, mut iterable Iterable, assertion
 		}
 		IError {
 			if errs.len == 0 {
-				panic('No error raised')
+				assert false, 'no error raised'
 			}
 			assert raised_error_to_be_checked == errs[0]
 		}
