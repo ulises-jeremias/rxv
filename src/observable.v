@@ -96,3 +96,8 @@ mut:
 	window_with_time_or_count(timespan Duration, count int, opts ...RxOption) Observable
 	zip_from_iterable(mut iterable Iterable, zipper Func2, opts ...RxOption) Observable
 }
+
+pub fn default_error_func_operator(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
+	item.send_context(mut ctx, dst)
+	operator_options.stop()
+}
