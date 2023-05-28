@@ -8,7 +8,7 @@ fn test_send_items_variadic() {
 	mut bctx := context.background()
 	mut iter := new_channel_iterable(ch)
 	spawn send_items(mut &bctx, ch, .close_channel, items)
-	// assert_iterable(mut &bctx, mut &iter, has_items(items), has_no_error())
+	assert_iterable(mut &bctx, mut &iter, has_items(...items), has_no_error())
 }
 
 fn test_send_items_variadic_with_error() {
@@ -18,7 +18,7 @@ fn test_send_items_variadic_with_error() {
 	mut bctx := context.background()
 	mut iter := new_channel_iterable(ch)
 	spawn send_items(mut &bctx, ch, .close_channel, items)
-	// assert_iterable(mut &bctx, mut &iter, has_items([items[0], items[2]]), has_error(err))
+	assert_iterable(mut &bctx, mut &iter, has_items(items[0], items[2]), has_error(err))
 }
 
 fn test_send_items_slice() {
@@ -28,7 +28,7 @@ fn test_send_items_slice() {
 	mut iter := new_channel_iterable(ch)
 	mut bctx := context.background()
 	spawn send_items(mut &bctx, ch, .close_channel, items_slice)
-	// assert_iterable(mut &bctx, mut &iter, has_items(items_slice), has_no_error())
+	assert_iterable(mut &bctx, mut &iter, has_items(...items_slice), has_no_error())
 }
 
 fn test_send_items_slice_with_error() {
@@ -39,7 +39,7 @@ fn test_send_items_slice_with_error() {
 	mut iter := new_channel_iterable(ch)
 	mut bctx := context.background()
 	spawn send_items(mut &bctx, ch, .close_channel, items_slice)
-	// assert_iterable(mut &bctx, mut &iter, has_items([items_slice[0], items_slice[2]]), has_error(err))
+	assert_iterable(mut &bctx, mut &iter, has_items(items_slice[0], items_slice[2]), has_error(err))
 }
 
 fn test_item_send_blocking() {

@@ -113,7 +113,7 @@ pub fn new_assertion(f AssertApplyFn) RxAssert {
 }
 
 // has_items checks that the observable produces the corresponding items.
-pub fn has_items(items []ItemValue) RxAssert {
+pub fn has_items(items ...ItemValue) RxAssert {
 	assertion_fn := fn [items] (mut a RxAssert) {
 		a.check_has_items = true
 		a.items = items
@@ -131,7 +131,7 @@ pub fn has_item(i ItemValue) RxAssert {
 }
 
 // has_items_no_order checks that an observable produces the corresponding items regardless of the order.
-pub fn has_items_no_order(items []ItemValue) RxAssert {
+pub fn has_items_no_order(items ...ItemValue) RxAssert {
 	assertion_fn := fn [items] (mut a RxAssert) {
 		a.check_has_items_no_order = true
 		a.items_no_order = items
@@ -173,7 +173,7 @@ pub fn has_an_error() RxAssert {
 }
 
 // has_errors checks that the observable has produce a set of errors.
-pub fn has_errors(errs []IError) RxAssert {
+pub fn has_errors(errs ...IError) RxAssert {
 	assertion_fn := fn [errs] (mut a RxAssert) {
 		a.check_has_raised_errors = true
 		a.errs = errs
@@ -184,7 +184,7 @@ pub fn has_errors(errs []IError) RxAssert {
 // has_no_error checks that the observable has not raised any error.
 pub fn has_no_error() RxAssert {
 	assertion_fn := fn (mut a RxAssert) {
-		a.check_has_raised_error = true
+		a.check_has_raised_error = false
 	}
 	return new_assertion(AssertApplyFn(assertion_fn))
 }
@@ -219,22 +219,29 @@ pub fn assert_iterable(mut ctx context.Context, mut iterable Iterable, assertion
 	observe := iterable.observe(...opts)
 	cdone := ctx.done()
 
-	for select {
-		_ := <-cdone {
+	for {
+		if select {
+			_ := <-cdone {
+				break
+			}
+			item := <-observe {
+				if item.is_error() {
+					match item.err {
+						IError { errs << item.err }
+						none {}
+					}
+				} else {
+					match item.value {
+						ItemValue { got << item.value }
+						none {}
+					}
+				}
+			}
+		} {
+			// do nothing here
+		} else {
 			break
 		}
-		item := <-observe {
-			if item.is_error() {
-				// errs << item.err
-			} else {
-				// match item.value {
-				// 	ItemValue { got << item.value }
-				// 	none {}
-				// }
-			}
-		}
-	} {
-		// nothing to do here
 	}
 
 	if predicates := ass.custom_predicates_to_be_checked() {
