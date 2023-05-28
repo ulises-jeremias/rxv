@@ -18,9 +18,9 @@ source "${ROOT}/util/logs.sh" || exit
 
 set -eo pipefail
 
-rxv_dir_path=$(dirname $(dirname "$0"))
+rxv_dir_path=$(realpath "$(dirname "$0")")
 
-flags=""
+flags="-cc gcc"
 
 if [[ -n "${use_autofree}" ]]; then
     echo "Running tests using V Math"
