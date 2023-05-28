@@ -11,8 +11,8 @@ pub interface ItemValue {}
 // are not reference types.
 pub struct Item {
 pub:
-	value ItemValue
-	err   IError = none
+	value ItemValue|none = none
+	err   IError|none    = none
 }
 
 // TimestampedItem is a wrapper around a value that can be used as a value in
@@ -64,22 +64,19 @@ fn send(mut ctx context.Context, ch chan Item, items []ItemValue) {
 				from_error(item).send_context(mut ctx, ch)
 			}
 			chan ItemValue {
-				loop: for {
-					select {
-						i := <-item {
-							match i {
-								Error {
-									from_error(i).send_context(mut ctx, ch)
-								}
-								else {
-									of(i).send_context(mut ctx, ch)
-								}
-							}
-						}
-						else {
-							break loop
-						}
+				for select {
+					i := <-item {
+						// match i {
+						// 	Error {
+						// 		from_error(i).send_context(mut ctx, ch)
+						// 	}
+						// 	else {
+						// 		of(i).send_context(mut ctx, ch)
+						// 	}
+						// }
 					}
+				} {
+					// nothing to do here
 				}
 			}
 			[]ItemValue {
@@ -96,13 +93,10 @@ fn send(mut ctx context.Context, ch chan Item, items []ItemValue) {
 
 // is_error checks if an item is an error
 pub fn (i Item) is_error() bool {
-	if isnil(i.err) {
-		return false
+	match i.err {
+		none { return false }
+		else { return true }
 	}
-	if i.err is none {
-		return false
-	}
-	return true
 }
 
 // send_blocking sends an item and blocks until it is sent

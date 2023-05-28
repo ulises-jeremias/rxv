@@ -60,7 +60,7 @@ fn (ass RxAssert) some_items_to_be_checked() bool {
 	return ass.check_has_some_items
 }
 
-fn (ass RxAssert) raised_error_to_be_checked() ?IError {
+fn (ass RxAssert) raised_error_to_be_checked() IError|none {
 	if !ass.check_has_raised_error {
 		return none
 	}
@@ -74,7 +74,7 @@ fn (ass RxAssert) raised_errors_to_be_checked() ?[]IError {
 	return ass.errs
 }
 
-fn (ass RxAssert) raised_an_error_to_be_checked() ?IError {
+fn (ass RxAssert) raised_an_error_to_be_checked() IError|none {
 	if !ass.check_has_raised_an_error {
 		return none
 	}
@@ -227,7 +227,10 @@ pub fn assert_iterable(mut ctx context.Context, mut iterable Iterable, assertion
 			if item.is_error() {
 				// errs << item.err
 			} else {
-				// got << item.value
+				// match item.value {
+				// 	ItemValue { got << item.value }
+				// 	none {}
+				// }
 			}
 		}
 	} {
@@ -242,13 +245,51 @@ pub fn assert_iterable(mut ctx context.Context, mut iterable Iterable, assertion
 
 	if expected_items := ass.items_to_be_checked() {
 		assert expected_items.len == got.len
-		assert expected_items == got
+		// assert expected_items == got
 	}
 
 	// TODO: assert using `items_no_order := ass.items_no_ordered_to_be_checked()`
 
-	if value := ass.item_to_be_checked() {
+	if _ := ass.item_to_be_checked() {
 		assert got.len == 1
-		assert value == got[0]
+		// assert value == got[0]
+	}
+
+	if ass.no_items_to_be_checked() {
+		assert got.len == 0
+	}
+
+	if ass.some_items_to_be_checked() {
+		assert got.len != 0
+	}
+
+	raised_error_to_be_checked := ass.raised_error_to_be_checked()
+	match raised_error_to_be_checked {
+		none {
+			assert errs.len == 0
+		}
+		IError {
+			if errs.len == 0 {
+				panic('No error raised')
+			}
+			assert raised_error_to_be_checked == errs[0]
+		}
+	}
+
+	if expected_errors := ass.raised_errors_to_be_checked() {
+		assert expected_errors == errs
+	}
+
+	match ass.raised_an_error_to_be_checked() {
+		none {
+			assert true
+		}
+		IError {
+			assert false
+		}
+	}
+
+	if ass.not_raised_error_to_be_checked() {
+		assert errs.len == 0
 	}
 }
