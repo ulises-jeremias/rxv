@@ -22,13 +22,13 @@ pub interface Observable {
 	Iterable
 mut:
 	all(predicate Predicate, opts ...RxOption) Single
-	// 	average_f32(opts ...RxOption) Single
-	// 	average_f64(opts ...RxOption) Single
-	// 	average_int(opts ...RxOption) Single
-	// 	average_i8(opts ...RxOption) Single
-	// 	average_i16(opts ...RxOption) Single
-	// 	average_i32(opts ...RxOption) Single
-	// 	average_i64(opts ...RxOption) Single
+	average_f32(opts ...RxOption) Single
+	average_f64(opts ...RxOption) Single
+	average_int(opts ...RxOption) Single
+	// average_i8(opts ...RxOption) Single
+	average_i16(opts ...RxOption) Single
+	average_i32(opts ...RxOption) Single
+	average_i64(opts ...RxOption) Single
 	// 	// back_off_retry(back_off_cfg backoff.BackOff, opts ...RxOption) Observable
 	// 	buffer_with_count(count int, opts ...RxOption) Observable
 	// 	buffer_with_time(timespan Duration, opts ...RxOption) Observable
