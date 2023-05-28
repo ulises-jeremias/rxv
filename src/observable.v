@@ -19,8 +19,9 @@ pub type TimeExtractorFn = fn (value ItemValue) time.Time
 
 // Observable is the standard interface for Observables.
 pub interface Observable {
-	Iterable // mut:
-	// 	all(predicate Predicate, opts ...RxOption) Single
+	Iterable
+mut:
+	all(predicate Predicate, opts ...RxOption) Single
 	// 	average_f32(opts ...RxOption) Single
 	// 	average_f64(opts ...RxOption) Single
 	// 	average_int(opts ...RxOption) Single
