@@ -89,6 +89,7 @@ jobs:
           - ubuntu-18.04
         flags: 
           - ""
+          # TODO: Add --prod flag once the new release is ready
           # - "--prod"
 
     steps:
