@@ -4,7 +4,7 @@ import context
 
 fn test_main() {
 	mut bctx := context.background()
-	mut ctx, cancel := context.with_cancel(mut &bctx)
+	mut ctx, cancel := context.with_cancel(mut bctx)
 
 	defer {
 		cancel()
