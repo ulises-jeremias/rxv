@@ -14,10 +14,10 @@ struct OperatorOptions {
 pub type Comparator = fn (a ItemValue, b ItemValue) int
 
 // ItemToObservable defines a function that computes an observable from an item.
-// pub type ItemToObservable = fn (item Item) Observable
+pub type ItemToObservable = fn (item Item) Observable
 
 // ErrorToObservable defines a function that transforms an observable from an error.
-// pub type ErrorToObservable = fn (err IError) Observable
+pub type ErrorToObservable = fn (err IError) Observable
 
 // Func defines a function that computes a value from an input value.
 pub type Func = fn (mut ctx context.Context, arg ItemValue) ?ItemValue
