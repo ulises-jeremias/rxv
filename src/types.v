@@ -2,7 +2,7 @@ module rxv
 
 import context
 
-struct OperatorOptions {
+pub struct OperatorOptions {
 	stop           fn ()
 	reset_iterable fn (mut Iterable)
 }

@@ -96,7 +96,32 @@ pub interface Observable {
 	// 	zip_from_iterable(mut iterable Iterable, zipper Func2, opts ...RxOption) Observable
 }
 
+// ObservableImpl implements Observable.
+pub struct ObservableImpl {
+mut:
+	iterable Iterable
+	parent   context.Context = context.background()
+}
+
+// str returns a string representation of the Observable.
+pub fn (o ObservableImpl) str() string {
+	return 'Observable'
+}
+
+// Observe observes an Observable by returning its channel.
+pub fn (mut o ObservableImpl) observe(opts ...RxOption) chan Item {
+	return o.iterable.observe(...opts)
+}
+
 pub fn default_error_func_operator(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions) {
 	item.send_context(mut ctx, dst)
 	operator_options.stop()
+}
+
+interface Operator {
+mut:
+	err(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions)
+	next(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions)
+	end(mut ctx context.Context, dst chan Item)
+	gather_next(mut ctx context.Context, item Item, dst chan Item, operator_options OperatorOptions)
 }
