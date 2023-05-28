@@ -4,7 +4,7 @@ import context
 import context.onecontext
 import runtime
 
-type SerializedFn = fn (ItemValue) ItemValue
+type SerializedFn = fn (ItemValue) int
 
 type FuncOptionMutation = fn (mut fdo FuncOption)
 

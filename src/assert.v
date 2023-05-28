@@ -309,3 +309,104 @@ pub fn assert_iterable(mut ctx context.Context, mut iterable Iterable, assertion
 		assert errs.len == 0
 	}
 }
+
+// assert_single asserts the result of an iterable against a list of assertions.
+pub fn assert_single(mut ctx context.Context, mut iterable Single, assertions ...RxAssert) {
+	ass := parse_assertions(...assertions)
+	mut got := []ItemValue{}
+	mut errs := []IError{}
+	opts := []RxOption{}
+
+	observe := iterable.observe(...opts)
+	cdone := ctx.done()
+
+	for {
+		if select {
+			_ := <-cdone {
+				break
+			}
+			item := <-observe {
+				if item.is_error() {
+					match item.err {
+						IError { errs << item.err }
+						none {}
+					}
+				} else {
+					match item.value {
+						ItemValue { got << item.value }
+						none {}
+					}
+				}
+			}
+		} {
+			// do nothing here
+		} else {
+			break
+		}
+	}
+
+	if predicates := ass.custom_predicates_to_be_checked() {
+		for predicate in predicates {
+			predicate(got) or { panic(err) }
+		}
+	}
+
+	if expected_items := ass.items_to_be_checked() {
+		assert expected_items.len == got.len
+		assert '${expected_items}' == '${got}'
+	}
+
+	if items_no_order := ass.items_no_ordered_to_be_checked() {
+		mut m := map[string]bool{}
+		for value in items_no_order {
+			m['${value}'] = true
+		}
+		for value in got {
+			m.delete('${value}')
+		}
+		assert m.len != 0, 'missing elements'
+	}
+
+	if value := ass.item_to_be_checked() {
+		assert got.len == 1, 'wrong number of items'
+		assert '${value}' == '${got[0]}'
+	}
+
+	if ass.no_items_to_be_checked() {
+		assert got.len == 0
+	}
+
+	if ass.some_items_to_be_checked() {
+		assert got.len != 0
+	}
+
+	raised_error_to_be_checked := ass.raised_error_to_be_checked()
+	match raised_error_to_be_checked {
+		none {
+			assert errs.len == 0
+		}
+		IError {
+			if errs.len == 0 {
+				assert false, 'no error raised'
+			}
+			assert raised_error_to_be_checked == errs[0]
+		}
+	}
+
+	if expected_errors := ass.raised_errors_to_be_checked() {
+		assert expected_errors == errs
+	}
+
+	match ass.raised_an_error_to_be_checked() {
+		none {
+			assert true
+		}
+		IError {
+			assert false
+		}
+	}
+
+	if ass.not_raised_error_to_be_checked() {
+		assert errs.len == 0
+	}
+}
