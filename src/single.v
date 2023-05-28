@@ -38,21 +38,22 @@ pub fn (mut o SingleImpl) get(opts ...RxOption) ?Item {
 	observe := o.observe(...opts)
 	done := ctx.done()
 
-	for {
-		select {
-			_ := <-done {
-				err := ctx.err()
-				match err {
-					none { return Item{} }
-					else { return err }
-				}
-			}
-			v := <-observe {
-				return v
+	for select {
+		_ := <-done {
+			err := ctx.err()
+			if err is none {
+				return empty_item()
+			} else {
+				return none
 			}
 		}
+		v := <-observe {
+			return v
+		}
+	} {
+		// do nothing
 	}
-	return Item{}
+	return empty_item()
 }
 
 struct FilterOperatorSingle {
@@ -146,13 +147,13 @@ pub fn (mut o SingleImpl) run(opts ...RxOption) chan int {
 		}
 
 		done := ctx.done()
-		for {
-			select {
-				_ := <-done {
-					return
-				}
-				_ := <-observe {}
+		for select {
+			_ := <-done {
+				return
 			}
+			_ := <-observe {}
+		} {
+			// do nothing
 		}
 	}(dispose, mut &ctx, observe)
 

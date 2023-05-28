@@ -32,6 +32,11 @@ pub enum CloseChannelStrategy {
 	close_channel
 }
 
+// empty_item is an empty item
+fn empty_item() Item {
+	return Item{}
+}
+
 // of creates an item from a value
 pub fn of(value ItemValue) Item {
 	return Item{
