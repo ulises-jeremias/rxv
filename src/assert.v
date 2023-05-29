@@ -219,28 +219,25 @@ pub fn assert_iterable(mut ctx context.Context, mut iterable Iterable, assertion
 	observe := iterable.observe(...opts)
 	cdone := ctx.done()
 
-	for {
+	loop: for {
 		if select {
 			_ := <-cdone {
-				break
+				break loop
 			}
 			item := <-observe {
 				if item.is_error() {
-					match item.err {
-						IError { errs << item.err }
-						none {}
+					if item.err is IError {
+						errs << item.err
 					}
 				} else {
-					match item.value {
-						ItemValue { got << item.value }
-						none {}
+					if item.value is ItemValue {
+						got << item.value
 					}
 				}
 			}
 		} {
-			// do nothing here
 		} else {
-			break
+			break loop
 		}
 	}
 
@@ -320,29 +317,25 @@ pub fn assert_single(mut ctx context.Context, mut iterable Single, assertions ..
 	observe := iterable.observe(...opts)
 	cdone := ctx.done()
 
-	for {
+	loop: for {
 		if select {
 			_ := <-cdone {
-				break
+				break loop
 			}
 			item := <-observe {
 				if item.is_error() {
-					match item.err {
-						IError { errs << item.err }
-						none {}
+					if item.err is IError {
+						errs << item.err
 					}
 				} else {
-					match item.value {
-						ItemValue { got << item.value }
-						none {}
+					if item.value is ItemValue {
+						got << item.value
 					}
 				}
 			}
-			else {}
 		} {
-			// do nothing here
 		} else {
-			break
+			break loop
 		}
 	}
 
