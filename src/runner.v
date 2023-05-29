@@ -22,10 +22,10 @@ fn run_sequential(mut ctx context.Context, next chan Item, mut iterable Iterable
 		}
 
 		done := ctx.done()
-		for !stopped {
+		loop: for !stopped {
 			select {
 				_ := <-done {
-					break
+					break loop
 				}
 				item := <-observe {
 					if item.is_error() {
@@ -107,10 +107,10 @@ fn run_parallel(mut ctx context.Context, next chan Item, observe chan Item, oper
 			}
 
 			done := ctx.done()
-			for !stopped {
+			loop: for !stopped {
 				select {
 					_ := <-done {
-						return
+						break loop
 					}
 					item := <-observe_copy {
 						if item.is_error() {
@@ -147,10 +147,10 @@ fn run_first_item(mut ctx context.Context, f IdentifierFn, notif chan Item, obse
 		}
 
 		done := ctx.done()
-		for !stopped {
+		loop: for !stopped {
 			select {
 				_ := <-done {
-					break
+					break loop
 				}
 				item := <-observe_copy {
 					if item.is_error() {
