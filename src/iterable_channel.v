@@ -52,7 +52,7 @@ fn (mut i ChannelIterable) connect(mut ctx context.Context) {
 
 fn (mut i ChannelIterable) produce(mut ctx context.Context) {
 	defer {
-		rlock i.subscribers {
+		lock i.subscribers {
 			for subscriber in i.subscribers {
 				subscriber.close()
 			}
@@ -66,7 +66,7 @@ fn (mut i ChannelIterable) produce(mut ctx context.Context) {
 			return
 		}
 		item := <-i.next {
-			rlock i.subscribers {
+			lock i.subscribers {
 				for subscriber in i.subscribers {
 					subscriber <- item
 				}

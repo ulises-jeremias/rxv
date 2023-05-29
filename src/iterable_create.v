@@ -66,7 +66,7 @@ fn (mut i CreateIterable) connect(mut ctx context.Context) {
 
 fn (mut i CreateIterable) produce(mut ctx context.Context) {
 	defer {
-		rlock i.subscribers {
+		lock i.subscribers {
 			for subscriber in i.subscribers {
 				subscriber.close()
 			}
