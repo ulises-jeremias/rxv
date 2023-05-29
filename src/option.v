@@ -29,7 +29,7 @@ struct FuncOption {
 mut:
 	is_buffer              bool
 	buffer                 int
-	ctx                    context.Context
+	ctx                    context.Context = context.background()
 	observation            ObservationStrategy
 	pool                   int
 	back_pressure_strategy BackpressureStrategy

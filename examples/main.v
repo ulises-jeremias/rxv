@@ -16,7 +16,7 @@ fn main() {
 	ch <- rxv.of(2.0)
 
 	mut obs := rxv.from_channel(ch)
-	// mut avgf64 := obs.average_f64()
+	mut avgf64 := obs.average_f64()
 
 	// rxv.assert_single(mut ctx, mut avgf64, rxv.has_items(1.0))
 }
