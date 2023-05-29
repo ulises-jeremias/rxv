@@ -338,6 +338,7 @@ pub fn assert_single(mut ctx context.Context, mut iterable Single, assertions ..
 					}
 				}
 			}
+			else {}
 		} {
 			// do nothing here
 		} else {

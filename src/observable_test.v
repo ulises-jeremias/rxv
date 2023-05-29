@@ -17,7 +17,7 @@ fn test_main() {
 	ch <- of(2.0)
 
 	mut obs := from_channel(ch)
-	// mut avgf64 := obs.average_f64()
+	mut avgf64 := obs.average_f64()
 
 	// assert_single(mut ctx, mut avgf64, has_items(1.0))
 }

@@ -18,5 +18,5 @@ fn main() {
 	mut obs := rxv.from_channel(ch)
 	mut avgf64 := obs.average_f64()
 
-	// rxv.assert_single(mut ctx, mut avgf64, rxv.has_items(1.0))
+	rxv.assert_single(mut ctx, mut avgf64, rxv.has_items(1.0))
 }
