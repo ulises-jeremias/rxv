@@ -129,7 +129,7 @@ mut:
 
 fn single(parent context.Context, mut iterable Iterable, operator_factory OperatorFactoryFn, force_seq bool, bypass_gather bool, opts ...RxOption) Single {
 	mut option := parse_options(...opts)
-	parallel := if _ := option.get_pool() { true } else { false }
+	parallel := if pool := option.get_pool() { pool > 0 } else { false }
 
 	next := option.build_channel()
 	mut ctx := option.build_context(parent)

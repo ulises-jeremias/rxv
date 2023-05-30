@@ -33,7 +33,7 @@ struct FuncOption {
 mut:
 	is_buffer              bool
 	buffer                 int
-	ctx                    context.Context
+	ctx                    context.Context = context.Context(unsafe { nil })
 	observation            ObservationStrategy
 	pool                   int
 	back_pressure_strategy BackpressureStrategy
@@ -42,6 +42,10 @@ mut:
 	connectable            bool
 	connect_operation      bool
 	serialized             SerializedFn
+}
+
+fn isnilctx(ctx context.Context) bool {
+	return ctx == context.Context(unsafe { nil })
 }
 
 pub fn (o FuncOption) str() string {
@@ -71,18 +75,17 @@ fn (fdo &FuncOption) build_channel() chan Item {
 }
 
 fn (fdo &FuncOption) build_context(parent context.Context) context.Context {
-	println('JEJE ${isnil(fdo.ctx)} ${isnil(parent)}')
 	// TODO: check the best way to check if the context is empty
-	if !isnil(fdo.ctx) && !isnil(parent) {
+	if !isnilctx(fdo.ctx) && !isnilctx(parent) {
 		ctx, _ := onecontext.merge(fdo.ctx, parent)
 		return ctx
 	}
 
-	if !isnil(fdo.ctx) {
+	if !isnilctx(fdo.ctx) {
 		return fdo.ctx
 	}
 
-	if !isnil(parent) {
+	if !isnilctx(parent) {
 		return parent
 	}
 

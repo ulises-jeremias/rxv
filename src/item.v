@@ -69,8 +69,8 @@ fn send(mut ctx context.Context, ch chan Item, items []ItemValue) {
 				from_error(item).send_context(mut ctx, ch)
 			}
 			chan ItemValue {
-				for {
-					if select {
+				loop: for {
+					select {
 						i := <-item {
 							match i {
 								Error {
@@ -81,10 +81,9 @@ fn send(mut ctx context.Context, ch chan Item, items []ItemValue) {
 								}
 							}
 						}
-					} {
-						// nothing to do here
-					} else {
-						break
+						else {
+							break loop
+						}
 					}
 				}
 			}
