@@ -21,16 +21,26 @@ fn new_event_source_iterable(mut ctx context.Context, next chan Item, strategy B
 
 		done := ctx.done()
 
-		for select {
-			_ := <-done {
-				return
-			}
-			item := <-next {
-				if i.deliver(item, mut ctx, next, strategy) {
+		for {
+			if select {
+				_ := <-done {
 					return
 				}
+				item := <-next {
+					if i.deliver(item, mut ctx, next, strategy) {
+						return
+					}
+				}
+				else {
+					if next.closed {
+						return
+					}
+				}
+			} {
+				// do nothing
+			} else {
+				break
 			}
-		} {
 		}
 	}(mut iterable, mut ctx, next, strategy)
 

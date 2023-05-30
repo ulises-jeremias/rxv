@@ -72,8 +72,8 @@ fn send(mut ctx context.Context, ch chan Item, items []ItemValue) {
 				from_error(item).send_context(mut ctx, ch)
 			}
 			chan ItemValue {
-				loop: for {
-					select {
+				for {
+					if select {
 						i := <-item {
 							match i {
 								Error {
@@ -88,8 +88,14 @@ fn send(mut ctx context.Context, ch chan Item, items []ItemValue) {
 							}
 						}
 						else {
-							break loop
+							if item.closed {
+								break
+							}
 						}
+					} {
+						// do nothing
+					} else {
+						break
 					}
 				}
 			}
@@ -129,6 +135,9 @@ pub fn (i Item) send_context(mut ctx context.Context, ch chan Item) bool {
 		else {}
 	}
 	select {
+		_ := <-done {
+			return false
+		}
 		ch <- i {
 			return true
 		}

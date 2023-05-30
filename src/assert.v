@@ -218,10 +218,10 @@ pub fn assert_iterable(mut ctx context.Context, mut iterable Iterable, assertion
 	observe := iterable.observe()
 	cdone := ctx.done()
 
-	loop: for {
+	for {
 		if select {
 			_ := <-cdone {
-				break loop
+				break
 			}
 			item := <-observe {
 				if item.is_error() {
@@ -230,10 +230,15 @@ pub fn assert_iterable(mut ctx context.Context, mut iterable Iterable, assertion
 					got << item.value as ItemValue
 				}
 			}
+			else {
+				if observe.closed {
+					break
+				}
+			}
 		} {
 			// do nothing
 		} else {
-			break loop
+			break
 		}
 	}
 
@@ -312,10 +317,10 @@ pub fn assert_single(mut ctx context.Context, mut iterable Single, assertions ..
 	observe := iterable.observe()
 	cdone := ctx.done()
 
-	loop: for {
+	for {
 		if select {
 			_ := <-cdone {
-				break loop
+				break
 			}
 			item := <-observe {
 				if item.is_error() {
@@ -324,13 +329,15 @@ pub fn assert_single(mut ctx context.Context, mut iterable Single, assertions ..
 					got << item.value as ItemValue
 				}
 			}
-		} {
-			// TODO: Revisit this and check if this is needed on all calls
-			if observe.closed {
-				break loop
+			else {
+				if observe.closed {
+					break
+				}
 			}
+		} {
+			// do nothing
 		} else {
-			break loop
+			break
 		}
 	}
 

@@ -146,13 +146,22 @@ pub fn (mut o SingleImpl) run(opts ...RxOption) chan int {
 		}
 
 		done := ctx.done()
-		for select {
-			_ := <-done {
-				return
+		for {
+			if select {
+				_ := <-done {
+					return
+				}
+				_ := <-observe {}
+				else {
+					if observe.closed {
+						return
+					}
+				}
+			} {
+				// do nothing
+			} else {
+				break
 			}
-			_ := <-observe {}
-		} {
-			// do nothing
 		}
 	}(dispose, mut &ctx, observe)
 

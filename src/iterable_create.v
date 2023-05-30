@@ -74,18 +74,27 @@ fn (mut i CreateIterable) produce(mut ctx context.Context) {
 	}
 
 	cdone := ctx.done()
-	for select {
-		_ := <-cdone {
-			return
-		}
-		item := <-i.next {
-			lock i.subscribers {
-				for subscriber in i.subscribers {
-					subscriber <- item
+	for {
+		if select {
+			_ := <-cdone {
+				return
+			}
+			item := <-i.next {
+				lock i.subscribers {
+					for subscriber in i.subscribers {
+						subscriber <- item
+					}
 				}
 			}
+			else {
+				if i.next.closed {
+					return
+				}
+			}
+		} {
+			// do nothing
+		} else {
+			break
 		}
-	} {
-		// nothing to do here
 	}
 }
