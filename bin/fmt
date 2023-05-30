@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-rxv_dir_path=$(dirname $(dirname "$0"))
-
-find ${rxv_dir_path} -name "*.v" -exec v fmt -w {} +

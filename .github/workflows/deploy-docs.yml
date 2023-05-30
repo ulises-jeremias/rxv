@@ -1,0 +1,35 @@
+name: Deploy Documentation
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout RxV
+        uses: actions/checkout@v3
+        with:
+          path: rxv
+
+      - name: Setup V
+        uses: vlang/setup-v@v1
+        with:
+          check-latest: true
+
+      - name: V doctor
+        run: v doctor
+
+      - name: Build docs
+        run: |
+          pushd rxv
+          v doc -readme -m -f html .
+          popd
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./rxv/_docs/
