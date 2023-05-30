@@ -231,7 +231,10 @@ pub fn assert_iterable(mut ctx context.Context, mut iterable Iterable, assertion
 				}
 			}
 		} {
-			// do nothing
+			// TODO: Revisit this and check if this is needed on all calls
+			if observe.closed {
+				break loop
+			}
 		} else {
 			break loop
 		}
@@ -325,7 +328,10 @@ pub fn assert_single(mut ctx context.Context, mut iterable Single, assertions ..
 				}
 			}
 		} {
-			// do nothing
+			// TODO: Revisit this and check if this is needed on all calls
+			if observe.closed {
+				break loop
+			}
 		} else {
 			break loop
 		}
