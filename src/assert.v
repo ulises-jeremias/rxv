@@ -228,9 +228,7 @@ pub fn assert_iterable(mut ctx context.Context, mut iterable Iterable, assertion
 				if item.is_error() {
 					errs << item.err as IError
 				} else {
-					if item.value is ItemValue {
-						got << item.value
-					}
+					got << item.value as ItemValue
 				}
 			}
 		} {
@@ -325,9 +323,7 @@ pub fn assert_single(mut ctx context.Context, mut iterable Single, assertions ..
 				if item.is_error() {
 					errs << item.err as IError
 				} else {
-					if item.value is ItemValue {
-						got << item.value
-					}
+					got << item.value as ItemValue
 				}
 			}
 		} {
