@@ -226,9 +226,7 @@ pub fn assert_iterable(mut ctx context.Context, mut iterable Iterable, assertion
 			}
 			item := <-observe {
 				if item.is_error() {
-					if item.err is IError {
-						errs << item.err
-					}
+					errs << item.err as IError
 				} else {
 					if item.value is ItemValue {
 						got << item.value
@@ -236,6 +234,7 @@ pub fn assert_iterable(mut ctx context.Context, mut iterable Iterable, assertion
 				}
 			}
 		} {
+			// do nothing
 		} else {
 			break loop
 		}
@@ -324,9 +323,7 @@ pub fn assert_single(mut ctx context.Context, mut iterable Single, assertions ..
 			}
 			item := <-observe {
 				if item.is_error() {
-					if item.err is IError {
-						errs << item.err
-					}
+					errs << item.err as IError
 				} else {
 					if item.value is ItemValue {
 						got << item.value
@@ -334,6 +331,7 @@ pub fn assert_single(mut ctx context.Context, mut iterable Single, assertions ..
 				}
 			}
 		} {
+			// do nothing
 		} else {
 			break loop
 		}

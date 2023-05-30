@@ -5,7 +5,7 @@ import context.onecontext
 import runtime
 
 const (
-	empty_context = context.Context(unsafe { nil })
+	empty_context = context.EmptyContext(2)
 )
 
 type SerializedFn = fn (ItemValue) int
@@ -33,7 +33,7 @@ struct FuncOption {
 mut:
 	is_buffer              bool
 	buffer                 int
-	ctx                    context.Context = context.Context(unsafe { nil })
+	ctx                    context.Context
 	observation            ObservationStrategy
 	pool                   int
 	back_pressure_strategy BackpressureStrategy
@@ -71,17 +71,18 @@ fn (fdo &FuncOption) build_channel() chan Item {
 }
 
 fn (fdo &FuncOption) build_context(parent context.Context) context.Context {
+	println('JEJE ${isnil(fdo.ctx)} ${isnil(parent)}')
 	// TODO: check the best way to check if the context is empty
-	if fdo.ctx != context.Context(unsafe { nil }) && parent != context.Context(unsafe { nil }) {
+	if !isnil(fdo.ctx) && !isnil(parent) {
 		ctx, _ := onecontext.merge(fdo.ctx, parent)
 		return ctx
 	}
 
-	if fdo.ctx != context.Context(unsafe { nil }) {
+	if !isnil(fdo.ctx) {
 		return fdo.ctx
 	}
 
-	if parent != context.Context(unsafe { nil }) {
+	if !isnil(parent) {
 		return parent
 	}
 
