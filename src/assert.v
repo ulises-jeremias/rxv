@@ -214,9 +214,8 @@ pub fn assert_iterable(mut ctx context.Context, mut iterable Iterable, assertion
 	ass := parse_assertions(...assertions)
 	mut got := []ItemValue{}
 	mut errs := []IError{}
-	opts := []RxOption{}
 
-	observe := iterable.observe(...opts)
+	observe := iterable.observe()
 	cdone := ctx.done()
 
 	loop: for {
@@ -309,9 +308,8 @@ pub fn assert_single(mut ctx context.Context, mut iterable Single, assertions ..
 	ass := parse_assertions(...assertions)
 	mut got := []ItemValue{}
 	mut errs := []IError{}
-	opts := []RxOption{}
 
-	observe := iterable.observe(...opts)
+	observe := iterable.observe()
 	cdone := ctx.done()
 
 	loop: for {
