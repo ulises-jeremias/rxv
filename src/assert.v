@@ -231,10 +231,7 @@ pub fn assert_iterable(mut ctx context.Context, mut iterable Iterable, assertion
 				}
 			}
 		} {
-			// TODO: Revisit this and check if this is needed on all calls
-			if observe.closed {
-				break loop
-			}
+			// do nothing
 		} else {
 			break loop
 		}
