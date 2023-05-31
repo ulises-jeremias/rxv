@@ -2,6 +2,33 @@ module rxv
 
 import context
 
+fn test_all() {
+	mut bctx := context.background()
+	mut ctx, cancel := context.with_cancel(mut bctx)
+
+	defer {
+		cancel()
+	}
+
+	ch := chan Item{cap: 5}
+
+	ch <- of(0.0)
+	ch <- of(1.0)
+	ch <- of(2.0)
+	ch <- of(-1.0)
+	ch <- of(-2.0)
+
+	mut obs := from_channel(ch)
+	mut all := obs.all(fn (value ItemValue) bool {
+		match value {
+			f64 { return *value >= 0.0 }
+			else { return false }
+		}
+	})
+
+	assert_single(mut ctx, mut all, has_items(false, false))
+}
+
 fn test_average_f32() {
 	mut bctx := context.background()
 	mut ctx, cancel := context.with_cancel(mut bctx)

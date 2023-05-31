@@ -32,13 +32,13 @@ pub type FuncN = fn (args ...ItemValue) ItemValue
 pub type ErrorFunc = fn (err IError) ItemValue
 
 // Predicate defines a func that returns a bool from an input value.
-pub type Predicate = fn (ItemValue) bool
+pub type Predicate = fn (value ItemValue) bool
 
 // Marshaller defines a marshaller type (ItemValue to []byte).
-pub type Marshaller = fn (ItemValue) ?[]byte
+pub type Marshaller = fn (value ItemValue) ?[]byte
 
 // Unmarshaller defines an unmarshaller type ([]byte to interface).
-pub type Unmarshaller = fn ([]byte, ItemValue) string
+pub type Unmarshaller = fn ([]byte, ItemValue) ItemValue
 
 // Producer defines a producer implementation.
 pub type Producer = fn (mut ctx context.Context, next chan Item)

@@ -15,6 +15,12 @@ ch <- rxv.of(1.0)
 ch <- rxv.of(2.0)
 
 mut obs := rxv.from_channel(ch)
-mut avgf64 := obs.average_f64()
+mut avg := obs.average_f64()
 
-rxv.assert_single(mut ctx, mut avgf64, rxv.has_items(1.0))
+observe := avg.observe()
+
+item := <-observe
+
+if item.value is rxv.ItemValue {
+	println(item.value)
+}
