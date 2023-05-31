@@ -5,7 +5,7 @@ import context.onecontext
 import runtime
 
 const (
-	empty_context = context.EmptyContext(2)
+	empty_context = context.EmptyContext{}
 )
 
 type SerializedFn = fn (ItemValue) int
