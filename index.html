@@ -504,7 +504,7 @@ pub type Disposable = context.CancelFn</p>
 
 </section>
 						<section id="Marshaller" class="doc-node">
-							<div class="title"><h2>type Marshaller <a href="#Marshaller">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/src/types.v#L38"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">type</span> Marshaller <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>ItemValue<span class="token punctuation">)</span> <span class="token operator">?</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span></code></pre>
+							<div class="title"><h2>type Marshaller <a href="#Marshaller">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/src/types.v#L38"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">type</span> Marshaller <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>value ItemValue<span class="token punctuation">)</span> <span class="token operator">?</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span></code></pre>
 <p>Marshaller defines a marshaller type (ItemValue to []byte).</p>
 
 </section>
@@ -514,7 +514,7 @@ pub type Disposable = context.CancelFn</p>
 
 </section>
 						<section id="Predicate" class="doc-node">
-							<div class="title"><h2>type Predicate <a href="#Predicate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/src/types.v#L35"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">type</span> Predicate <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>ItemValue<span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
+							<div class="title"><h2>type Predicate <a href="#Predicate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/src/types.v#L35"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">type</span> Predicate <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>value ItemValue<span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
 <p>Predicate defines a func that returns a bool from an input value.</p>
 
 </section>
@@ -549,7 +549,7 @@ pub type Disposable = context.CancelFn</p>
 
 </section>
 						<section id="Unmarshaller" class="doc-node">
-							<div class="title"><h2>type Unmarshaller <a href="#Unmarshaller">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/src/types.v#L41"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">type</span> Unmarshaller <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">,</span> ItemValue<span class="token punctuation">)</span> <span class="token builtin">string</span></code></pre>
+							<div class="title"><h2>type Unmarshaller <a href="#Unmarshaller">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/src/types.v#L41"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">type</span> Unmarshaller <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">,</span> ItemValue<span class="token punctuation">)</span> ItemValue</code></pre>
 <p>Unmarshaller defines an unmarshaller type ([]byte to interface).</p>
 
 </section>
@@ -822,7 +822,7 @@ values that are not reference types.</p>
 </section>
 
           <div class="footer">
-            Powered by vdoc. Generated on: 31 May 2023 04:10:53
+            Powered by vdoc. Generated on: 31 May 2023 04:45:31
           </div>
         </div>
         <div class="doc-toc"><ul><li class="open"><a href="#assert_iterable">fn assert_iterable</a>        <ul>
