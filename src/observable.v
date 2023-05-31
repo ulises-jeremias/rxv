@@ -27,7 +27,6 @@ mut:
 	average_int(opts ...RxOption) Single
 	// average_i8(opts ...RxOption) Single
 	average_i16(opts ...RxOption) Single
-	average_i32(opts ...RxOption) Single
 	average_i64(opts ...RxOption) Single
 	// 	// back_off_retry(back_off_cfg backoff.BackOff, opts ...RxOption) Observable
 	// 	buffer_with_count(count int, opts ...RxOption) Observable

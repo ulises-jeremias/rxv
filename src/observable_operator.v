@@ -185,13 +185,6 @@ pub fn (mut o ObservableImpl) average_int(opts ...RxOption) Single {
 	}, false, false, ...opts)
 }
 
-// average_i32 calculates the average of numbers emitted by an Observable and emits the average int
-pub fn (mut o ObservableImpl) average_i32(opts ...RxOption) Single {
-	return single(o.parent, mut o, fn () Operator {
-		return &AverageIntOperator{}
-	}, false, false, ...opts)
-}
-
 struct AverageIntOperator {
 mut:
 	count int
