@@ -88,7 +88,7 @@ fn send(mut ctx context.Context, ch chan Item, items []ItemValue) {
 							}
 						}
 						else {
-							if item.closed {
+							if item.len == 0 && item.closed {
 								break
 							}
 						}

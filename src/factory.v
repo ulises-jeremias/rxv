@@ -1,5 +1,7 @@
 module rxv
 
+import math
+
 // create creates an Observable from scratch by calling the passed function observer methods programatically.
 pub fn create(f []Producer, opts ...RxOption) Observable {
 	return &ObservableImpl{
@@ -61,6 +63,21 @@ pub fn just_item(item ItemValue) fn (opts ...RxOption) Observable {
 		return &ObservableImpl{
 			iterable: iterable_creator(...opts)
 		}
+	}
+}
+
+// range creates an Observable that emits a range of sequential integers.
+pub fn range(start int, count int, opts ...RxOption) Observable {
+	if count < 0 {
+		return thrown(new_illegal_input_error('count must be >= 0'))
+	}
+
+	if start + count - 1 > math.max_i32 {
+		return thrown(new_illegal_input_error('start + count must be <= math.max_i32'))
+	}
+
+	return &ObservableImpl{
+		iterable: new_range_iterable(start, count, ...opts)
 	}
 }
 

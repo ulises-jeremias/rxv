@@ -54,44 +54,43 @@ fn run_parallel(mut ctx context.Context, next chan Item, observe chan Item, oper
 	if !bypass_gather {
 		gather = chan Item{cap: 1}
 
-		// TODO: Fixme
-		// // gather
-		// spawn fn [mut observe_copy, opts, gather, next] (mut ctx context.Context, operator_factory OperatorFactoryFn, option RxOption) {
-		// 	mut op := operator_factory()
-		// 	mut stopped := false
-		// 	operator := OperatorOptions{
-		// 		stop: fn [option, mut stopped] () {
-		// 			if option.get_error_strategy() == .stop_on_error {
-		// 				stopped = true
-		// 			}
-		// 		}
-		// 		reset_iterable: fn [mut observe_copy, opts] (mut new_iterable Iterable) {
-		// 			observe_copy = new_iterable.observe(...opts)
-		// 		}
-		// 	}
+		// gather
+		spawn fn [mut observe_copy, opts, gather] (mut ctx context.Context, next chan Item, operator_factory OperatorFactoryFn, option RxOption) {
+			mut op := operator_factory()
+			mut stopped := false
+			operator := OperatorOptions{
+				stop: fn [option, mut stopped] () {
+					if option.get_error_strategy() == .stop_on_error {
+						stopped = true
+					}
+				}
+				reset_iterable: fn [mut observe_copy, opts] (mut new_iterable Iterable) {
+					observe_copy = new_iterable.observe(...opts)
+				}
+			}
 
-		// 	for select {
-		// 		item := <-gather {
-		// 			if stopped {
-		// 				break
-		// 			}
-		// 			if item.is_error() {
-		// 				op.err(mut ctx, item, next, operator)
-		// 			} else {
-		// 				op.gather_next(mut ctx, item, next, operator)
-		// 			}
-		// 		}
-		// 	} {
-		//                 // do nothing
-		// 	}
-		// 	op.end(mut ctx, next)
-		// 	next.close()
-		// }(mut ctx, operator_factory, option)
+			for select {
+				item := <-gather {
+					if stopped {
+						break
+					}
+					if item.is_error() {
+						op.err(mut ctx, item, next, operator)
+					} else {
+						op.gather_next(mut ctx, item, next, operator)
+					}
+				}
+			} {
+				// do nothing
+			}
+			op.end(mut ctx, next)
+			next.close()
+		}(mut ctx, next, operator_factory, option)
 	}
 
 	// scatter
 	for i in 0 .. pool {
-		spawn fn [mut observe_copy, opts, gather] (mut wg sync.WaitGroup, mut ctx context.Context, operator_factory OperatorFactoryFn, option RxOption) {
+		spawn fn [mut observe_copy, opts, gather, bypass_gather] (mut wg sync.WaitGroup, mut ctx context.Context, operator_factory OperatorFactoryFn, option RxOption) {
 			mut op := operator_factory()
 			mut stopped := false
 			operator := OperatorOptions{
@@ -123,7 +122,12 @@ fn run_parallel(mut ctx context.Context, next chan Item, observe chan Item, oper
 						}
 					}
 					else {
-						break
+						if observe_copy.len == 0 && observe_copy.closed {
+							if !bypass_gather {
+								of(op as ItemValue).send_context(mut ctx, gather)
+							}
+							break
+						}
 					}
 				}
 			}

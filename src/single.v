@@ -153,7 +153,7 @@ pub fn (mut o SingleImpl) run(opts ...RxOption) chan int {
 				}
 				_ := <-observe {}
 				else {
-					if observe.closed {
+					if observe.len == 0 && observe.closed {
 						return
 					}
 				}

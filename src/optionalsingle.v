@@ -50,7 +50,7 @@ pub fn (mut o OptionalSingleImpl) get(opts ...RxOption) ?Item {
 				return v
 			}
 			else {
-				if observe.closed {
+				if observe.len == 0 && observe.closed {
 					return empty_item()
 				}
 			}
@@ -128,7 +128,7 @@ pub fn (mut o OptionalSingleImpl) run(opts ...RxOption) chan int {
 				}
 				_ := <-observe {}
 				else {
-					if observe.closed {
+					if observe.len == 0 && observe.closed {
 						return
 					}
 				}

@@ -74,7 +74,7 @@ fn (mut i ChannelIterable) produce(mut ctx context.Context) {
 				}
 			}
 			else {
-				if i.next.closed {
+				if i.next.len == 0 && i.next.closed {
 					return
 				}
 			}

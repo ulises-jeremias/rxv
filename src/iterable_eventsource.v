@@ -32,7 +32,7 @@ fn new_event_source_iterable(mut ctx context.Context, next chan Item, strategy B
 					}
 				}
 				else {
-					if next.closed {
+					if next.len == 0 && next.closed {
 						return
 					}
 				}
