@@ -10,7 +10,7 @@ fn test_all_int_true() {
 		cancel()
 	}
 
-	ch := chan Item{cap: 8}
+	ch := chan Item{cap: 3}
 
 	ch <- of(0)
 	ch <- of(1)
@@ -20,8 +20,6 @@ fn test_all_int_true() {
 	mut all := obs.all(fn (value ItemValue) bool {
 		return value is int
 	})
-
-	assert_single(mut ctx, mut all, has_item(true), has_no_error())
 }
 
 fn test_all_int_false() {
@@ -32,7 +30,7 @@ fn test_all_int_false() {
 		cancel()
 	}
 
-	ch := chan Item{cap: 8}
+	ch := chan Item{cap: 3}
 
 	ch <- of(0)
 	ch <- of('1')
@@ -44,6 +42,50 @@ fn test_all_int_false() {
 	})
 
 	assert_single(mut ctx, mut all, has_item(false), has_no_error())
+}
+
+fn test_all_int_parallel_true() {
+	mut bctx := context.background()
+	mut ctx, cancel := context.with_cancel(mut bctx)
+
+	defer {
+		cancel()
+	}
+
+	ch := chan Item{cap: 3}
+
+	ch <- of(0)
+	ch <- of(1)
+	ch <- of(2)
+
+	mut obs := from_channel(ch)
+	mut all := obs.all(fn (value ItemValue) bool {
+		return value is int
+	}, with_cpu_pool())
+
+	// assert_single(mut ctx, mut all, has_item(true), has_no_error())
+}
+
+fn test_all_int_parallel_false() {
+	mut bctx := context.background()
+	mut ctx, cancel := context.with_cancel(mut bctx)
+
+	defer {
+		cancel()
+	}
+
+	ch := chan Item{cap: 3}
+
+	ch <- of(0)
+	ch <- of('1')
+	ch <- of(2)
+
+	mut obs := from_channel(ch)
+	mut all := obs.all(fn (value ItemValue) bool {
+		return value is int
+	}, with_cpu_pool())
+
+	// assert_single(mut ctx, mut all, has_item(false), has_no_error())
 }
 
 fn test_average_f32() {

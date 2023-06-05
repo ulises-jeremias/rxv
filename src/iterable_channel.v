@@ -73,13 +73,10 @@ fn (mut i ChannelIterable) produce(mut ctx context.Context) {
 					}
 				}
 			}
-			else {
-				if i.next.len == 0 && i.next.closed {
-					return
-				}
-			}
 		} {
-			// do nothing
+			if i.next.len == 0 && i.next.closed {
+				return
+			}
 		} else {
 			break
 		}
