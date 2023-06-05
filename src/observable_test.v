@@ -21,7 +21,7 @@ fn test_all_int_true() {
 		return value is int
 	})
 
-	assert_single(mut ctx, mut all, has_item(true))
+	assert_single(mut ctx, mut all, has_item(true), has_no_error())
 }
 
 fn test_all_int_false() {
@@ -43,7 +43,7 @@ fn test_all_int_false() {
 		return value is int
 	})
 
-	assert_single(mut ctx, mut all, has_item(false))
+	assert_single(mut ctx, mut all, has_item(false), has_no_error())
 }
 
 fn test_average_f32() {
@@ -63,7 +63,7 @@ fn test_average_f32() {
 	mut obs := from_channel(ch)
 	mut avg := obs.average_f32()
 
-	assert_single(mut ctx, mut avg, has_item(f32(1.0)))
+	assert_single(mut ctx, mut avg, has_item(f32(1.0)), has_no_error())
 }
 
 fn test_average_f64() {
@@ -83,7 +83,7 @@ fn test_average_f64() {
 	mut obs := from_channel(ch)
 	mut avg := obs.average_f64()
 
-	assert_single(mut ctx, mut avg, has_item(1.0))
+	assert_single(mut ctx, mut avg, has_item(1.0), has_no_error())
 }
 
 fn test_average_int() {
@@ -103,7 +103,7 @@ fn test_average_int() {
 	mut obs := from_channel(ch)
 	mut avg := obs.average_int()
 
-	assert_single(mut ctx, mut avg, has_item(1))
+	assert_single(mut ctx, mut avg, has_item(1), has_no_error())
 }
 
 fn test_average_i16() {
@@ -123,7 +123,7 @@ fn test_average_i16() {
 	mut obs := from_channel(ch)
 	mut avg := obs.average_i16()
 
-	assert_single(mut ctx, mut avg, has_item(i16(1)))
+	assert_single(mut ctx, mut avg, has_item(i16(1)), has_no_error())
 }
 
 fn test_average_i64() {
@@ -143,5 +143,5 @@ fn test_average_i64() {
 	mut obs := from_channel(ch)
 	mut avg := obs.average_i64()
 
-	assert_single(mut ctx, mut avg, has_item(i64(1)))
+	assert_single(mut ctx, mut avg, has_item(i64(1)), has_no_error())
 }
