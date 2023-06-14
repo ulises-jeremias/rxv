@@ -3,7 +3,7 @@ module rxv
 import context
 
 fn predicate_all_int(value ItemValue) bool {
-        return value is int
+	return value is int
 }
 
 fn test_all_int_true() {
@@ -14,16 +14,10 @@ fn test_all_int_true() {
 		cancel()
 	}
 
-	ch := chan Item{cap: 3}
-
-	ch <- of(0)
-	ch <- of(1)
-	ch <- of(2)
-
-	mut obs := from_channel(ch)
+	mut obs := range(0, 3)
 	mut all := obs.all(predicate_all_int)
 
-        assert_single(mut ctx, mut all, has_item(true), has_no_error())
+	assert_single(mut ctx, mut all, has_item(true), has_no_error())
 }
 
 fn test_all_int_false() {

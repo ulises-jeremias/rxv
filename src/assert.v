@@ -218,28 +218,24 @@ pub fn assert_iterable(mut ctx context.Context, mut iterable Iterable, assertion
 	observe := iterable.observe()
 	cdone := ctx.done()
 
-	for {
-		if select {
-			_ := <-cdone {
-				break
-			}
-			item := <-observe {
-				if item.is_error() {
-					errs << item.err as IError
-				} else {
-					got << item.value as ItemValue
-				}
-			}
-			else {
-				if observe.len == 0 && observe.closed {
-					break
-				}
-			}
-		} {
-			// do nothing
-		} else {
+	for select {
+		_ := <-cdone {
 			break
 		}
+		item := <-observe {
+			if item.is_error() {
+				errs << item.err as IError
+			} else {
+				got << item.value as ItemValue
+			}
+		}
+		else {
+			if observe.len == 0 && observe.closed {
+				break
+			}
+		}
+	} {
+		// do nothing
 	}
 
 	if predicates := ass.custom_predicates_to_be_checked() {
@@ -332,10 +328,13 @@ pub fn assert_single(mut ctx context.Context, mut iterable Single, assertions ..
 				}
 			}
 		}
-	} {
-		if observe.len == 0 && observe.closed {
-			break
+		else {
+			if observe.len == 0 && observe.closed {
+				break
+			}
 		}
+	} {
+		// do nothing
 	}
 
 	if predicates := ass.custom_predicates_to_be_checked() {

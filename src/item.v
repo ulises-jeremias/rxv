@@ -72,31 +72,27 @@ fn send(mut ctx context.Context, ch chan Item, items []ItemValue) {
 				from_error(item).send_context(mut ctx, ch)
 			}
 			chan ItemValue {
-				for {
-					if select {
-						i := <-item {
-							match i {
-								Error {
-									from_error(i).send_context(mut ctx, ch)
-								}
-								MessageError {
-									from_error(i).send_context(mut ctx, ch)
-								}
-								else {
-									of(i).send_context(mut ctx, ch)
-								}
+				for select {
+					i := <-item {
+						match i {
+							Error {
+								from_error(i as IError).send_context(mut ctx, ch)
+							}
+							MessageError {
+								from_error(i as IError).send_context(mut ctx, ch)
+							}
+							else {
+								of(i as ItemValue).send_context(mut ctx, ch)
 							}
 						}
-						else {
-							if item.len == 0 && item.closed {
-								break
-							}
-						}
-					} {
-						// do nothing
-					} else {
-						break
 					}
+					else {
+						if item.len == 0 && item.closed {
+							break
+						}
+					}
+				} {
+					// do nothing
 				}
 			}
 			[]ItemValue {

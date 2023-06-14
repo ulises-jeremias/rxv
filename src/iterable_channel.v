@@ -61,24 +61,23 @@ fn (mut i ChannelIterable) produce(mut ctx context.Context) {
 
 	cdone := ctx.done()
 
-	for {
-		if select {
-			_ := <-cdone {
-				return
-			}
-			item := <-i.next {
-				lock i.subscribers {
-					for subscriber in i.subscribers {
-						subscriber <- item
-					}
+	for select {
+		_ := <-cdone {
+			return
+		}
+		item := <-i.next {
+			lock i.subscribers {
+				for subscriber in i.subscribers {
+					subscriber <- item
 				}
 			}
-		} {
+		}
+		else {
 			if i.next.len == 0 && i.next.closed {
 				return
 			}
-		} else {
-			break
 		}
+	} {
+		// do nothing
 	}
 }

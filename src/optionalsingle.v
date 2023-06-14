@@ -36,29 +36,25 @@ pub fn (mut o OptionalSingleImpl) get(opts ...RxOption) ?Item {
 	observe := o.observe(...opts)
 	done := ctx.done()
 
-	for {
-		if select {
-			_ := <-done {
-				err := ctx.err()
-				if err is none {
-					return empty_item()
-				} else {
-					return none
-				}
+	for select {
+		_ := <-done {
+			err := ctx.err()
+			if err is none {
+				return empty_item()
+			} else {
+				return none
 			}
-			v := <-observe {
-				return v
-			}
-			else {
-				if observe.len == 0 && observe.closed {
-					return empty_item()
-				}
-			}
-		} {
-			// do nothing
-		} else {
-			break
 		}
+		v := <-observe {
+			return v
+		}
+		else {
+			if observe.len == 0 && observe.closed {
+				return empty_item()
+			}
+		}
+	} {
+		// do nothing
 	}
 	return empty_item()
 }
@@ -121,22 +117,18 @@ pub fn (mut o OptionalSingleImpl) run(opts ...RxOption) chan int {
 		}
 
 		done := ctx.done()
-		for {
-			if select {
-				_ := <-done {
+		for select {
+			_ := <-done {
+				return
+			}
+			_ := <-observe {}
+			else {
+				if observe.len == 0 && observe.closed {
 					return
 				}
-				_ := <-observe {}
-				else {
-					if observe.len == 0 && observe.closed {
-						return
-					}
-				}
-			} {
-				// do nothing
-			} else {
-				break
 			}
+		} {
+			// do nothing
 		}
 	}(dispose, mut &ctx, observe)
 
