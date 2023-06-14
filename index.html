@@ -32,7 +32,7 @@
           <div class="info">
             <div class="module">rxv</div>
             <div class="toggle-version-container">
-              <span>0.1.0 5440657</span>
+              <span>0.1.0 bbd1027</span>
               <div id="dark-mode-toggle" role="switch" aria-checked="false" aria-label="Toggle dark mode"><svg xmlns="http://www.w3.org/2000/svg" class="light-icon" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/></svg>
 <svg xmlns="http://www.w3.org/2000/svg" class="dark-icon" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><g><rect fill="none" height="24" width="24"/></g><g><g><g><path d="M11.1,12.08C8.77,7.57,10.6,3.6,11.63,2.01C6.27,2.2,1.98,6.59,1.98,12c0,0.14,0.02,0.28,0.02,0.42 C2.62,12.15,3.29,12,4,12c1.66,0,3.18,0.83,4.1,2.15C9.77,14.63,11,16.17,11,18c0,1.52-0.87,2.83-2.12,3.51 c0.98,0.32,2.03,0.5,3.11,0.5c3.5,0,6.58-1.8,8.37-4.52C18,17.72,13.38,16.52,11.1,12.08z"/></g><path d="M7,16l-0.18,0C6.4,14.84,5.3,14,4,14c-1.66,0-3,1.34-3,3s1.34,3,3,3c0.62,0,2.49,0,3,0c1.1,0,2-0.9,2-2 C9,16.9,8.1,16,7,16z"/></g></g></svg>
 </div>
@@ -273,75 +273,75 @@ This strategy is propagated to the parent observable.</p>
 	<span class="token function">average_f32</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> Single
 	<span class="token function">average_f64</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> Single
 	<span class="token function">average_int</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> Single
-<span class="token comment">// average_i8(opts ...RxOption) Single</span>
+	<span class="token comment">// average_i8(opts ...RxOption) Single</span>
 	<span class="token function">average_i16</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> Single
 	<span class="token function">average_i64</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> Single
-<span class="token comment">// 	// back_off_retry(back_off_cfg backoff.BackOff, opts ...RxOption) Observable</span>
-<span class="token comment">// 	buffer_with_count(count int, opts ...RxOption) Observable</span>
-<span class="token comment">// 	buffer_with_time(timespan Duration, opts ...RxOption) Observable</span>
-<span class="token comment">// 	buffer_with_time_or_count(timespan Duration, count int, opts ...RxOption) Observable</span>
-<span class="token comment">// 	connect(mut ctx context.Context) (context.Context, context.CancelFn)</span>
-<span class="token comment">// 	contains(equal Predicate, opts ...RxOption) Single</span>
-<span class="token comment">// 	count(opts ...RxOption) Single</span>
-<span class="token comment">// 	debounce(timespan Duration, opts ...RxOption) Observable</span>
-<span class="token comment">// 	default_if_empty(default_value ItemValue, opts ...RxOption) Observable</span>
-<span class="token comment">// 	distinct(apply Func, opts ...RxOption) Observable</span>
-<span class="token comment">// 	distinct_until_changed(apply Func, opts ...RxOption) Observable</span>
-<span class="token comment">// 	do_on_completed(completed_func CompletedFunc, opts ...RxOption) chan int</span>
-<span class="token comment">// 	do_on_error(err_func ErrFunc, opts ...RxOption) chan int</span>
-<span class="token comment">// 	do_on_next(next_func NextFunc, opts ...RxOption) chan int</span>
-<span class="token comment">// 	element_at(index u32, opts ...RxOption) Single</span>
-<span class="token comment">// 	error(opts ...RxOption) IError</span>
-<span class="token comment">// 	errors(opts ...RxOption) []IError</span>
-<span class="token comment">// 	filter(apply Predicate, opts ...RxOption) Observable</span>
-<span class="token comment">// 	find(find Predicate, opts ...RxOption) OptionalSingle</span>
-<span class="token comment">// 	first(opts ...RxOption) OptionalSingle</span>
-<span class="token comment">// 	first_or_default(default_value ItemValue, opts ...RxOption) Single</span>
-<span class="token comment">// 	flat_map(apply ItemToObservable, opts ...RxOption) Observable</span>
-<span class="token comment">// 	for_each(next_func NextFunc, err_func ErrFunc, completed_func CompletedFunc, opts ...RxOption) chan int</span>
-<span class="token comment">// 	group_by(length int, distribution DistributionFn, opts ...RxOption) Observable</span>
-<span class="token comment">// 	group_by_dynamic(distribution DistributionStrFn, opts ...RxOption) Observable</span>
-<span class="token comment">// 	ignore_elements(opts ...RxOption) Observable</span>
-<span class="token comment">// 	join(joiner Func2, mut right Observable, time_extractor TimeExtractorFn, window Duration, opts ...RxOption) Observable</span>
-<span class="token comment">// 	last(opts ...RxOption) OptionalSingle</span>
-<span class="token comment">// 	last_or_default(default_value ItemValue, opts ...RxOption) Single</span>
-<span class="token comment">// 	map(apply Func, opts ...RxOption) Observable</span>
-<span class="token comment">// 	marshal(marshaller Marshaller, opts ...RxOption) Observable</span>
-<span class="token comment">// 	max(comparator Comparator, opts ...RxOption) OptionalSingle</span>
-<span class="token comment">// 	min(comparator Comparator, opts ...RxOption) OptionalSingle</span>
-<span class="token comment">// 	on_error_resume_next(resume_sequence ErrorToObservable, opts ...RxOption) Observable</span>
-<span class="token comment">// 	on_error_return(resume_func ErrorFunc, opts ...RxOption) Observable</span>
-<span class="token comment">// 	on_error_return_item(resume ItemValue, opts ...RxOption) Observable</span>
-<span class="token comment">// 	reduce(apply Func2, opts ...RxOption) OptionalSingle</span>
-<span class="token comment">// 	repeat(count i64, frequency Duration, opts ...RxOption) Observable</span>
-<span class="token comment">// 	retry(count int, should_retry RetryFn, opts ...RxOption) Observable</span>
-<span class="token comment">// 	run(opts ...RxOption) chan int</span>
-<span class="token comment">// 	sample(mut iterable Iterable, opts ...RxOption) Observable</span>
-<span class="token comment">// 	scan(apply Func2, opts ...RxOption) Observable</span>
-<span class="token comment">// 	sequence_equal(mut iterable Iterable, opts ...RxOption) Single</span>
-<span class="token comment">// 	send(output chan Item, opts ...RxOption)</span>
-<span class="token comment">// 	serialize(from context.Context, identifier IdentifierFn, opts ...RxOption) Observable</span>
-<span class="token comment">// 	skip(nth u32, opts ...RxOption) Observable</span>
-<span class="token comment">// 	skip_last(nth u32, opts ...RxOption) Observable</span>
-<span class="token comment">// 	skip_while(apply Predicate, opts ...RxOption) Observable</span>
-<span class="token comment">// 	start_with(mut iterable Iterable, opts ...RxOption) Observable</span>
-<span class="token comment">// 	sum_f32(opts ...RxOption) OptionalSingle</span>
-<span class="token comment">// 	sum_f64(opts ...RxOption) OptionalSingle</span>
-<span class="token comment">// 	sum_i64(opts ...RxOption) OptionalSingle</span>
-<span class="token comment">// 	take(nth u32, opts ...RxOption) Observable</span>
-<span class="token comment">// 	take_last(nth u32, opts ...RxOption) Observable</span>
-<span class="token comment">// 	take_until(apply Predicate, opts ...RxOption) Observable</span>
-<span class="token comment">// 	take_while(apply Predicate, opts ...RxOption) Observable</span>
-<span class="token comment">// 	time_interval(opts ...RxOption) Observable</span>
-<span class="token comment">// 	timestamp(opts ...RxOption) Observable</span>
-<span class="token comment">// 	to_map(key_selector Func, opts ...RxOption) Single</span>
-<span class="token comment">// 	to_map_with_value_selector(key_selector Func, valueSelector Func, opts ...RxOption) Single</span>
-<span class="token comment">// 	to_slice(initial_capacity int, opts ...RxOption) ?[]ItemValue</span>
-<span class="token comment">// 	unmarshal(unmarshaller Unmarshaller, factory FactoryFn, opts ...RxOption) Observable</span>
-<span class="token comment">// 	window_with_count(count int, opts ...RxOption) Observable</span>
-<span class="token comment">// 	window_with_time(timespan Duration, opts ...RxOption) Observable</span>
-<span class="token comment">// 	window_with_time_or_count(timespan Duration, count int, opts ...RxOption) Observable</span>
-<span class="token comment">// 	zip_from_iterable(mut iterable Iterable, zipper Func2, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	// back_off_retry(back_off_cfg backoff.BackOff, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	buffer_with_count(count int, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	buffer_with_time(timespan Duration, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	buffer_with_time_or_count(timespan Duration, count int, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	connect(mut ctx context.Context) (context.Context, context.CancelFn)</span>
+	<span class="token comment">// 	contains(equal Predicate, opts ...RxOption) Single</span>
+	<span class="token comment">// 	count(opts ...RxOption) Single</span>
+	<span class="token comment">// 	debounce(timespan Duration, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	default_if_empty(default_value ItemValue, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	distinct(apply Func, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	distinct_until_changed(apply Func, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	do_on_completed(completed_func CompletedFunc, opts ...RxOption) chan int</span>
+	<span class="token comment">// 	do_on_error(err_func ErrFunc, opts ...RxOption) chan int</span>
+	<span class="token comment">// 	do_on_next(next_func NextFunc, opts ...RxOption) chan int</span>
+	<span class="token comment">// 	element_at(index u32, opts ...RxOption) Single</span>
+	<span class="token comment">// 	error(opts ...RxOption) IError</span>
+	<span class="token comment">// 	errors(opts ...RxOption) []IError</span>
+	<span class="token comment">// 	filter(apply Predicate, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	find(find Predicate, opts ...RxOption) OptionalSingle</span>
+	<span class="token comment">// 	first(opts ...RxOption) OptionalSingle</span>
+	<span class="token comment">// 	first_or_default(default_value ItemValue, opts ...RxOption) Single</span>
+	<span class="token comment">// 	flat_map(apply ItemToObservable, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	for_each(next_func NextFunc, err_func ErrFunc, completed_func CompletedFunc, opts ...RxOption) chan int</span>
+	<span class="token comment">// 	group_by(length int, distribution DistributionFn, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	group_by_dynamic(distribution DistributionStrFn, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	ignore_elements(opts ...RxOption) Observable</span>
+	<span class="token comment">// 	join(joiner Func2, mut right Observable, time_extractor TimeExtractorFn, window Duration, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	last(opts ...RxOption) OptionalSingle</span>
+	<span class="token comment">// 	last_or_default(default_value ItemValue, opts ...RxOption) Single</span>
+	<span class="token comment">// 	map(apply Func, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	marshal(marshaller Marshaller, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	max(comparator Comparator, opts ...RxOption) OptionalSingle</span>
+	<span class="token comment">// 	min(comparator Comparator, opts ...RxOption) OptionalSingle</span>
+	<span class="token comment">// 	on_error_resume_next(resume_sequence ErrorToObservable, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	on_error_return(resume_func ErrorFunc, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	on_error_return_item(resume ItemValue, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	reduce(apply Func2, opts ...RxOption) OptionalSingle</span>
+	<span class="token comment">// 	repeat(count i64, frequency Duration, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	retry(count int, should_retry RetryFn, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	run(opts ...RxOption) chan int</span>
+	<span class="token comment">// 	sample(mut iterable Iterable, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	scan(apply Func2, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	sequence_equal(mut iterable Iterable, opts ...RxOption) Single</span>
+	<span class="token comment">// 	send(output chan Item, opts ...RxOption)</span>
+	<span class="token comment">// 	serialize(from context.Context, identifier IdentifierFn, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	skip(nth u32, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	skip_last(nth u32, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	skip_while(apply Predicate, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	start_with(mut iterable Iterable, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	sum_f32(opts ...RxOption) OptionalSingle</span>
+	<span class="token comment">// 	sum_f64(opts ...RxOption) OptionalSingle</span>
+	<span class="token comment">// 	sum_i64(opts ...RxOption) OptionalSingle</span>
+	<span class="token comment">// 	take(nth u32, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	take_last(nth u32, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	take_until(apply Predicate, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	take_while(apply Predicate, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	time_interval(opts ...RxOption) Observable</span>
+	<span class="token comment">// 	timestamp(opts ...RxOption) Observable</span>
+	<span class="token comment">// 	to_map(key_selector Func, opts ...RxOption) Single</span>
+	<span class="token comment">// 	to_map_with_value_selector(key_selector Func, valueSelector Func, opts ...RxOption) Single</span>
+	<span class="token comment">// 	to_slice(initial_capacity int, opts ...RxOption) ?[]ItemValue</span>
+	<span class="token comment">// 	unmarshal(unmarshaller Unmarshaller, factory FactoryFn, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	window_with_count(count int, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	window_with_time(timespan Duration, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	window_with_time_or_count(timespan Duration, count int, opts ...RxOption) Observable</span>
+	<span class="token comment">// 	zip_from_iterable(mut iterable Iterable, zipper Func2, opts ...RxOption) Observable</span>
 <span class="token punctuation">}</span></code></pre>
 <p>Observable is the standard interface for Observables.</p>
 
@@ -560,9 +560,9 @@ pub type Disposable = context.CancelFn</p>
 </section>
 						<section id="BackpressureStrategy" class="doc-node">
 							<div class="title"><h2>enum BackpressureStrategy <a href="#BackpressureStrategy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/src/types.v#L66"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">enum</span> <span class="token symbol">BackpressureStrategy</span> <span class="token punctuation">{</span>
-<span class="token comment">// block blocks until the channel is available.</span>
+	<span class="token comment">// block blocks until the channel is available.</span>
 	block
-<span class="token comment">// drop drops the message.</span>
+	<span class="token comment">// drop drops the message.</span>
 	drop
 <span class="token punctuation">}</span></code></pre>
 <p>BackpressureStrategy is the backpressure strategy type.</p>
@@ -570,9 +570,9 @@ pub type Disposable = context.CancelFn</p>
 </section>
 						<section id="CloseChannelStrategy" class="doc-node">
 							<div class="title"><h2>enum CloseChannelStrategy <a href="#CloseChannelStrategy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/src/item.v#L28"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">enum</span> <span class="token symbol">CloseChannelStrategy</span> <span class="token punctuation">{</span>
-<span class="token comment">// leave_channel_open indicates to leave the channel open after completion.</span>
+	<span class="token comment">// leave_channel_open indicates to leave the channel open after completion.</span>
 	leave_channel_open
-<span class="token comment">// close_channel indicates to close the channel open after completion.</span>
+	<span class="token comment">// close_channel indicates to close the channel open after completion.</span>
 	close_channel
 <span class="token punctuation">}</span></code></pre>
 <p>CloseChannelStrategy indicates a strategy on whether to close a channel.</p>
@@ -580,9 +580,9 @@ pub type Disposable = context.CancelFn</p>
 </section>
 						<section id="ObservationStrategy" class="doc-node">
 							<div class="title"><h2>enum ObservationStrategy <a href="#ObservationStrategy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/src/types.v#L83"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">enum</span> <span class="token symbol">ObservationStrategy</span> <span class="token punctuation">{</span>
-<span class="token comment">// lazy is the default observation strategy, when an Observer subscribes.</span>
+	<span class="token comment">// lazy is the default observation strategy, when an Observer subscribes.</span>
 	lazy
-<span class="token comment">// eager means consuming as soon as the Observable is created.</span>
+	<span class="token comment">// eager means consuming as soon as the Observable is created.</span>
 	eager
 <span class="token punctuation">}</span></code></pre>
 <p>ObservationStrategy defines the strategy to consume from an Observable.</p>
@@ -590,10 +590,10 @@ pub type Disposable = context.CancelFn</p>
 </section>
 						<section id="OnErrorStrategy" class="doc-node">
 							<div class="title"><h2>enum OnErrorStrategy <a href="#OnErrorStrategy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/src/types.v#L74"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">enum</span> <span class="token symbol">OnErrorStrategy</span> <span class="token punctuation">{</span>
-<span class="token comment">// stop_on_error is the default error strategy.</span>
-<span class="token comment">// An operator will stop processing items on error.</span>
+	<span class="token comment">// stop_on_error is the default error strategy.</span>
+	<span class="token comment">// An operator will stop processing items on error.</span>
 	stop_on_error
-<span class="token comment">// continue_on_error means an operator will continue processing items after an error.</span>
+	<span class="token comment">// continue_on_error means an operator will continue processing items after an error.</span>
 	continue_on_error
 <span class="token punctuation">}</span></code></pre>
 <p>OnErrorStrategy is the Observable error strategy.</p>
@@ -827,7 +827,7 @@ values that are not reference types.</p>
 </section>
 
           <div class="footer">
-            Powered by vdoc. Generated on: 5 Jun 2023 05:35:08
+            Powered by vdoc. Generated on: 14 Jun 2023 23:31:22
           </div>
         </div>
         <div class="doc-toc"><ul><li class="open"><a href="#assert_iterable">fn assert_iterable</a>        <ul>
