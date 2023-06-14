@@ -20,6 +20,8 @@ fn test_all_int_true() {
 	mut all := obs.all(fn (value ItemValue) bool {
 		return value is int
 	})
+
+        assert_single(mut ctx, mut all, has_item(true), has_no_error())
 }
 
 fn test_all_int_false() {
