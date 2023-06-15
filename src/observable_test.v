@@ -12,9 +12,7 @@ fn channel_value(mut ctx context.Context, items ...ItemValue) chan Item {
 		for item in items {
 			if item is IError {
 				from_error(item as IError).send_context(mut ctx, next)
-				continue
-			}
-			if item is ItemValue {
+			} else {
 				of(item as ItemValue).send_context(mut ctx, next)
 			}
 		}
