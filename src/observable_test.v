@@ -34,7 +34,7 @@ fn test_all_int_true() {
 	}
 
 	mut obs := range(0, 3)
-	mut all := obs.all(predicate_all_int)
+	mut all := obs.all(predicate_all_int, with_context(mut ctx), with_context(mut ctx))
 
 	assert_single(mut ctx, mut all, has_item(true), has_no_error())
 }
@@ -55,7 +55,7 @@ fn test_all_int_false() {
 
 	// mut obs := observable_for_tests(mut ctx, 1, 'x', 3)
 	mut obs := from_channel(ch)
-	mut all := obs.all(predicate_all_int)
+	mut all := obs.all(predicate_all_int, with_context(mut ctx))
 
 	assert_single(mut ctx, mut all, has_item(false), has_no_error())
 }
@@ -69,7 +69,7 @@ fn test_all_int_parallel_true() {
 	}
 
 	mut obs := range(0, 3)
-	mut all := obs.all(predicate_all_int, with_cpu_pool())
+	mut all := obs.all(predicate_all_int, with_context(mut ctx), with_cpu_pool())
 
 	// assert_single(mut ctx, mut all, has_item(true), has_no_error())
 }
@@ -89,7 +89,7 @@ fn test_all_int_parallel_false() {
 	ch <- of(2)
 
 	mut obs := from_channel(ch)
-	mut all := obs.all(predicate_all_int, with_cpu_pool())
+	mut all := obs.all(predicate_all_int, with_context(mut ctx), with_cpu_pool())
 
 	// assert_single(mut ctx, mut all, has_item(false), has_no_error())
 }
@@ -109,7 +109,7 @@ fn test_average_f32() {
 	ch <- of(f32(2.0))
 
 	mut obs := from_channel(ch)
-	mut avg := obs.average_f32()
+	mut avg := obs.average_f32(with_context(mut ctx))
 
 	assert_single(mut ctx, mut avg, has_item(f32(1.0)), has_no_error())
 }
@@ -129,7 +129,7 @@ fn test_average_f64() {
 	ch <- of(2.0)
 
 	mut obs := from_channel(ch)
-	mut avg := obs.average_f64()
+	mut avg := obs.average_f64(with_context(mut ctx))
 
 	assert_single(mut ctx, mut avg, has_item(1.0), has_no_error())
 }
@@ -149,7 +149,7 @@ fn test_average_int() {
 	ch <- of(2)
 
 	mut obs := from_channel(ch)
-	mut avg := obs.average_int()
+	mut avg := obs.average_int(with_context(mut ctx))
 
 	assert_single(mut ctx, mut avg, has_item(1), has_no_error())
 }
@@ -169,7 +169,7 @@ fn test_average_i16() {
 	ch <- of(i16(2))
 
 	mut obs := from_channel(ch)
-	mut avg := obs.average_i16()
+	mut avg := obs.average_i16(with_context(mut ctx))
 
 	assert_single(mut ctx, mut avg, has_item(i16(1)), has_no_error())
 }
@@ -189,7 +189,7 @@ fn test_average_i64() {
 	ch <- of(i64(2))
 
 	mut obs := from_channel(ch)
-	mut avg := obs.average_i64()
+	mut avg := obs.average_i64(with_context(mut ctx))
 
 	assert_single(mut ctx, mut avg, has_item(i64(1)), has_no_error())
 }
