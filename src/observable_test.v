@@ -6,6 +6,27 @@ fn predicate_all_int(value ItemValue) bool {
 	return value is int
 }
 
+fn channel_value(mut ctx context.Context, items ...ItemValue) chan Item {
+	next := chan Item{cap: items.len}
+	spawn fn (mut ctx context.Context, next chan Item, items []ItemValue) {
+		for item in items {
+			if item is IError {
+				from_error(item as IError).send_context(mut ctx, next)
+				continue
+			}
+			if item is ItemValue {
+				of(item as ItemValue).send_context(mut ctx, next)
+			}
+		}
+		next.close()
+	}(mut &ctx, next, items)
+	return next
+}
+
+fn observable_for_tests(mut ctx context.Context, items ...ItemValue) Observable {
+	return from_channel(channel_value(mut ctx, ...items))
+}
+
 fn test_all_int_true() {
 	mut bctx := context.background()
 	mut ctx, cancel := context.with_cancel(mut bctx)
@@ -34,6 +55,7 @@ fn test_all_int_false() {
 	ch <- of('1')
 	ch <- of(2)
 
+	// mut obs := observable_for_tests(mut ctx, 1, 'x', 3)
 	mut obs := from_channel(ch)
 	mut all := obs.all(predicate_all_int)
 
@@ -48,13 +70,7 @@ fn test_all_int_parallel_true() {
 		cancel()
 	}
 
-	ch := chan Item{cap: 3}
-
-	ch <- of(0)
-	ch <- of(1)
-	ch <- of(2)
-
-	mut obs := from_channel(ch)
+	mut obs := range(0, 3)
 	mut all := obs.all(predicate_all_int, with_cpu_pool())
 
 	// assert_single(mut ctx, mut all, has_item(true), has_no_error())
