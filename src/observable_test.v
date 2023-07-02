@@ -8,7 +8,7 @@ fn predicate_all_int(value ItemValue) bool {
 
 fn channel_value(mut ctx context.Context, items ...ItemValue) chan Item {
 	next := chan Item{cap: items.len}
-	spawn fn (mut ctx context.Context, next chan Item, items []ItemValue) {
+	go fn (mut ctx context.Context, next chan Item, items []ItemValue) {
 		for item in items {
 			if item is IError {
 				from_error(item as IError).send_context(mut ctx, next)

@@ -16,7 +16,7 @@ fn new_create_iterable(fs []Producer, opts ...RxOption) Iterable {
 	mut ctx := option.build_context(empty_context)
 	next := option.build_channel()
 
-	spawn fn (fs []Producer, next chan Item, mut ctx context.Context) {
+	go fn (fs []Producer, next chan Item, mut ctx context.Context) {
 		defer {
 			next.close()
 		}
@@ -59,7 +59,7 @@ fn (mut i CreateIterable) connect(mut ctx context.Context) {
 		if i.producer_already_created {
 			return
 		}
-		spawn i.produce(mut ctx)
+		go i.produce(mut ctx)
 		i.producer_already_created = true
 	}
 }

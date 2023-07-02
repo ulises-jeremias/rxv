@@ -22,6 +22,6 @@ pub fn (i &JustIterable) observe(opts ...RxOption) chan Item {
 	next := option.build_channel()
 	mut ctx := option.build_context(empty_context)
 
-	spawn send_items(mut &ctx, next, .close_channel, i.items)
+	go send_items(mut &ctx, next, .close_channel, i.items)
 	return next
 }

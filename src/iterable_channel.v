@@ -45,7 +45,7 @@ fn (mut i ChannelIterable) connect(mut ctx context.Context) {
 		if i.producer_already_created {
 			return
 		}
-		spawn i.produce(mut ctx)
+		go i.produce(mut ctx)
 		i.producer_already_created = true
 	}
 }

@@ -22,7 +22,7 @@ pub fn (i &SliceIterable) observe(opts ...RxOption) chan Item {
 	next := option.build_channel()
 	mut ctx := option.build_context(empty_context)
 
-	spawn fn (i &SliceIterable, next chan Item, mut ctx context.Context) {
+	go fn (i &SliceIterable, next chan Item, mut ctx context.Context) {
 		for item in i.items {
 			cdone := ctx.done()
 			select {

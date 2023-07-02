@@ -7,7 +7,7 @@ type OperatorFactoryFn = fn () Operator
 
 fn run_sequential(mut ctx context.Context, next chan Item, mut iterable Iterable, operator_factory OperatorFactoryFn, option RxOption, opts ...RxOption) {
 	mut observe := iterable.observe(...opts)
-	spawn fn [mut observe, opts] (mut ctx context.Context, next chan Item, operator_factory OperatorFactoryFn, option RxOption) {
+	go fn [mut observe, opts] (mut ctx context.Context, next chan Item, operator_factory OperatorFactoryFn, option RxOption) {
 		mut op := operator_factory()
 		mut stopped := false
 		operator := OperatorOptions{
@@ -55,7 +55,7 @@ fn run_parallel(mut ctx context.Context, next chan Item, observe chan Item, oper
 		gather = chan Item{cap: 1}
 
 		// gather
-		spawn fn [mut observe_copy, opts, gather] (mut ctx context.Context, next chan Item, operator_factory OperatorFactoryFn, option RxOption) {
+		go fn [mut observe_copy, opts, gather] (mut ctx context.Context, next chan Item, operator_factory OperatorFactoryFn, option RxOption) {
 			mut op := operator_factory()
 			mut stopped := false
 			operator := OperatorOptions{
@@ -90,7 +90,7 @@ fn run_parallel(mut ctx context.Context, next chan Item, observe chan Item, oper
 
 	// scatter
 	for i in 0 .. pool {
-		spawn fn [mut observe_copy, opts, gather, bypass_gather] (mut wg sync.WaitGroup, mut ctx context.Context, operator_factory OperatorFactoryFn, option RxOption) {
+		go fn [mut observe_copy, opts, gather, bypass_gather] (mut wg sync.WaitGroup, mut ctx context.Context, operator_factory OperatorFactoryFn, option RxOption) {
 			mut op := operator_factory()
 			mut stopped := false
 			operator := OperatorOptions{
@@ -134,7 +134,7 @@ fn run_parallel(mut ctx context.Context, next chan Item, observe chan Item, oper
 		}(mut wg, mut ctx, operator_factory, option)
 	}
 
-	spawn fn (mut wg sync.WaitGroup, gather chan Item) {
+	go fn (mut wg sync.WaitGroup, gather chan Item) {
 		wg.wait()
 		gather.close()
 	}(mut wg, gather)
@@ -142,7 +142,7 @@ fn run_parallel(mut ctx context.Context, next chan Item, observe chan Item, oper
 
 fn run_first_item(mut ctx context.Context, f IdentifierFn, notif chan Item, observe chan Item, next chan Item, mut iterable Iterable, operator_factory OperatorFactoryFn, option RxOption, opts ...RxOption) {
 	mut observe_copy := observe
-	spawn fn [mut observe_copy, opts, f, notif] (mut ctx context.Context, next chan Item, operator_factory OperatorFactoryFn, option RxOption) {
+	go fn [mut observe_copy, opts, f, notif] (mut ctx context.Context, next chan Item, operator_factory OperatorFactoryFn, option RxOption) {
 		mut op := operator_factory()
 		mut stopped := false
 		operator := OperatorOptions{
