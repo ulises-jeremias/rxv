@@ -178,6 +178,33 @@ mut obs := rxv.just[int](10, 20, 30).element_at(1)
 // emits: 20
 ```
 
+### `.all(predicate)`
+
+Returns true if all items satisfy the predicate.
+
+```v ignore
+mut obs := rxv.just[int](2, 4, 6).all(fn (v int) bool { return v % 2 == 0 })
+// emits: true
+```
+
+### `.any(predicate)`
+
+Returns true if at least one item satisfies the predicate.
+
+```v ignore
+mut obs := rxv.just[int](1, 3, 5, 6).any(fn (v int) bool { return v % 2 == 0 })
+// emits: true
+```
+
+### `.find(predicate)`
+
+Returns the first item that satisfies the predicate, or completes without value if none match.
+
+```v ignore
+mut obs := rxv.just[int](1, 3, 5, 6, 8).find(fn (v int) bool { return v % 2 == 0 })
+// emits: 6
+```
+
 ---
 
 ## Transformation Operators
