@@ -920,14 +920,14 @@ pub fn buffer_[T](mut o ObservableImpl[T], count u32, opts ...RxOption) &Observa
 	mut option := parse_options(...opts)
 	next := option.build_channel_t[[]T]()
 	src := o.ch
-	spawn buffer_count_worker(count, src, next)
+	spawn buffer_count_worker[T](src, count, next)
 	return &ObservableImpl[[]T]{
 		ch:     next
 		parent: o.parent
 	}
 }
 
-fn buffer_count_worker[U](count u32, src chan Item[U], next chan Item[[]U]) {
+fn buffer_count_worker[U](src chan Item[U], count u32, next chan Item[[]U]) {
 	mut buf := []U{}
 	for {
 		mut item := Item[U]{
