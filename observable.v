@@ -852,66 +852,66 @@ pub fn (mut o ObservableImpl[T]) timeout(timeout_ms int, opts ...RxOption) &Obse
 	}
 }
 
-// ---- debounce ------------------------------------------------------------
-
-fn obs_debounce_run[T](delay_ms int, src chan Item[T], next chan Item[T]) {
-	mut last_item := Item[T]{
-		has_value: false
-		err:       none
-	}
-	mut has_last := false
-	mut timer_fired := false
-	for {
-		if timer_fired && has_last {
-			next <- last_item
-			has_last = false
-			timer_fired = false
-		}
-		mut item := Item[T]{
-			has_value: false
-			err:       none
-		}
-		s := src.try_pop(mut item)
-		if s == .success {
-			if item.is_error() {
-				next <- item
-				break
-			}
-			if item.has_value {
-				last_item = item
-				has_last = true
-				timer_fired = false
-			}
-		} else if s == .closed {
-			if has_last {
-				next <- last_item
-			}
-			break
-		} else {
-			if has_last && !timer_fired {
-				spawn fn [delay_ms, mut timer_fired, mut has_last, last_item, next] () {
-					time.sleep(time.millisecond * delay_ms)
-					timer_fired = true
-				}()
-				time.sleep(poll_sleep)
-			} else {
-				time.sleep(poll_sleep)
-			}
-		}
-	}
-	next.close()
-}
-
 // debounce emits an item only after the specified delay has passed without any other item.
-pub fn (mut o ObservableImpl[T]) debounce(delay_ms int, opts ...RxOption) &ObservableImpl[T] {
+pub fn debounce_[T](mut o ObservableImpl[T], delay_ms int, opts ...RxOption) &ObservableImpl[T] {
 	mut option := parse_options(...opts)
 	next := option.build_channel_t[T]()
 	src := o.ch
-	spawn obs_debounce_run[T](delay_ms, src, next)
+	debounce[T](delay_ms, src, next)
 	return &ObservableImpl[T]{
 		ch:     next
 		parent: o.parent
 	}
+}
+
+fn debounce[T](delay_ms int, src chan Item[T], next chan Item[T]) {
+	spawn fn [delay_ms, src, next] () {
+		mut last_item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		mut has_last := false
+		mut timer_fired := false
+		for {
+			if timer_fired && has_last {
+				next <- last_item
+				has_last = false
+				timer_fired = false
+			}
+			mut item := Item[T]{
+				has_value: false
+				err:       none
+			}
+			s := src.try_pop(mut item)
+			if s == .success {
+				if item.is_error() {
+					next <- item
+					break
+				}
+				if item.has_value {
+					last_item = item
+					has_last = true
+					timer_fired = false
+				}
+			} else if s == .closed {
+				if has_last {
+					next <- last_item
+				}
+				break
+			} else {
+				if has_last && !timer_fired {
+					spawn fn [delay_ms, mut timer_fired, mut has_last, last_item, next] () {
+						time.sleep(time.millisecond * delay_ms)
+						timer_fired = true
+					}()
+					time.sleep(poll_sleep)
+				} else {
+					time.sleep(poll_sleep)
+				}
+			}
+		}
+		next.close()
+	}()
 }
 
 // ---- buffer(count) --------------------------------------------------------
@@ -1002,98 +1002,100 @@ fn buffer_count[T](count u32, src chan Item[T], next chan Item[[]T]) {
 
 // ---- sample ---------------------------------------------------------------
 
-fn obs_sample_run[T](period_ms int, src chan Item[T], next chan Item[T]) {
-	mut last_item := Item[T]{
-		has_value: false
-		err:       none
-	}
-	mut has_last := false
-	mut last_sent_time := i64(0)
-	mut period_us := i64(period_ms) * 1000
-	for {
-		now := time.now().unix_offset() * 1_000_000
-		if has_last && (now - last_sent_time) >= period_us {
-			next <- last_item
-			last_sent_time = now
-			has_last = false
-		}
-		mut item := Item[T]{
+fn sample_[T](period_ms int, src chan Item[T], next chan Item[T]) {
+	spawn fn [period_ms, src, next] () {
+		mut last_item := Item[T]{
 			has_value: false
 			err:       none
 		}
-		s := src.try_pop(mut item)
-		if s == .success {
-			if item.is_error() {
-				next <- item
+		mut has_last := false
+		mut last_sent_time := i64(0)
+		mut period_us := i64(period_ms) * 1000
+		for {
+			now := time.now().unix_offset() * 1_000_000
+			if has_last && (now - last_sent_time) >= period_us {
+				next <- last_item
+				last_sent_time = now
+				has_last = false
+			}
+			mut item := Item[T]{
+				has_value: false
+				err:       none
+			}
+			s := src.try_pop(mut item)
+			if s == .success {
+				if item.is_error() {
+					next <- item
+					break
+				}
+				if item.has_value {
+					last_item = item
+					has_last = true
+				}
+			} else if s == .closed {
 				break
+			} else {
+				time.sleep(poll_sleep)
 			}
-			if item.has_value {
-				last_item = item
-				has_last = true
-			}
-		} else if s == .closed {
-			break
-		} else {
-			time.sleep(poll_sleep)
 		}
-	}
-	next.close()
+		next.close()
+	}()
 }
 
 // sample emits the most recent item at the specified periodic interval.
-pub fn (mut o ObservableImpl[T]) sample(period_ms int, opts ...RxOption) &ObservableImpl[T] {
+pub fn sample[T](mut o ObservableImpl[T], period_ms int, opts ...RxOption) &ObservableImpl[T] {
 	mut option := parse_options(...opts)
 	next := option.build_channel_t[T]()
 	src := o.ch
-	spawn obs_sample_run[T](period_ms, src, next)
+	sample_[T](period_ms, src, next)
 	return &ObservableImpl[T]{
 		ch:     next
 		parent: o.parent
 	}
-}
-
-// ---- throttle_first -------------------------------------------------------
-
-fn obs_throttle_first_run[T](delay_ms int, src chan Item[T], next chan Item[T]) {
-	mut blocked := false
-	for {
-		mut item := Item[T]{
-			has_value: false
-			err:       none
-		}
-		s := src.try_pop(mut item)
-		if s == .success {
-			if item.is_error() {
-				next <- item
-				break
-			}
-			if item.has_value && !blocked {
-				next <- item
-				blocked = true
-				spawn fn [delay_ms, mut blocked] () {
-					time.sleep(time.millisecond * delay_ms)
-					blocked = false
-				}()
-			}
-		} else if s == .closed {
-			break
-		} else {
-			time.sleep(poll_sleep)
-		}
-	}
-	next.close()
 }
 
 // throttle_first emits the first item, then ignores subsequent items until delay expires.
-pub fn (mut o ObservableImpl[T]) throttle_first(delay_ms int, opts ...RxOption) &ObservableImpl[T] {
+pub fn throttle_first_[T](mut o ObservableImpl[T], delay_ms int, opts ...RxOption) &ObservableImpl[T] {
 	mut option := parse_options(...opts)
 	next := option.build_channel_t[T]()
 	src := o.ch
-	spawn obs_throttle_first_run[T](delay_ms, src, next)
+	throttle_first[T](delay_ms, src, next)
 	return &ObservableImpl[T]{
 		ch:     next
 		parent: o.parent
 	}
+}
+
+fn throttle_first[T](delay_ms int, src chan Item[T], next chan Item[T]) {
+	spawn fn [delay_ms, src, next] () {
+		mut blocked := false
+		for {
+			mut item := Item[T]{
+				has_value: false
+				err:       none
+			}
+			s := src.try_pop(mut item)
+			if s == .success {
+				if item.is_error() {
+					next <- item
+					break
+				}
+				if item.has_value && !blocked {
+					next <- item
+					blocked = true
+					spawn fn [delay_ms, mut blocked] () {
+						time.sleep(time.millisecond * delay_ms)
+						blocked = false
+					}()
+				}
+			} else if s == .closed {
+				break
+			} else {
+				time.sleep(poll_sleep)
+			}
+		}
+		next.close()
+	}()
 }
 
 // ---- buffer_with_time ----------------------------------------------------
