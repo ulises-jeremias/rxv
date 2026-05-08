@@ -368,7 +368,9 @@ fn obs_distinct_until_changed_run[T](src chan Item[T], next chan Item[T]) {
 			if item.has_value {
 				val := item.get_value()
 				if !has_prev || prev != val {
-					prev = val.clone()
+					unsafe {
+						prev = val
+					}
 					has_prev = true
 					next <- item
 				}
