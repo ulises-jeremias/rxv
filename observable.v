@@ -688,6 +688,125 @@ pub fn (mut o ObservableImpl[T]) element_at(index u32, opts ...RxOption) &Observ
 	}
 }
 
+// ---- all -----------------------------------------------------------------
+
+fn obs_all_run[T](pred PredicateFn[T], src chan Item[T], next chan Item[bool]) {
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- of[bool](false)
+				break
+			}
+			if item.has_value && !pred(item.get_value()) {
+				next <- of[bool](false)
+				break
+			}
+		} else if s == .closed {
+			next <- of[bool](true)
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
+}
+
+// all returns true if all items satisfy the predicate.
+pub fn (mut o ObservableImpl[T]) all(pred PredicateFn[T], opts ...RxOption) &ObservableImpl[bool] {
+	mut option := parse_options(...opts)
+	next := option.build_channel_t[bool]()
+	src := o.ch
+	spawn obs_all_run[T](pred, src, next)
+	return &ObservableImpl[bool]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
+// ---- any -----------------------------------------------------------------
+
+fn obs_any_run[T](pred PredicateFn[T], src chan Item[T], next chan Item[bool]) {
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- of[bool](false)
+				break
+			}
+			if item.has_value && pred(item.get_value()) {
+				next <- of[bool](true)
+				break
+			}
+		} else if s == .closed {
+			next <- of[bool](false)
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
+}
+
+// any returns true if at least one item satisfies the predicate.
+pub fn (mut o ObservableImpl[T]) any(pred PredicateFn[T], opts ...RxOption) &ObservableImpl[bool] {
+	mut option := parse_options(...opts)
+	next := option.build_channel_t[bool]()
+	src := o.ch
+	spawn obs_any_run[T](pred, src, next)
+	return &ObservableImpl[bool]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
+// ---- find ----------------------------------------------------------------
+
+fn obs_find_run[T](pred PredicateFn[T], src chan Item[T], next chan Item[T]) {
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- item
+				break
+			}
+			if item.has_value && pred(item.get_value()) {
+				next <- item
+				break
+			}
+		} else if s == .closed {
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
+}
+
+// find returns the first item that satisfies the predicate.
+pub fn (mut o ObservableImpl[T]) find(pred PredicateFn[T], opts ...RxOption) &ObservableImpl[T] {
+	mut option := parse_options(...opts)
+	next := option.build_channel_t[T]()
+	src := o.ch
+	spawn obs_find_run[T](pred, src, next)
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
 // ---- timeout --------------------------------------------------------------
 // NOTE: timeout_ms granularity is ~10µs poll intervals.
 // A value of 0 disables the timeout.
