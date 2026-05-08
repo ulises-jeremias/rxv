@@ -3,7 +3,7 @@ import rxv
 // buffer emits batches of exactly 2 items
 fn test_buffer_exact_count() {
 	mut obs := rxv.just[int](1, 2, 3, 4, 5)
-	mut result := obs.buffer(2)
+	mut result := rxv.buffer_(mut obs, 2)
 	ch := result.observe()
 	mut item := rxv.Item[[]int]{
 		has_value: false
@@ -31,7 +31,7 @@ fn test_buffer_exact_count() {
 // buffer with count larger than stream emits single batch
 fn test_buffer_count_larger_than_stream() {
 	mut obs := rxv.just[int](1, 2)
-	mut result := obs.buffer(5)
+	mut result := rxv.buffer_(mut obs, 5)
 	ch := result.observe()
 	mut item := rxv.Item[[]int]{
 		has_value: false

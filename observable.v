@@ -952,15 +952,52 @@ fn obs_buffer_count_run[T](count u32, src chan Item[T], next chan Item[[]T]) {
 }
 
 // buffer collects items into batches of the specified size and emits each batch.
-pub fn (mut o ObservableImpl[T]) buffer(count u32, opts ...RxOption) &ObservableImpl[[]T] {
+pub fn buffer_[T](mut o ObservableImpl[T], count u32, opts ...RxOption) &ObservableImpl[[]T] {
 	mut option := parse_options(...opts)
 	next := option.build_channel_t[[]T]()
 	src := o.ch
-	spawn obs_buffer_count_run[T](count, src, next)
+	buffer_count[T](count, src, next)
 	return &ObservableImpl[[]T]{
 		ch:     next
 		parent: o.parent
 	}
+}
+
+fn buffer_count[T](count u32, src chan Item[T], next chan Item[[]T]) {
+	spawn fn [count, src, next] () {
+		mut buf := []T{}
+		for {
+			mut item := Item[T]{
+				has_value: false
+				err:       none
+			}
+			s := src.try_pop(mut item)
+			if s == .success {
+				if item.is_error() {
+					if buf.len > 0 {
+						next <- of[[]T](buf)
+					}
+					next <- item
+					break
+				}
+				if item.has_value {
+					buf << item.get_value()
+					if u32(buf.len) >= count {
+						next <- of[[]T](buf)
+						buf = []T{}
+					}
+				}
+			} else if s == .closed {
+				if buf.len > 0 {
+					next <- of[[]T](buf)
+				}
+				break
+			} else {
+				time.sleep(poll_sleep)
+			}
+		}
+		next.close()
+	}()
 }
 
 // ---- sample ---------------------------------------------------------------

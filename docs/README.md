@@ -106,7 +106,7 @@ trying to send to a channel that nobody reads.
 
 **Always consume or close:**
 
-```v
+```v ignore
 mut obs := rxv.interval(100)
 // BAD: goroutine leaks after 500ms
 if false {
