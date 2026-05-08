@@ -368,7 +368,7 @@ fn obs_distinct_until_changed_run[T](src chan Item[T], next chan Item[T]) {
 			if item.has_value {
 				val := item.get_value()
 				if !has_prev || prev != val {
-					prev = val
+					prev = val.clone()
 					has_prev = true
 					next <- item
 				}
@@ -865,58 +865,67 @@ pub fn debounce_[T](mut o ObservableImpl[T], delay_ms int, opts ...RxOption) &Ob
 }
 
 fn debounce[T](delay_ms int, src chan Item[T], next chan Item[T]) {
-	spawn fn [delay_ms, src, next] () {
-		mut last_item := Item[T]{
+	spawn debounce_inner[T](delay_ms, src, next)
+}
+
+fn debounce_inner[T](delay_ms int, src chan Item[T], next chan Item[T]) {
+	mut last_item := Item[T]{
+		has_value: false
+		err:       none
+	}
+	mut has_last := false
+	mut timer_started := false
+	mut timer_start_time := i64(0)
+	for {
+		if has_last && timer_started {
+			elapsed := time.now().unix_offset() * 1_000 - timer_start_time
+			if elapsed >= i64(delay_ms) * 1_000 {
+				next <- last_item
+				has_last = false
+				timer_started = false
+			}
+		}
+		mut item := Item[T]{
 			has_value: false
 			err:       none
 		}
-		mut has_last := false
-		mut timer_fired := false
-		for {
-			if timer_fired && has_last {
-				next <- last_item
-				has_last = false
-				timer_fired = false
-			}
-			mut item := Item[T]{
-				has_value: false
-				err:       none
-			}
-			s := src.try_pop(mut item)
-			if s == .success {
-				if item.is_error() {
-					next <- item
-					break
-				}
-				if item.has_value {
-					last_item = item
-					has_last = true
-					timer_fired = false
-				}
-			} else if s == .closed {
-				if has_last {
-					next <- last_item
-				}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- item
 				break
-			} else {
-				if has_last && !timer_fired {
-					spawn fn [delay_ms, mut timer_fired, mut has_last, last_item, next] () {
-						time.sleep(time.millisecond * delay_ms)
-						timer_fired = true
-					}()
-					time.sleep(poll_sleep)
-				} else {
-					time.sleep(poll_sleep)
-				}
 			}
+			if item.has_value {
+				last_item = item
+				has_last = true
+				timer_started = true
+				timer_start_time = time.now().unix_offset() * 1_000
+			}
+		} else if s == .closed {
+			if has_last {
+				next <- last_item
+			}
+			break
+		} else {
+			time.sleep(poll_sleep)
 		}
-		next.close()
-	}()
+	}
+	next.close()
 }
 
-// ---- buffer(count) --------------------------------------------------------
+// ---- sample ---------------------------------------------------------------
+pub fn buffer_[T](mut o ObservableImpl[T], count u32, opts ...RxOption) &ObservableImpl[[]T] {
+	mut option := parse_options(...opts)
+	next := option.build_channel_t[[]T]()
+	src := o.ch
+	spawn buffer_count_worker[T](count, src, next)
+	return &ObservableImpl[[]T]{
+		ch:     next
+		parent: o.parent
+	}
+}
 
-fn obs_buffer_count_run[T](count u32, src chan Item[T], next chan Item[[]T]) {
+fn buffer_count_worker[T](count u32, src chan Item[T], next chan Item[[]T]) {
 	mut buf := []T{}
 	for {
 		mut item := Item[T]{
@@ -951,95 +960,48 @@ fn obs_buffer_count_run[T](count u32, src chan Item[T], next chan Item[[]T]) {
 	next.close()
 }
 
-// buffer collects items into batches of the specified size and emits each batch.
-pub fn buffer_[T](mut o ObservableImpl[T], count u32, opts ...RxOption) &ObservableImpl[[]T] {
-	mut option := parse_options(...opts)
-	next := option.build_channel_t[[]T]()
-	src := o.ch
-	buffer_count[T](count, src, next)
-	return &ObservableImpl[[]T]{
-		ch:     next
-		parent: o.parent
-	}
-}
-
-fn buffer_count[T](count u32, src chan Item[T], next chan Item[[]T]) {
-	spawn fn [count, src, next] () {
-		mut buf := []T{}
-		for {
-			mut item := Item[T]{
-				has_value: false
-				err:       none
-			}
-			s := src.try_pop(mut item)
-			if s == .success {
-				if item.is_error() {
-					if buf.len > 0 {
-						next <- of[[]T](buf)
-					}
-					next <- item
-					break
-				}
-				if item.has_value {
-					buf << item.get_value()
-					if u32(buf.len) >= count {
-						next <- of[[]T](buf)
-						buf = []T{}
-					}
-				}
-			} else if s == .closed {
-				if buf.len > 0 {
-					next <- of[[]T](buf)
-				}
-				break
-			} else {
-				time.sleep(poll_sleep)
-			}
-		}
-		next.close()
-	}()
-}
-
 // ---- sample ---------------------------------------------------------------
 
 fn sample_[T](period_ms int, src chan Item[T], next chan Item[T]) {
-	spawn fn [period_ms, src, next] () {
-		mut last_item := Item[T]{
+	spawn sample_worker[T](period_ms, src, next)
+}
+
+fn sample_worker[T](period_ms int, src chan Item[T], next chan Item[T]) {
+	mut last_item := Item[T]{
+		has_value: false
+		err:       none
+	}
+	mut has_last := false
+	mut last_sent_time := i64(0)
+	mut period_us := i64(period_ms) * 1000
+	for {
+		now := time.now().unix_offset() * 1_000_000
+		if has_last && (now - last_sent_time) >= period_us {
+			next <- last_item
+			last_sent_time = now
+			has_last = false
+		}
+		mut item := Item[T]{
 			has_value: false
 			err:       none
 		}
-		mut has_last := false
-		mut last_sent_time := i64(0)
-		mut period_us := i64(period_ms) * 1000
-		for {
-			now := time.now().unix_offset() * 1_000_000
-			if has_last && (now - last_sent_time) >= period_us {
-				next <- last_item
-				last_sent_time = now
-				has_last = false
-			}
-			mut item := Item[T]{
-				has_value: false
-				err:       none
-			}
-			s := src.try_pop(mut item)
-			if s == .success {
-				if item.is_error() {
-					next <- item
-					break
-				}
-				if item.has_value {
-					last_item = item
-					has_last = true
-				}
-			} else if s == .closed {
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- item
 				break
-			} else {
-				time.sleep(poll_sleep)
 			}
+			if item.has_value {
+				last_item = item
+				has_last = true
+			}
+		} else if s == .closed {
+			break
+		} else {
+			time.sleep(poll_sleep)
 		}
-		next.close()
-	}()
+	}
+	next.close()
 }
 
 // sample emits the most recent item at the specified periodic interval.
@@ -1067,35 +1029,42 @@ pub fn throttle_first_[T](mut o ObservableImpl[T], delay_ms int, opts ...RxOptio
 }
 
 fn throttle_first[T](delay_ms int, src chan Item[T], next chan Item[T]) {
-	spawn fn [delay_ms, src, next] () {
-		mut blocked := false
-		for {
-			mut item := Item[T]{
-				has_value: false
-				err:       none
-			}
-			s := src.try_pop(mut item)
-			if s == .success {
-				if item.is_error() {
-					next <- item
-					break
-				}
-				if item.has_value && !blocked {
-					next <- item
-					blocked = true
-					spawn fn [delay_ms, mut blocked] () {
-						time.sleep(time.millisecond * delay_ms)
-						blocked = false
-					}()
-				}
-			} else if s == .closed {
-				break
-			} else {
-				time.sleep(poll_sleep)
+	spawn throttle_first_worker[T](delay_ms, src, next)
+}
+
+fn throttle_first_worker[T](delay_ms int, src chan Item[T], next chan Item[T]) {
+	mut blocked := false
+	mut block_start := i64(0)
+	mut blocked_duration := i64(delay_ms) * 1_000_000
+	for {
+		if blocked {
+			elapsed := time.now().unix_offset() * 1_000_000 - block_start
+			if elapsed >= blocked_duration {
+				blocked = false
 			}
 		}
-		next.close()
-	}()
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- item
+				break
+			}
+			if item.has_value && !blocked {
+				next <- item
+				blocked = true
+				block_start = time.now().unix_offset() * 1_000_000
+			}
+		} else if s == .closed {
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
 }
 
 // ---- buffer_with_time ----------------------------------------------------
@@ -1113,45 +1082,46 @@ pub fn buffer_time_[T](mut o ObservableImpl[T], period_ms int, opts ...RxOption)
 }
 
 fn buffer_time[T](period_ms int, src chan Item[T], next chan Item[[]T]) {
-	spawn fn [period_ms, src, next] () {
-		mut buf := []T{}
-		mut last_flush := time.now()
-		for {
-			mut item := Item[T]{
-				has_value: false
-				err:       none
-			}
-			s := src.try_pop(mut item)
-			if s == .success {
-				if item.is_error() {
-					if buf.len > 0 {
-						next <- of[[]T](buf)
-					}
-					next <- item
-					break
-				}
-				if item.has_value {
-					buf << item.get_value()
-				}
-			} else if s == .closed {
+	spawn buffer_time_worker[T](period_ms, src, next)
+}
+
+fn buffer_time_worker[T](period_ms int, src chan Item[T], next chan Item[[]T]) {
+	mut buf := []T{}
+	mut last_flush := time.now()
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
 				if buf.len > 0 {
 					next <- of[[]T](buf)
 				}
+				next <- item
 				break
+			}
+			if item.has_value {
+				buf << item.get_value()
+			}
+		} else if s == .closed {
+			if buf.len > 0 {
+				next <- of[[]T](buf)
+			}
+			break
+		} else {
+			now := time.now()
+			if now.unix_offset_ms() - last_flush.unix_offset_ms() >= i64(period_ms) && buf.len > 0 {
+				next <- of[[]T](buf)
+				buf = []T{}
+				last_flush = now
 			} else {
-				now := time.now()
-				if now.unix_offset_ms() - last_flush.unix_offset_ms() >= i64(period_ms)
-					&& buf.len > 0 {
-					next <- of[[]T](buf)
-					buf = []T{}
-					last_flush = now
-				} else {
-					time.sleep(poll_sleep)
-				}
+				time.sleep(poll_sleep)
 			}
 		}
-		next.close()
-	}()
+	}
+	next.close()
 }
 
 // ---- average_f64 ---------------------------------------------------------
