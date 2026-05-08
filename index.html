@@ -77,31 +77,301 @@
 					<div class="doc-content">
 								<section id="readme_README" class="doc-node">
 			<div class="title"><h1> README <a href="#readme_README">#</a></h1></div>
-<div align="center"> <h1>Reactive V</h1>
+<div align="center"> <h1>Reactive V (RxV)</h1>
 
-<p><a href="https://vlang.io">vlang.io</a> | <a href="https://ulises-jeremias.github.io/rxv">Docs</a> | <a href="https://github.com/ulises-jeremias/rxv/blob/main/CONTRIBUTING.md">Contributing</a></p></div> <div align="center">
+<p><a href="https://vlang.io">vlang.io</a> | <a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/README.md">Docs</a> | <a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/OPERATORS.md">Operators</a> | <a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/tutorials">Tutorials</a> | <a href="https://github.com/ulises-jeremias/rxv/blob/master/CONTRIBUTING.md">Contributing</a></p></div> <div align="center">
 
 <p>[![Continuous Integration][workflowbadge]][workflowurl] [![Deploy Documentation][deploydocsbadge]][deploydocsurl] [![License: MIT][licensebadge]][licenseurl]</p></div>
 
-<p>Reactive Extensions for the V language</p>
-<h2 id="reactivex">ReactiveX</h2>
-<p><a href="http://reactivex.io/">ReactiveX</a>, or Rx for short, is an API for programming with Observable streams. This is the official ReactiveX API for <a href="https://vlang.io/">the V Programming language</a>.</p>
-<p>ReactiveX is a new, alternative way of asynchronous programming to callbacks, promises, and deferred. It is about processing streams of events or items, with events being any occurrences or changes within the system. A stream of events is called an <a href="http://reactivex.io/documentation/contract.html">Observable</a>.</p>
-<p>An operator is a function that defines an Observable, how and when it should emit data. The list of operators covered is available <a href="https://github.com/ulises-jeremias/rxv/blob/master/README.md#supported-operators-in-rxv">here</a>.</p>
-<h2 id="rxv">RxV</h2>
-<p>The RxV implementation is based on the concept of pipelines. A pipeline is a series of stages connected by channels, where each stage is a group of routines running the same function.</p>
-<h3 id="install-rxv">Install rxv</h3>
+<p><strong>RxV</strong> is a ReactiveX implementation for the <a href="https://vlang.io/">V programming language</a> — fully generic, built on channels, zero dependencies.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#what-is-reactivex">What is ReactiveX?</a></li>
+<li><a href="#install">Install</a></li>
+<li><a href="#quick-start">Quick Start</a></li>
+<li><a href="#supported-operators">Supported Operators</a></li>
+<li><a href="#v-compiler-notes">V Compiler Notes</a></li>
+<li><a href="#examples">Examples</a></li>
+<li><a href="#tutorials">Tutorials</a></li>
+<li><a href="#api-reference">API Reference</a></li>
+<li><a href="#testing">Testing</a></li>
+<li><a href="#contributing">Contributing</a></li></ul>
+<hr />
+<h2 id="what-is-reactivex">What is ReactiveX?</h2>
+<p><a href="http://reactivex.io/">ReactiveX</a> is an API for programming with Observable streams. It provides a unified model for handling asynchronous data — whether from user events, HTTP responses, database results, or any other source.</p>
+<p>RxV brings this model to V using:</p>
+<ul>
+<li><strong>Generic Observables</strong> — <code>ObservableImpl[T]</code> works with any type</li>
+<li><strong>Channel-based pipelines</strong> — each operator spawns a goroutine and connects via <code>chan Item[T]</code></li>
+<li><strong>Composable operators</strong> — filter, map, merge, reduce, and more</li></ul>
+<hr />
+<h2 id="install">Install</h2>
 <pre><code class="language-sh">v install rxv</code></pre>
-<p>Done. Installation completed.</p>
+<hr />
+<h2 id="quick-start">Quick Start</h2>
+<pre><code class="language-v"><span class="token keyword">import</span> rxv
+
+<span class="token keyword">fn</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 1. Create a stream of integers</span>
+    <span class="token keyword">mut</span> obs <span class="token operator">:=</span> rxv<span class="token punctuation">.</span><span class="token function">range</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">)</span> <span class="token comment">// emits 1, 2, 3, 4, 5</span>
+
+    <span class="token comment">// 2. Keep only even numbers</span>
+    <span class="token keyword">mut</span> evens <span class="token operator">:=</span> obs<span class="token punctuation">.</span><span class="token function">filter</span><span class="token punctuation">(</span><span class="token keyword">fn</span> <span class="token punctuation">(</span>v <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> v <span class="token operator">%</span> <span class="token number">2</span> <span class="token operator">==</span> <span class="token number">0</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    <span class="token comment">// 3. Double each value using map_ (free function — see V Compiler Notes)</span>
+    <span class="token keyword">mut</span> doubled <span class="token operator">:=</span> rxv<span class="token punctuation">.</span>map_<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> evens<span class="token punctuation">,</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>v <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token builtin">int</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> v <span class="token operator">*</span> <span class="token number">2</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    <span class="token comment">// 4. Subscribe and collect results</span>
+    done <span class="token operator">:=</span> doubled<span class="token punctuation">.</span><span class="token function">for_each</span><span class="token punctuation">(</span><span class="token keyword">fn</span> <span class="token punctuation">(</span>v <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">println</span><span class="token punctuation">(</span>v<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>e <span class="token builtin">IError</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">eprintln</span><span class="token punctuation">(</span><span class="token string">&#39;error: </span><span class="token string_interp">$</span>{e}<span class="token string">&#39;</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">println</span><span class="token punctuation">(</span><span class="token string">'done'</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    _ <span class="token operator">=</span> <span class="token operator">&lt;-</span>done
+    <span class="token comment">// Output:</span>
+    <span class="token comment">// 4</span>
+    <span class="token comment">// 8</span>
+    <span class="token comment">// done</span>
+<span class="token punctuation">}</span></code></pre>
+<hr />
+<h2 id="a-more-complete-example">A More Complete Example</h2>
+<pre><code class="language-v"><span class="token keyword">import</span> rxv
+
+<span class="token keyword">fn</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// Aggregate: sum all integers from 1 to 10</span>
+    <span class="token keyword">mut</span> obs <span class="token operator">:=</span> rxv<span class="token punctuation">.</span><span class="token function">range</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span>
+    <span class="token keyword">mut</span> total <span class="token operator">:=</span> rxv<span class="token punctuation">.</span>reduce_<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> obs<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>acc <span class="token builtin">int</span><span class="token punctuation">,</span> val <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">int</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> acc <span class="token operator">+</span> val
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    done <span class="token operator">:=</span> total<span class="token punctuation">.</span><span class="token function">for_each</span><span class="token punctuation">(</span><span class="token keyword">fn</span> <span class="token punctuation">(</span>v <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">println</span><span class="token punctuation">(</span><span class="token string">&#39;Sum 1..10 = </span><span class="token string_interp">$</span>{v}<span class="token string">&#39;</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>e <span class="token builtin">IError</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">eprintln</span><span class="token punctuation">(</span>e<span class="token punctuation">.</span><span class="token function">msg</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    _ <span class="token operator">=</span> <span class="token operator">&lt;-</span>done
+    <span class="token comment">// Output: Sum 1..10 = 55</span>
+<span class="token punctuation">}</span></code></pre>
+<hr />
+<h2 id="supported-operators">Supported Operators</h2>
+<h3 id="creating">Creating</h3>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Description</th></tr></thead>
+<tbody>
+<tr>
+<td><code>just[T](items ...T)</code></td>
+<td>Emit fixed values</td></tr>
+<tr>
+<td><code>from_slice[T](items []T)</code></td>
+<td>Emit items from a slice</td></tr>
+<tr>
+<td><code>from_channel[T](ch)</code></td>
+<td>Wrap an existing channel</td></tr>
+<tr>
+<td><code>create[T](producer)</code></td>
+<td>Create from a producer function</td></tr>
+<tr>
+<td><code>empty[T]()</code></td>
+<td>Complete immediately</td></tr>
+<tr>
+<td><code>throw[T](err)</code></td>
+<td>Emit one error and complete</td></tr>
+<tr>
+<td><code>range(start, count)</code></td>
+<td>Emit a range of integers</td></tr>
+<tr>
+<td><code>repeat[T](value, count)</code></td>
+<td>Emit the same value N times</td></tr>
+<tr>
+<td><code>interval(period_ms)</code></td>
+<td>Emit sequential integers periodically</td></tr>
+<tr>
+<td><code>timer(delay_ms)</code></td>
+<td>Emit <code>0</code> after a delay</td></tr>
+<tr>
+<td><code>defer_[T](factory)</code></td>
+<td>Lazily evaluate on each subscription</td></tr></tbody></table>
+<h3 id="filtering">Filtering</h3>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Description</th></tr></thead>
+<tbody>
+<tr>
+<td><code>.filter(predicate)</code></td>
+<td>Keep only matching items</td></tr>
+<tr>
+<td><code>.take(n)</code></td>
+<td>Emit at most N items</td></tr>
+<tr>
+<td><code>.first()</code></td>
+<td>Emit only the first item</td></tr>
+<tr>
+<td><code>.last()</code></td>
+<td>Emit only the last item</td></tr>
+<tr>
+<td><code>.distinct()</code></td>
+<td>Suppress all duplicates</td></tr>
+<tr>
+<td><code>.distinct_until_changed()</code></td>
+<td>Suppress consecutive duplicates</td></tr>
+<tr>
+<td><code>.timeout(ms)</code></td>
+<td>Error if no item within deadline</td></tr></tbody></table>
+<h3 id="transforming-">Transforming <em>(free functions — see <a href="#v-compiler-notes">V Compiler Notes</a>)</em></h3>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Description</th></tr></thead>
+<tbody>
+<tr>
+<td><code>map_[T, U](mut o, fn)</code></td>
+<td>Transform each item to type U</td></tr>
+<tr>
+<td><code>flat_map_[T, U](mut o, fn)</code></td>
+<td>Map each item to an inner observable, merge all</td></tr>
+<tr>
+<td><code>concat_map_[T, U](mut o, fn)</code></td>
+<td>Like flat_map_ but sequential</td></tr></tbody></table>
+<h3 id="aggregating-">Aggregating <em>(free functions)</em></h3>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Description</th></tr></thead>
+<tbody>
+<tr>
+<td><code>scan_[T, U](mut o, seed, fn)</code></td>
+<td>Emit each intermediate accumulated value</td></tr>
+<tr>
+<td><code>reduce_[T, U](mut o, seed, fn)</code></td>
+<td>Emit only the final accumulated value</td></tr>
+<tr>
+<td><code>count_[T](mut o)</code></td>
+<td>Emit the total item count</td></tr></tbody></table>
+<h3 id="combining">Combining</h3>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Description</th></tr></thead>
+<tbody>
+<tr>
+<td><code>merge[T](mut o1, mut o2)</code></td>
+<td>Interleave emissions from two observables</td></tr>
+<tr>
+<td><code>concat[T](observables)</code></td>
+<td>Emit all items from each observable in sequence</td></tr></tbody></table>
+<h3 id="mathematical-">Mathematical <em>(f64 only)</em></h3>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Description</th></tr></thead>
+<tbody>
+<tr>
+<td><code>.average_f64()</code></td>
+<td>Compute the arithmetic mean</td></tr>
+<tr>
+<td><code>.sum_f64()</code></td>
+<td>Compute the sum</td></tr></tbody></table>
+<h3 id="subscribing">Subscribing</h3>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Description</th></tr></thead>
+<tbody>
+<tr>
+<td><code>.observe()</code></td>
+<td>Returns the underlying <code>chan Item[T]</code></td></tr>
+<tr>
+<td><code>.for_each(next, err, done)</code></td>
+<td>Subscribe with callbacks</td></tr></tbody></table>
+<hr />
+<h2 id="v-compiler-notes">V Compiler Notes</h2>
+<p>RxV targets <strong>V 0.5.x</strong>. The current compiler has limitations with certain generic patterns:</p>
+<blockquote>
+<p><strong>Methods cannot have additional type parameters.</strong><br /><code>(mut o ObservableImpl[T]) map[U](fn(T) U)</code> is not supported.</p></blockquote>
+<p><strong>Workaround:</strong> Operators that transform to a different type are exposed as <strong>free functions</strong> named with a <code>_</code> suffix:</p>
+<pre><code class="language-v"><span class="token comment">// Instead of obs.map[string](fn(v int) string { ... })</span>
+<span class="token keyword">mut</span> labels <span class="token operator">:=</span> rxv<span class="token punctuation">.</span>map_<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token builtin">string</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> obs<span class="token punctuation">,</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>v <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token builtin">string</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> v<span class="token punctuation">.</span><span class="token function">str</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+<span class="token comment">// Instead of obs.scan[int](0, accumulator)</span>
+<span class="token keyword">mut</span> running <span class="token operator">:=</span> rxv<span class="token punctuation">.</span>scan_<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> obs<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>acc <span class="token builtin">int</span><span class="token punctuation">,</span> v <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">int</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> acc <span class="token operator">+</span> v <span class="token punctuation">}</span><span class="token punctuation">)</span></code></pre>
+<p>See the full list of compiler workarounds in <a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/API.md#known-compiler-limitations-v-05x">docs/API.md</a>.</p>
+<hr />
+<h2 id="examples">Examples</h2>
+<table>
+<thead>
+<tr>
+<th>Example</th>
+<th>Description</th></tr></thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/ulises-jeremias/rxv/blob/master/examples/hello_world">hello_world</a></td>
+<td>Minimal hello world</td></tr>
+<tr>
+<td><a href="https://github.com/ulises-jeremias/rxv/blob/master/examples/02-from-slice-and-range">02-from-slice-and-range</a></td>
+<td>Creating observables</td></tr>
+<tr>
+<td><a href="https://github.com/ulises-jeremias/rxv/blob/master/examples/03-filtering">03-filtering</a></td>
+<td>filter, take, distinct, chaining</td></tr>
+<tr>
+<td><a href="https://github.com/ulises-jeremias/rxv/blob/master/examples/04-transforming-map">04-transforming-map</a></td>
+<td>map_, flat_map_, concat_map_</td></tr>
+<tr>
+<td><a href="https://github.com/ulises-jeremias/rxv/blob/master/examples/05-aggregation">05-aggregation</a></td>
+<td>scan_, reduce_, count_, average_f64, sum_f64</td></tr>
+<tr>
+<td><a href="https://github.com/ulises-jeremias/rxv/blob/master/examples/06-combining">06-combining</a></td>
+<td>merge, concat</td></tr>
+<tr>
+<td><a href="https://github.com/ulises-jeremias/rxv/blob/master/examples/07-error-handling">07-error-handling</a></td>
+<td>throw, error propagation</td></tr></tbody></table>
+<p>Run any example:</p>
+<pre><code class="language-sh">v run examples<span class="token operator">/</span>0<span class="token number">5</span><span class="token operator">-</span>aggregation<span class="token operator">/</span>main<span class="token punctuation">.</span>v</code></pre>
+<hr />
+<h2 id="tutorials">Tutorials</h2>
+<p>Step-by-step guides in <a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/tutorials">docs/tutorials/</a>:</p>
+<ol>
+<li><a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/tutorials/01-hello-world.md">Hello World</a></li>
+<li><a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/tutorials/02-creating-observables.md">Creating Observables</a></li>
+<li><a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/tutorials/03-filtering.md">Filtering</a></li>
+<li><a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/tutorials/04-transforming.md">Transforming</a></li>
+<li><a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/tutorials/05-error-handling.md">Error Handling</a></li></ol>
+<hr />
+<h2 id="api-reference">API Reference</h2>
+<p>→ <a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/README.md">docs/README.md</a> — documentation home   → <a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/API.md">docs/API.md</a> — full type and function reference → <a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/OPERATORS.md">docs/OPERATORS.md</a> — operator reference with examples</p>
+<hr />
 <h2 id="testing">Testing</h2>
-<p>To test the module, just type the following command:</p>
-<pre><code class="language-sh"><span class="token punctuation">.</span><span class="token operator">/</span>bin<span class="token operator">/</span>test ##</code></pre>
+<pre><code class="language-sh"><span class="token punctuation">.</span><span class="token operator">/</span>bin<span class="token operator">/</span>test</code></pre>
+<p>Or run a single test file directly:</p>
+<pre><code class="language-sh">cd <span class="token operator">~</span><span class="token operator">/</span><span class="token punctuation">.</span>vmodules <span class="token operator">&amp;&amp;</span> v run rxv<span class="token operator">/</span>filter_observe_test<span class="token punctuation">.</span>v</code></pre>
+<blockquote>
+<p><strong>Note:</strong> Avoid <code>v test rxv</code> — it runs all tests in parallel which can<br />exhaust system resources. Use <code>./bin/test</code> which runs them sequentially.</p></blockquote>
+<hr />
+<h2 id="contributing">Contributing</h2>
+<p>See <a href="https://github.com/ulises-jeremias/rxv/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> for the contribution workflow.</p>
+<hr />
 <p>[workflowbadge]: <a href="https://github.com/ulises-jeremias/rxv/actions/workflows/ci.yml/badge.svg">https://github.com/ulises-jeremias/rxv/actions/workflows/ci.yml/badge.svg</a> [deploydocsbadge]: <a href="https://github.com/ulises-jeremias/rxv/actions/workflows/deploy-docs.yml/badge.svg">https://github.com/ulises-jeremias/rxv/actions/workflows/deploy-docs.yml/badge.svg</a> [licensebadge]: <a href="https://img.shields.io/badge/License-MIT-blue.svg">https://img.shields.io/badge/License-MIT-blue.svg</a> [workflowurl]: <a href="https://github.com/ulises-jeremias/rxv/actions/workflows/ci.yml">https://github.com/ulises-jeremias/rxv/actions/workflows/ci.yml</a> [deploydocsurl]: <a href="https://github.com/ulises-jeremias/rxv/actions/workflows/deploy-docs.yml">https://github.com/ulises-jeremias/rxv/actions/workflows/deploy-docs.yml</a> [licenseurl]: <a href="https://github.com/ulises-jeremias/rxv/blob/main/LICENSE">https://github.com/ulises-jeremias/rxv/blob/main/LICENSE</a></p>
 
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 8 May 2026 02:19:44</div>
+						<div class="footer">Powered by vdoc. Generated on: 8 May 2026 04:58:23</div>
 					</div>
 					
 				</div>

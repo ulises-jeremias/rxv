@@ -77,31 +77,325 @@
 					<div class="doc-content">
 								<section id="readme_rxv" class="doc-node">
 			<div class="title"><h1> rxv <a href="#readme_rxv">#</a></h1></div>
-<div align="center"> <h1>Reactive V</h1>
+<div align="center"> <h1>Reactive V (RxV)</h1>
 
-<p><a href="https://vlang.io">vlang.io</a> | <a href="https://ulises-jeremias.github.io/rxv">Docs</a> | <a href="https://github.com/ulises-jeremias/rxv/blob/main/CONTRIBUTING.md">Contributing</a></p></div> <div align="center">
+<p><a href="https://vlang.io">vlang.io</a> | <a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/README.md">Docs</a> | <a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/OPERATORS.md">Operators</a> | <a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/tutorials">Tutorials</a> | <a href="https://github.com/ulises-jeremias/rxv/blob/master/CONTRIBUTING.md">Contributing</a></p></div> <div align="center">
 
 <p>[![Continuous Integration][workflowbadge]][workflowurl] [![Deploy Documentation][deploydocsbadge]][deploydocsurl] [![License: MIT][licensebadge]][licenseurl]</p></div>
 
-<p>Reactive Extensions for the V language</p>
-<h2 id="reactivex">ReactiveX</h2>
-<p><a href="http://reactivex.io/">ReactiveX</a>, or Rx for short, is an API for programming with Observable streams. This is the official ReactiveX API for <a href="https://vlang.io/">the V Programming language</a>.</p>
-<p>ReactiveX is a new, alternative way of asynchronous programming to callbacks, promises, and deferred. It is about processing streams of events or items, with events being any occurrences or changes within the system. A stream of events is called an <a href="http://reactivex.io/documentation/contract.html">Observable</a>.</p>
-<p>An operator is a function that defines an Observable, how and when it should emit data. The list of operators covered is available <a href="https://github.com/ulises-jeremias/rxv/blob/master/README.md#supported-operators-in-rxv">here</a>.</p>
-<h2 id="rxv">RxV</h2>
-<p>The RxV implementation is based on the concept of pipelines. A pipeline is a series of stages connected by channels, where each stage is a group of routines running the same function.</p>
-<h3 id="install-rxv">Install rxv</h3>
+<p><strong>RxV</strong> is a ReactiveX implementation for the <a href="https://vlang.io/">V programming language</a> — fully generic, built on channels, zero dependencies.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#what-is-reactivex">What is ReactiveX?</a></li>
+<li><a href="#install">Install</a></li>
+<li><a href="#quick-start">Quick Start</a></li>
+<li><a href="#supported-operators">Supported Operators</a></li>
+<li><a href="#v-compiler-notes">V Compiler Notes</a></li>
+<li><a href="#examples">Examples</a></li>
+<li><a href="#tutorials">Tutorials</a></li>
+<li><a href="#api-reference">API Reference</a></li>
+<li><a href="#testing">Testing</a></li>
+<li><a href="#contributing">Contributing</a></li></ul>
+<hr />
+<h2 id="what-is-reactivex">What is ReactiveX?</h2>
+<p><a href="http://reactivex.io/">ReactiveX</a> is an API for programming with Observable streams. It provides a unified model for handling asynchronous data — whether from user events, HTTP responses, database results, or any other source.</p>
+<p>RxV brings this model to V using:</p>
+<ul>
+<li><strong>Generic Observables</strong> — <code>ObservableImpl[T]</code> works with any type</li>
+<li><strong>Channel-based pipelines</strong> — each operator spawns a goroutine and connects via <code>chan Item[T]</code></li>
+<li><strong>Composable operators</strong> — filter, map, merge, reduce, and more</li></ul>
+<hr />
+<h2 id="install">Install</h2>
 <pre><code class="language-sh">v install rxv</code></pre>
-<p>Done. Installation completed.</p>
+<hr />
+<h2 id="quick-start">Quick Start</h2>
+<pre><code class="language-v"><span class="token keyword">import</span> rxv
+
+<span class="token keyword">fn</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 1. Create a stream of integers</span>
+    <span class="token keyword">mut</span> obs <span class="token operator">:=</span> rxv<span class="token punctuation">.</span><span class="token function">range</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">)</span> <span class="token comment">// emits 1, 2, 3, 4, 5</span>
+
+    <span class="token comment">// 2. Keep only even numbers</span>
+    <span class="token keyword">mut</span> evens <span class="token operator">:=</span> obs<span class="token punctuation">.</span><span class="token function">filter</span><span class="token punctuation">(</span><span class="token keyword">fn</span> <span class="token punctuation">(</span>v <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> v <span class="token operator">%</span> <span class="token number">2</span> <span class="token operator">==</span> <span class="token number">0</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    <span class="token comment">// 3. Double each value using map_ (free function — see V Compiler Notes)</span>
+    <span class="token keyword">mut</span> doubled <span class="token operator">:=</span> rxv<span class="token punctuation">.</span>map_<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> evens<span class="token punctuation">,</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>v <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token builtin">int</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> v <span class="token operator">*</span> <span class="token number">2</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    <span class="token comment">// 4. Subscribe and collect results</span>
+    done <span class="token operator">:=</span> doubled<span class="token punctuation">.</span><span class="token function">for_each</span><span class="token punctuation">(</span><span class="token keyword">fn</span> <span class="token punctuation">(</span>v <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">println</span><span class="token punctuation">(</span>v<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>e <span class="token builtin">IError</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">eprintln</span><span class="token punctuation">(</span><span class="token string">&#39;error: </span><span class="token string_interp">$</span>{e}<span class="token string">&#39;</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">println</span><span class="token punctuation">(</span><span class="token string">'done'</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    _ <span class="token operator">=</span> <span class="token operator">&lt;-</span>done
+    <span class="token comment">// Output:</span>
+    <span class="token comment">// 4</span>
+    <span class="token comment">// 8</span>
+    <span class="token comment">// done</span>
+<span class="token punctuation">}</span></code></pre>
+<hr />
+<h2 id="a-more-complete-example">A More Complete Example</h2>
+<pre><code class="language-v"><span class="token keyword">import</span> rxv
+
+<span class="token keyword">fn</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// Aggregate: sum all integers from 1 to 10</span>
+    <span class="token keyword">mut</span> obs <span class="token operator">:=</span> rxv<span class="token punctuation">.</span><span class="token function">range</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span>
+    <span class="token keyword">mut</span> total <span class="token operator">:=</span> rxv<span class="token punctuation">.</span>reduce_<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> obs<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>acc <span class="token builtin">int</span><span class="token punctuation">,</span> val <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">int</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> acc <span class="token operator">+</span> val
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    done <span class="token operator">:=</span> total<span class="token punctuation">.</span><span class="token function">for_each</span><span class="token punctuation">(</span><span class="token keyword">fn</span> <span class="token punctuation">(</span>v <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">println</span><span class="token punctuation">(</span><span class="token string">&#39;Sum 1..10 = </span><span class="token string_interp">$</span>{v}<span class="token string">&#39;</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>e <span class="token builtin">IError</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">eprintln</span><span class="token punctuation">(</span>e<span class="token punctuation">.</span><span class="token function">msg</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    _ <span class="token operator">=</span> <span class="token operator">&lt;-</span>done
+    <span class="token comment">// Output: Sum 1..10 = 55</span>
+<span class="token punctuation">}</span></code></pre>
+<hr />
+<h2 id="supported-operators">Supported Operators</h2>
+<h3 id="creating">Creating</h3>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Description</th></tr></thead>
+<tbody>
+<tr>
+<td><code>just[T](items ...T)</code></td>
+<td>Emit fixed values</td></tr>
+<tr>
+<td><code>from_slice[T](items []T)</code></td>
+<td>Emit items from a slice</td></tr>
+<tr>
+<td><code>from_channel[T](ch)</code></td>
+<td>Wrap an existing channel</td></tr>
+<tr>
+<td><code>create[T](producer)</code></td>
+<td>Create from a producer function</td></tr>
+<tr>
+<td><code>empty[T]()</code></td>
+<td>Complete immediately</td></tr>
+<tr>
+<td><code>throw[T](err)</code></td>
+<td>Emit one error and complete</td></tr>
+<tr>
+<td><code>range(start, count)</code></td>
+<td>Emit a range of integers</td></tr>
+<tr>
+<td><code>repeat[T](value, count)</code></td>
+<td>Emit the same value N times</td></tr>
+<tr>
+<td><code>interval(period_ms)</code></td>
+<td>Emit sequential integers periodically</td></tr>
+<tr>
+<td><code>timer(delay_ms)</code></td>
+<td>Emit <code>0</code> after a delay</td></tr>
+<tr>
+<td><code>defer_[T](factory)</code></td>
+<td>Lazily evaluate on each subscription</td></tr></tbody></table>
+<h3 id="filtering">Filtering</h3>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Description</th></tr></thead>
+<tbody>
+<tr>
+<td><code>.filter(predicate)</code></td>
+<td>Keep only matching items</td></tr>
+<tr>
+<td><code>.take(n)</code></td>
+<td>Emit at most N items</td></tr>
+<tr>
+<td><code>.first()</code></td>
+<td>Emit only the first item</td></tr>
+<tr>
+<td><code>.last()</code></td>
+<td>Emit only the last item</td></tr>
+<tr>
+<td><code>.distinct()</code></td>
+<td>Suppress all duplicates</td></tr>
+<tr>
+<td><code>.distinct_until_changed()</code></td>
+<td>Suppress consecutive duplicates</td></tr>
+<tr>
+<td><code>.timeout(ms)</code></td>
+<td>Error if no item within deadline</td></tr></tbody></table>
+<h3 id="transforming-">Transforming <em>(free functions — see <a href="#v-compiler-notes">V Compiler Notes</a>)</em></h3>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Description</th></tr></thead>
+<tbody>
+<tr>
+<td><code>map_[T, U](mut o, fn)</code></td>
+<td>Transform each item to type U</td></tr>
+<tr>
+<td><code>flat_map_[T, U](mut o, fn)</code></td>
+<td>Map each item to an inner observable, merge all</td></tr>
+<tr>
+<td><code>concat_map_[T, U](mut o, fn)</code></td>
+<td>Like flat_map_ but sequential</td></tr></tbody></table>
+<h3 id="aggregating-">Aggregating <em>(free functions)</em></h3>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Description</th></tr></thead>
+<tbody>
+<tr>
+<td><code>scan_[T, U](mut o, seed, fn)</code></td>
+<td>Emit each intermediate accumulated value</td></tr>
+<tr>
+<td><code>reduce_[T, U](mut o, seed, fn)</code></td>
+<td>Emit only the final accumulated value</td></tr>
+<tr>
+<td><code>count_[T](mut o)</code></td>
+<td>Emit the total item count</td></tr></tbody></table>
+<h3 id="combining">Combining</h3>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Description</th></tr></thead>
+<tbody>
+<tr>
+<td><code>merge[T](mut o1, mut o2)</code></td>
+<td>Interleave emissions from two observables</td></tr>
+<tr>
+<td><code>concat[T](observables)</code></td>
+<td>Emit all items from each observable in sequence</td></tr></tbody></table>
+<h3 id="mathematical-">Mathematical <em>(f64 only)</em></h3>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Description</th></tr></thead>
+<tbody>
+<tr>
+<td><code>.average_f64()</code></td>
+<td>Compute the arithmetic mean</td></tr>
+<tr>
+<td><code>.sum_f64()</code></td>
+<td>Compute the sum</td></tr></tbody></table>
+<h3 id="subscribing">Subscribing</h3>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Description</th></tr></thead>
+<tbody>
+<tr>
+<td><code>.observe()</code></td>
+<td>Returns the underlying <code>chan Item[T]</code></td></tr>
+<tr>
+<td><code>.for_each(next, err, done)</code></td>
+<td>Subscribe with callbacks</td></tr></tbody></table>
+<hr />
+<h2 id="v-compiler-notes">V Compiler Notes</h2>
+<p>RxV targets <strong>V 0.5.x</strong>. The current compiler has limitations with certain generic patterns:</p>
+<blockquote>
+<p><strong>Methods cannot have additional type parameters.</strong><br /><code>(mut o ObservableImpl[T]) map[U](fn(T) U)</code> is not supported.</p></blockquote>
+<p><strong>Workaround:</strong> Operators that transform to a different type are exposed as <strong>free functions</strong> named with a <code>_</code> suffix:</p>
+<pre><code class="language-v"><span class="token comment">// Instead of obs.map[string](fn(v int) string { ... })</span>
+<span class="token keyword">mut</span> labels <span class="token operator">:=</span> rxv<span class="token punctuation">.</span>map_<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token builtin">string</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> obs<span class="token punctuation">,</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>v <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token builtin">string</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> v<span class="token punctuation">.</span><span class="token function">str</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+<span class="token comment">// Instead of obs.scan[int](0, accumulator)</span>
+<span class="token keyword">mut</span> running <span class="token operator">:=</span> rxv<span class="token punctuation">.</span>scan_<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> obs<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>acc <span class="token builtin">int</span><span class="token punctuation">,</span> v <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">int</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> acc <span class="token operator">+</span> v <span class="token punctuation">}</span><span class="token punctuation">)</span></code></pre>
+<p>See the full list of compiler workarounds in <a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/API.md#known-compiler-limitations-v-05x">docs/API.md</a>.</p>
+<hr />
+<h2 id="examples">Examples</h2>
+<table>
+<thead>
+<tr>
+<th>Example</th>
+<th>Description</th></tr></thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/ulises-jeremias/rxv/blob/master/examples/hello_world">hello_world</a></td>
+<td>Minimal hello world</td></tr>
+<tr>
+<td><a href="https://github.com/ulises-jeremias/rxv/blob/master/examples/02-from-slice-and-range">02-from-slice-and-range</a></td>
+<td>Creating observables</td></tr>
+<tr>
+<td><a href="https://github.com/ulises-jeremias/rxv/blob/master/examples/03-filtering">03-filtering</a></td>
+<td>filter, take, distinct, chaining</td></tr>
+<tr>
+<td><a href="https://github.com/ulises-jeremias/rxv/blob/master/examples/04-transforming-map">04-transforming-map</a></td>
+<td>map_, flat_map_, concat_map_</td></tr>
+<tr>
+<td><a href="https://github.com/ulises-jeremias/rxv/blob/master/examples/05-aggregation">05-aggregation</a></td>
+<td>scan_, reduce_, count_, average_f64, sum_f64</td></tr>
+<tr>
+<td><a href="https://github.com/ulises-jeremias/rxv/blob/master/examples/06-combining">06-combining</a></td>
+<td>merge, concat</td></tr>
+<tr>
+<td><a href="https://github.com/ulises-jeremias/rxv/blob/master/examples/07-error-handling">07-error-handling</a></td>
+<td>throw, error propagation</td></tr></tbody></table>
+<p>Run any example:</p>
+<pre><code class="language-sh">v run examples<span class="token operator">/</span>0<span class="token number">5</span><span class="token operator">-</span>aggregation<span class="token operator">/</span>main<span class="token punctuation">.</span>v</code></pre>
+<hr />
+<h2 id="tutorials">Tutorials</h2>
+<p>Step-by-step guides in <a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/tutorials">docs/tutorials/</a>:</p>
+<ol>
+<li><a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/tutorials/01-hello-world.md">Hello World</a></li>
+<li><a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/tutorials/02-creating-observables.md">Creating Observables</a></li>
+<li><a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/tutorials/03-filtering.md">Filtering</a></li>
+<li><a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/tutorials/04-transforming.md">Transforming</a></li>
+<li><a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/tutorials/05-error-handling.md">Error Handling</a></li></ol>
+<hr />
+<h2 id="api-reference">API Reference</h2>
+<p>→ <a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/README.md">docs/README.md</a> — documentation home   → <a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/API.md">docs/API.md</a> — full type and function reference → <a href="https://github.com/ulises-jeremias/rxv/blob/master/docs/OPERATORS.md">docs/OPERATORS.md</a> — operator reference with examples</p>
+<hr />
 <h2 id="testing">Testing</h2>
-<p>To test the module, just type the following command:</p>
-<pre><code class="language-sh"><span class="token punctuation">.</span><span class="token operator">/</span>bin<span class="token operator">/</span>test ##</code></pre>
+<pre><code class="language-sh"><span class="token punctuation">.</span><span class="token operator">/</span>bin<span class="token operator">/</span>test</code></pre>
+<p>Or run a single test file directly:</p>
+<pre><code class="language-sh">cd <span class="token operator">~</span><span class="token operator">/</span><span class="token punctuation">.</span>vmodules <span class="token operator">&amp;&amp;</span> v run rxv<span class="token operator">/</span>filter_observe_test<span class="token punctuation">.</span>v</code></pre>
+<blockquote>
+<p><strong>Note:</strong> Avoid <code>v test rxv</code> — it runs all tests in parallel which can<br />exhaust system resources. Use <code>./bin/test</code> which runs them sequentially.</p></blockquote>
+<hr />
+<h2 id="contributing">Contributing</h2>
+<p>See <a href="https://github.com/ulises-jeremias/rxv/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> for the contribution workflow.</p>
+<hr />
 <p>[workflowbadge]: <a href="https://github.com/ulises-jeremias/rxv/actions/workflows/ci.yml/badge.svg">https://github.com/ulises-jeremias/rxv/actions/workflows/ci.yml/badge.svg</a> [deploydocsbadge]: <a href="https://github.com/ulises-jeremias/rxv/actions/workflows/deploy-docs.yml/badge.svg">https://github.com/ulises-jeremias/rxv/actions/workflows/deploy-docs.yml/badge.svg</a> [licensebadge]: <a href="https://img.shields.io/badge/License-MIT-blue.svg">https://img.shields.io/badge/License-MIT-blue.svg</a> [workflowurl]: <a href="https://github.com/ulises-jeremias/rxv/actions/workflows/ci.yml">https://github.com/ulises-jeremias/rxv/actions/workflows/ci.yml</a> [deploydocsurl]: <a href="https://github.com/ulises-jeremias/rxv/actions/workflows/deploy-docs.yml">https://github.com/ulises-jeremias/rxv/actions/workflows/deploy-docs.yml</a> [licenseurl]: <a href="https://github.com/ulises-jeremias/rxv/blob/main/LICENSE">https://github.com/ulises-jeremias/rxv/blob/main/LICENSE</a></p>
 
 </section>
 
+		<section id="concat" class="doc-node">
+			<div class="title"><h2>fn concat <a href="#concat">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/combination.v#L89"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> concat<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>observables <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>concat concatenates multiple observables sequentially.</p>
+
+</section>
+
+		<section id="concat_map_" class="doc-node">
+			<div class="title"><h2>fn concat_map_ <a href="#concat_map_">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/transformation.v#L104"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> concat_map_<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">,</span> <span class="token builtin">U</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> mapper <span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">U</span><span class="token punctuation">]</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">U</span><span class="token punctuation">]</span></code></pre>
+<p>concat_map_ transforms each item by applying a function that returns an observable, and flattens them sequentially (one inner completes before the next starts).</p>
+
+</section>
+
+		<section id="count_" class="doc-node">
+			<div class="title"><h2>fn count_ <a href="#count_">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L277"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> count_<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span></code></pre>
+<p>count_ returns an Observable emitting the number of items emitted by the source.</p>
+
+</section>
+
 		<section id="create" class="doc-node">
-			<div class="title"><h2>fn create <a href="#create">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L25"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn create <a href="#create">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L42"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> create<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>producer ProducerFn<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>create builds an ObservableImpl from a producer function.</p>
@@ -109,7 +403,7 @@
 </section>
 
 		<section id="defer_" class="doc-node">
-			<div class="title"><h2>fn defer_ <a href="#defer_">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L82"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn defer_ <a href="#defer_">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L105"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> defer_<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>factory <span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 
@@ -117,10 +411,18 @@
 </section>
 
 		<section id="empty" class="doc-node">
-			<div class="title"><h2>fn empty <a href="#empty">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L35"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn empty <a href="#empty">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L52"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> empty<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>empty completes immediately without emitting any item.</p>
+
+</section>
+
+		<section id="flat_map_" class="doc-node">
+			<div class="title"><h2>fn flat_map_ <a href="#flat_map_">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/transformation.v#L50"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> flat_map_<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">,</span> <span class="token builtin">U</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> mapper <span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">U</span><span class="token punctuation">]</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">U</span><span class="token punctuation">]</span></code></pre>
+<p>flat_map_ transforms each item by applying a function that returns an observable, then merges all inner observables into a single stream.</p>
 
 </section>
 
@@ -140,6 +442,22 @@
 
 </section>
 
+		<section id="from_slice" class="doc-node">
+			<div class="title"><h2>fn from_slice <a href="#from_slice">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L32"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> from_slice<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>items <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="interval" class="doc-node">
+			<div class="title"><h2>fn interval <a href="#interval">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L125"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">interval</span><span class="token punctuation">(</span>period_ms <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span></code></pre>
+<p>interval emits sequential integers starting at 0 at each <code>period_ms</code> milliseconds. The returned observable never completes — use take() to limit emissions.</p>
+
+</section>
+
 		<section id="just" class="doc-node">
 			<div class="title"><h2>fn just <a href="#just">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -149,10 +467,18 @@
 </section>
 
 		<section id="map_" class="doc-node">
-			<div class="title"><h2>fn map_ <a href="#map_">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L231"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn map_ <a href="#map_">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L164"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> map_<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">,</span> <span class="token builtin">U</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> apply MapFn<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">,</span> <span class="token builtin">U</span><span class="token punctuation">]</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">U</span><span class="token punctuation">]</span></code></pre>
 
+
+</section>
+
+		<section id="merge" class="doc-node">
+			<div class="title"><h2>fn merge <a href="#merge">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/combination.v#L52"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> merge<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> o1 ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> o2 ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>merge combines two observables by interleaving their emissions.</p>
 
 </section>
 
@@ -197,18 +523,50 @@
 </section>
 
 		<section id="range" class="doc-node">
-			<div class="title"><h2>fn range <a href="#range">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L56"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn range <a href="#range">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L73"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">range</span><span class="token punctuation">(</span>start <span class="token builtin">int</span><span class="token punctuation">,</span> count <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span></code></pre>
 <p>range emits integers in [start, start+count).</p>
 
 </section>
 
+		<section id="reduce_" class="doc-node">
+			<div class="title"><h2>fn reduce_ <a href="#reduce_">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L240"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> reduce_<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">,</span> <span class="token builtin">U</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> seed <span class="token builtin">U</span><span class="token punctuation">,</span> accumulator <span class="token keyword">fn</span> <span class="token punctuation">(</span>acc <span class="token builtin">U</span><span class="token punctuation">,</span> val <span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token builtin">U</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">U</span><span class="token punctuation">]</span></code></pre>
+<p>reduce_ applies an accumulator over the entire stream, emitting only the final value.</p>
+
+</section>
+
+		<section id="repeat" class="doc-node">
+			<div class="title"><h2>fn repeat <a href="#repeat">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L78"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> repeat<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>value <span class="token builtin">T</span><span class="token punctuation">,</span> count <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>repeat emits the same value <code>count</code> times.</p>
+
+</section>
+
+		<section id="scan_" class="doc-node">
+			<div class="title"><h2>fn scan_ <a href="#scan_">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L202"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> scan_<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">,</span> <span class="token builtin">U</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> seed <span class="token builtin">U</span><span class="token punctuation">,</span> accumulator <span class="token keyword">fn</span> <span class="token punctuation">(</span>acc <span class="token builtin">U</span><span class="token punctuation">,</span> val <span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token builtin">U</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">U</span><span class="token punctuation">]</span></code></pre>
+<p>scan_ applies an accumulator over the stream, emitting each intermediate result.</p>
+
+</section>
+
 		<section id="throw" class="doc-node">
-			<div class="title"><h2>fn throw <a href="#throw">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L45"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn throw <a href="#throw">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L62"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> throw<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>err <span class="token builtin">IError</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>throw emits a single error then completes.</p>
+
+</section>
+
+		<section id="timer" class="doc-node">
+			<div class="title"><h2>fn timer <a href="#timer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L142"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">timer</span><span class="token punctuation">(</span>delay_ms <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span></code></pre>
+<p>timer emits a single 0 after <code>delay_ms</code> milliseconds, then completes.</p>
 
 </section>
 
@@ -354,10 +712,26 @@
 </section>
 
 		<section id="ObservableImpl[T].str" class="doc-node">
-			<div class="title"><h2>fn (ObservableImpl[T]) str <a href="#ObservableImpl[T].str">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L37"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (ObservableImpl[T]) str <a href="#ObservableImpl[T].str">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L13"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">str</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span></code></pre>
 
+
+</section>
+
+		<section id="ObservableImpl[f64].average_f64" class="doc-node">
+			<div class="title"><h2>fn (ObservableImpl[f64]) average_f64 <a href="#ObservableImpl[f64].average_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L516"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">average_f64</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
+<p>average_f64 computes the average of f64 values emitted by the source.</p>
+
+</section>
+
+		<section id="ObservableImpl[f64].sum_f64" class="doc-node">
+			<div class="title"><h2>fn (ObservableImpl[f64]) sum_f64 <a href="#ObservableImpl[f64].sum_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L553"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">sum_f64</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
+<p>sum_f64 computes the sum of f64 values emitted by the source.</p>
 
 </section>
 
@@ -418,7 +792,7 @@
 </section>
 
 		<section id="rxv.ObservableImpl[T].observe" class="doc-node">
-			<div class="title"><h2>fn (rxv.ObservableImpl[T]) observe <a href="#rxv.ObservableImpl[T].observe">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L41"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (rxv.ObservableImpl[T]) observe <a href="#rxv.ObservableImpl[T].observe">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L17"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">observe</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token builtin">chan</span> Item<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 
@@ -426,7 +800,7 @@
 </section>
 
 		<section id="rxv.ObservableImpl[T].filter" class="doc-node">
-			<div class="title"><h2>fn (rxv.ObservableImpl[T]) filter <a href="#rxv.ObservableImpl[T].filter">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L77"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (rxv.ObservableImpl[T]) filter <a href="#rxv.ObservableImpl[T].filter">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L46"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">filter</span><span class="token punctuation">(</span>predicate PredicateFn<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 
@@ -434,7 +808,7 @@
 </section>
 
 		<section id="rxv.ObservableImpl[T].take" class="doc-node">
-			<div class="title"><h2>fn (rxv.ObservableImpl[T]) take <a href="#rxv.ObservableImpl[T].take">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L120"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (rxv.ObservableImpl[T]) take <a href="#rxv.ObservableImpl[T].take">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L76"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">take</span><span class="token punctuation">(</span>n <span class="token builtin">u32</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 
@@ -442,10 +816,50 @@
 </section>
 
 		<section id="rxv.ObservableImpl[T].for_each" class="doc-node">
-			<div class="title"><h2>fn (rxv.ObservableImpl[T]) for_each <a href="#rxv.ObservableImpl[T].for_each">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L167"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (rxv.ObservableImpl[T]) for_each <a href="#rxv.ObservableImpl[T].for_each">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L111"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">for_each</span><span class="token punctuation">(</span>next_fn NextFn<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> err_fn ErrFn<span class="token punctuation">,</span> completed_fn CompletedFn<span class="token punctuation">,</span> opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token builtin">chan</span> <span class="token builtin">int</span></code></pre>
 
+
+</section>
+
+		<section id="rxv.ObservableImpl[T].distinct" class="doc-node">
+			<div class="title"><h2>fn (rxv.ObservableImpl[T]) distinct <a href="#rxv.ObservableImpl[T].distinct">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L317"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">distinct</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>distinct suppresses duplicate items, emitting only items not previously seen.</p>
+
+</section>
+
+		<section id="rxv.ObservableImpl[T].distinct_until_changed" class="doc-node">
+			<div class="title"><h2>fn (rxv.ObservableImpl[T]) distinct_until_changed <a href="#rxv.ObservableImpl[T].distinct_until_changed">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L359"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">distinct_until_changed</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>distinct_until_changed suppresses consecutive duplicate items.</p>
+
+</section>
+
+		<section id="rxv.ObservableImpl[T].first" class="doc-node">
+			<div class="title"><h2>fn (rxv.ObservableImpl[T]) first <a href="#rxv.ObservableImpl[T].first">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L396"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">first</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>first emits only the first item from the source.</p>
+
+</section>
+
+		<section id="rxv.ObservableImpl[T].last" class="doc-node">
+			<div class="title"><h2>fn (rxv.ObservableImpl[T]) last <a href="#rxv.ObservableImpl[T].last">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L433"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">last</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>last emits only the last item from the source.</p>
+
+</section>
+
+		<section id="rxv.ObservableImpl[T].timeout" class="doc-node">
+			<div class="title"><h2>fn (rxv.ObservableImpl[T]) timeout <a href="#rxv.ObservableImpl[T].timeout">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L475"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">timeout</span><span class="token punctuation">(</span>timeout_ms <span class="token builtin">int</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>timeout emits an error if no item is received within <code>timeout_ms</code> milliseconds.</p>
 
 </section>
 
@@ -553,7 +967,7 @@
 </section>
 
 		<section id="ObservableImpl" class="doc-node">
-			<div class="title"><h2>struct ObservableImpl <a href="#ObservableImpl">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L31"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>struct ObservableImpl <a href="#ObservableImpl">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <div class="attributes"><div class="attribute">@[heap]</div></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
@@ -561,11 +975,7 @@
 	ch     <span class="token builtin">chan</span> Item<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span>
 	parent context<span class="token punctuation">.</span>Context
 <span class="token punctuation">}</span></code></pre>
-<p>ObservableImpl[T] is the primary reactive stream type.</p>
-<p>DESIGN NOTE — why <code>chan Item[T]</code> not <code>Iterable[T]</code>: V's generic codegen has a bug where assigning to an interface field inside a generic function cross-contaminates specializations. Using a concrete <code>chan Item[T]</code> avoids that.</p>
-<p>DESIGN NOTE — why try_pop not select: V's select codegen for generic channels allocates the receive-buffer with the wrong type when multiple specializations of the same function coexist in the same translation unit. try_pop bypasses that.</p>
-<p>DESIGN NOTE — for_each and channel-capture pattern: V closures capture arrays by copy, not by reference. The workaround:1. User closures capture a <code>chan T</code> (results_ch) instead of <code>[]T</code>2. main thread drains bridge channel, calling user next_fn on each value3. completed_fn is called after drain4. for_each returns the signal channel</p>
-<p>User code receives results by draining results_ch into a local array AFTER &lt;-for_each_signal completes. Example: done := obs.for_each(fn [mut results] (v) { results &lt;- v }, ...) &lt;-done for { v := &lt;-results_ch; if closed {break} else { arr &lt;&lt; v } }</p>
+
 
 </section>
 
@@ -604,9 +1014,18 @@
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 8 May 2026 02:19:44</div>
+						<div class="footer">Powered by vdoc. Generated on: 8 May 2026 04:58:23</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_rxv">README</a></li>
+<li class="open"><a href="#concat">fn concat</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#concat_map_">fn concat_map_</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#count_">fn count_</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#create">fn create</a>        <ul>
 </ul>
 </li>
@@ -616,16 +1035,28 @@
 <li class="open"><a href="#empty">fn empty</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#flat_map_">fn flat_map_</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#from_channel">fn from_channel</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#from_error">fn from_error</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#from_slice">fn from_slice</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#interval">fn interval</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#just">fn just</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#map_">fn map_</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#merge">fn merge</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#new_channel_iterable">fn new_channel_iterable</a>        <ul>
@@ -646,7 +1077,19 @@
 <li class="open"><a href="#range">fn range</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#reduce_">fn reduce_</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#repeat">fn repeat</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#scan_">fn scan_</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#throw">fn throw</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#timer">fn timer</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#with_buffer_size">fn with_buffer_size</a>        <ul>
@@ -706,6 +1149,11 @@
 <li><a href="#ObservableImpl[T].str">fn str</a></li>
 </ul>
 </li>
+<li class="open"><a href="#ObservableImpl[f64].average_f64">type ObservableImpl[f64]</a>        <ul>
+<li><a href="#ObservableImpl[f64].average_f64">fn average_f64</a></li>
+<li><a href="#ObservableImpl[f64].sum_f64">fn sum_f64</a></li>
+</ul>
+</li>
 <li class="open"><a href="#PredicateFn">type PredicateFn</a>        <ul>
 </ul>
 </li>
@@ -730,6 +1178,11 @@
 <li><a href="#rxv.ObservableImpl[T].filter">fn filter</a></li>
 <li><a href="#rxv.ObservableImpl[T].take">fn take</a></li>
 <li><a href="#rxv.ObservableImpl[T].for_each">fn for_each</a></li>
+<li><a href="#rxv.ObservableImpl[T].distinct">fn distinct</a></li>
+<li><a href="#rxv.ObservableImpl[T].distinct_until_changed">fn distinct_until_changed</a></li>
+<li><a href="#rxv.ObservableImpl[T].first">fn first</a></li>
+<li><a href="#rxv.ObservableImpl[T].last">fn last</a></li>
+<li><a href="#rxv.ObservableImpl[T].timeout">fn timeout</a></li>
 </ul>
 </li>
 <li class="open"><a href="#rxv.Options.build_channel_t">type rxv.Options</a>        <ul>
