@@ -477,6 +477,94 @@ pub fn (mut o ObservableImpl[T]) last(opts ...RxOption) &ObservableImpl[T] {
 	}
 }
 
+// ---- skip ----------------------------------------------------------------
+
+fn obs_skip_run[T](n u32, src chan Item[T], next chan Item[T]) {
+	mut skipped := u32(0)
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- item
+				break
+			}
+			if item.has_value {
+				if skipped < n {
+					skipped++
+				} else {
+					next <- item
+				}
+			}
+		} else if s == .closed {
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
+}
+
+// skip suppresses the first n items emitted by the source.
+pub fn (mut o ObservableImpl[T]) skip(n u32, opts ...RxOption) &ObservableImpl[T] {
+	mut option := parse_options(...opts)
+	next := option.build_channel_t[T]()
+	src := o.ch
+	spawn obs_skip_run[T](n, src, next)
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
+// ---- take_last -----------------------------------------------------------
+
+fn obs_take_last_run[T](n u32, src chan Item[T], next chan Item[T]) {
+	mut window := []Item[T]{}
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- item
+				break
+			}
+			if item.has_value {
+				window << item
+				if window.len > int(n) {
+					window.delete(0)
+				}
+			}
+		} else if s == .closed {
+			for i in 0 .. window.len {
+				next <- window[i]
+			}
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
+}
+
+// take_last emits only the last n items from the source.
+pub fn (mut o ObservableImpl[T]) take_last(n u32, opts ...RxOption) &ObservableImpl[T] {
+	mut option := parse_options(...opts)
+	next := option.build_channel_t[T]()
+	src := o.ch
+	spawn obs_take_last_run[T](n, src, next)
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
 // ---- timeout --------------------------------------------------------------
 // NOTE: timeout_ms granularity is ~10µs poll intervals.
 // A value of 0 disables the timeout.
