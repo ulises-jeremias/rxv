@@ -1098,55 +1098,58 @@ pub fn (mut o ObservableImpl[T]) throttle_first(delay_ms int, opts ...RxOption) 
 
 // ---- buffer_with_time ----------------------------------------------------
 
-fn obs_buffer_time_run[T](period_ms int, src chan Item[T], next chan Item[[]T]) {
-	mut buf := []T{}
-	mut last_flush := time.now()
-	for {
-		mut item := Item[T]{
-			has_value: false
-			err:       none
-		}
-		s := src.try_pop(mut item)
-		if s == .success {
-			if item.is_error() {
-				if buf.len > 0 {
-					next <- of[[]T](buf)
-				}
-				next <- item
-				break
-			}
-			if item.has_value {
-				buf << item.get_value()
-			}
-		} else if s == .closed {
-			if buf.len > 0 {
-				next <- of[[]T](buf)
-			}
-			break
-		} else {
-			now := time.now()
-			if now.unix_offset_ms() - last_flush.unix_offset_ms() >= i64(period_ms) && buf.len > 0 {
-				next <- of[[]T](buf)
-				buf = []T{}
-				last_flush = now
-			} else {
-				time.sleep(poll_sleep)
-			}
-		}
-	}
-	next.close()
-}
-
 // buffer_with_time collects items into a buffer and emits it every `period_ms` ms.
-pub fn (mut o ObservableImpl[T]) buffer_with_time(period_ms int, opts ...RxOption) &ObservableImpl[[]T] {
+pub fn buffer_time_[T](mut o ObservableImpl[T], period_ms int, opts ...RxOption) &ObservableImpl[[]T] {
 	mut option := parse_options(...opts)
 	next := option.build_channel_t[[]T]()
 	src := o.ch
-	spawn obs_buffer_time_run[T](period_ms, src, next)
+	buffer_time[T](period_ms, src, next)
 	return &ObservableImpl[[]T]{
 		ch:     next
 		parent: o.parent
 	}
+}
+
+fn buffer_time[T](period_ms int, src chan Item[T], next chan Item[[]T]) {
+	spawn fn [period_ms, src, next] () {
+		mut buf := []T{}
+		mut last_flush := time.now()
+		for {
+			mut item := Item[T]{
+				has_value: false
+				err:       none
+			}
+			s := src.try_pop(mut item)
+			if s == .success {
+				if item.is_error() {
+					if buf.len > 0 {
+						next <- of[[]T](buf)
+					}
+					next <- item
+					break
+				}
+				if item.has_value {
+					buf << item.get_value()
+				}
+			} else if s == .closed {
+				if buf.len > 0 {
+					next <- of[[]T](buf)
+				}
+				break
+			} else {
+				now := time.now()
+				if now.unix_offset_ms() - last_flush.unix_offset_ms() >= i64(period_ms)
+					&& buf.len > 0 {
+					next <- of[[]T](buf)
+					buf = []T{}
+					last_flush = now
+				} else {
+					time.sleep(poll_sleep)
+				}
+			}
+		}
+		next.close()
+	}()
 }
 
 // ---- average_f64 ---------------------------------------------------------

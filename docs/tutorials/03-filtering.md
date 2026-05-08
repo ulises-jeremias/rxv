@@ -83,7 +83,7 @@ fn main() {
 	done := result.for_each(fn (v int) {
 		println(v)
 	}, fn (e IError) {
-		eprintln(e.msg())
+		eprintln('error: ${e}')
 	}, fn () {})
 	_ = <-done
 }

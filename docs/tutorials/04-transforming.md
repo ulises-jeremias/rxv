@@ -107,7 +107,7 @@ fn main() {
 	done := total.for_each(fn (v int) {
 		println('sum = ${v}')
 	}, fn (e IError) {
-		eprintln(e.msg())
+		eprintln('error: ${e}')
 	}, fn () {})
 	_ = <-done
 	// prints: sum = 15
