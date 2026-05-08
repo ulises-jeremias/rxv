@@ -2,10 +2,6 @@ module rxv
 
 import time
 
-// Item represents an emitted value or error in the rxv stream.
-// NOTE: We use `has_value bool` instead of `?T` to avoid a V compiler codegen
-// bug (V 0.5.1) where optional ?T field access generates wrong C temp types
-// when multiple generic specializations coexist in one translation unit.
 pub struct Item[T] {
 pub:
 	value     T
@@ -32,7 +28,6 @@ pub fn (i Item[T]) is_error() bool {
 	return i.err !is none
 }
 
-// get_value returns the item's value. Only call when has_value is true.
 pub fn (i Item[T]) get_value() T {
 	return i.value
 }
