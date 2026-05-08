@@ -920,7 +920,7 @@ pub fn buffer_[T](mut o ObservableImpl[T], count u32, opts ...RxOption) &Observa
 	mut option := parse_options(...opts)
 	next := option.build_channel_t[[]T]()
 	src := o.ch
-	spawn buffer_count_worker[T](count, src, next)
+	spawn buffer_count_worker(count, src, next)
 	return &ObservableImpl[[]T]{
 		ch:     next
 		parent: o.parent
@@ -1084,7 +1084,7 @@ pub fn buffer_time_[T](mut o ObservableImpl[T], period_ms int, opts ...RxOption)
 }
 
 fn buffer_time[T](period_ms int, src chan Item[T], next chan Item[[]T]) {
-	spawn buffer_time_worker[T](period_ms, src, next)
+	spawn buffer_time_worker(period_ms, src, next)
 }
 
 fn buffer_time_worker[U](period_ms int, src chan Item[U], next chan Item[[]U]) {
