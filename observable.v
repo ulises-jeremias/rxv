@@ -566,7 +566,6 @@ pub fn (mut o ObservableImpl[T]) take_last(n u32, opts ...RxOption) &ObservableI
 }
 
 // ---- contains -------------------------------------------------------------
-// ---- contains -------------------------------------------------------------
 
 fn obs_contains_run[T](pred PredicateFn[T], src chan Item[T], next chan Item[bool]) {
 	for {
