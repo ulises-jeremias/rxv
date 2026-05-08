@@ -916,53 +916,6 @@ fn debounce_inner[T](delay_ms int, src chan Item[T], next chan Item[T]) {
 }
 
 // ---- sample ---------------------------------------------------------------
-pub fn buffer_[T](mut o ObservableImpl[T], count u32, opts ...RxOption) &ObservableImpl[[]T] {
-	mut option := parse_options(...opts)
-	next := option.build_channel_t[[]T]()
-	src := o.ch
-	spawn buffer_count_worker[T](src, count, next)
-	return &ObservableImpl[[]T]{
-		ch:     next
-		parent: o.parent
-	}
-}
-
-fn buffer_count_worker[U](src chan Item[U], count u32, next chan Item[[]U]) {
-	mut buf := []U{}
-	for {
-		mut item := Item[U]{
-			has_value: false
-			err:       none
-		}
-		s := src.try_pop(mut item)
-		if s == .success {
-			if item.is_error() {
-				if buf.len > 0 {
-					next <- of[[]U](buf)
-				}
-				next <- item
-				break
-			}
-			if item.has_value {
-				buf << item.get_value()
-				if u32(buf.len) >= count {
-					next <- of[[]U](buf)
-					buf = []U{}
-				}
-			}
-		} else if s == .closed {
-			if buf.len > 0 {
-				next <- of[[]U](buf)
-			}
-			break
-		} else {
-			time.sleep(poll_sleep)
-		}
-	}
-	next.close()
-}
-
-// ---- sample ---------------------------------------------------------------
 
 fn sample_[T](period_ms int, src chan Item[T], next chan Item[T]) {
 	spawn sample_worker[T](period_ms, src, next)
@@ -1064,63 +1017,6 @@ fn throttle_first_worker[T](delay_ms int, src chan Item[T], next chan Item[T]) {
 			break
 		} else {
 			time.sleep(poll_sleep)
-		}
-	}
-	next.close()
-}
-
-// ---- buffer_with_time ----------------------------------------------------
-
-// buffer_with_time collects items into a buffer and emits it every `period_ms` ms.
-pub fn buffer_time_[T](mut o ObservableImpl[T], period_ms int, opts ...RxOption) &ObservableImpl[[]T] {
-	mut option := parse_options(...opts)
-	next := option.build_channel_t[[]T]()
-	src := o.ch
-	buffer_time[T](period_ms, src, next)
-	return &ObservableImpl[[]T]{
-		ch:     next
-		parent: o.parent
-	}
-}
-
-fn buffer_time[T](period_ms int, src chan Item[T], next chan Item[[]T]) {
-	spawn buffer_time_worker(period_ms, src, next)
-}
-
-fn buffer_time_worker[U](period_ms int, src chan Item[U], next chan Item[[]U]) {
-	mut buf := []U{}
-	mut last_flush := time.now()
-	for {
-		mut item := Item[U]{
-			has_value: false
-			err:       none
-		}
-		s := src.try_pop(mut item)
-		if s == .success {
-			if item.is_error() {
-				if buf.len > 0 {
-					next <- of[[]U](buf)
-				}
-				next <- item
-				break
-			}
-			if item.has_value {
-				buf << item.get_value()
-			}
-		} else if s == .closed {
-			if buf.len > 0 {
-				next <- of[[]U](buf)
-			}
-			break
-		} else {
-			now := time.now()
-			if now.unix_offset_ms() - last_flush.unix_offset_ms() >= i64(period_ms) && buf.len > 0 {
-				next <- of[[]U](buf)
-				buf = []U{}
-				last_flush = now
-			} else {
-				time.sleep(poll_sleep)
-			}
 		}
 	}
 	next.close()

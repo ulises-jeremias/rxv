@@ -214,15 +214,6 @@ mut obs := rxv.just[string]('a', 'b', 'c').debounce(100)
 // 'c' arrives after 100ms silence
 ```
 
-### `.buffer(count)`
-
-Collects items into batches of the specified size and emits each batch.
-
-```v ignore
-mut obs := rxv.just[int](1, 2, 3, 4, 5).buffer(2)
-// emits: [1, 2], [3, 4], [5]
-```
-
 ### `.sample(period_ms)`
 
 Emits the most recent item at the specified periodic interval.
@@ -239,15 +230,6 @@ Emits the first item, then ignores subsequent items until the delay expires.
 ```v ignore
 mut obs := rxv.just[int](1, 2, 3, 4, 5).throttle_first(100)
 // emits: 1, then ignores until 100ms passes, then allows next first item through
-```
-
-### `.buffer_with_time(period_ms)`
-
-Collects items into a buffer and emits it every `period_ms` milliseconds.
-
-```v ignore
-mut obs := rxv.just[int](1, 2, 3).buffer_with_time(500)
-// emits a batch every 500ms regardless of count
 ```
 
 ---

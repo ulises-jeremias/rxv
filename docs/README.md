@@ -137,7 +137,6 @@ downstream is slow, the upstream may block or drop depending on the operator.
 | `timeout` | On `observe()` | On source close or timeout |
 | `sample` | On `observe()` | On source close |
 | `throttle_first` | On `observe()` | On source close |
-| `buffer_with_time` | On `observe()` | On source close |
 | All synchronous operators (`just`, `from_slice`, `range`) | On `observe()` | Immediately after emit |
 
 ---
