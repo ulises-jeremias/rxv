@@ -1,9 +1,13 @@
 import rxv
 
-mut observable := rxv.just('Hello World')()
-ch := observable.observe()
-item := <-ch
-
-if item.value is rxv.ItemValue {
-	println(item.value)
+fn main() {
+	mut obs := rxv.just[string]('Hello, World!')
+	done := obs.for_each(fn (v string) {
+		println(v)
+	}, fn (e IError) {
+		eprintln('error: ${e}')
+	}, fn () {
+		println('done')
+	})
+	_ = <-done
 }
