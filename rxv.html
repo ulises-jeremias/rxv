@@ -1,0 +1,780 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>rxv | vdoc</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+		<link rel="manifest" href="site.webmanifest" />
+		<link rel="mask-icon" href="safari-pinned-tab.svg" color="#5bbad5" />
+		<meta name="msapplication-TileColor" content="#da532c" />
+		<meta name="theme-color" content="#ffffff" />
+		<link rel="stylesheet" href="doc.css" />
+		<link rel="stylesheet" href="normalize.css" />
+		<script src="dark-mode.js"></script>
+	</head>
+
+	<body>
+		<div><a id="skip-to-content-link" href="#main-content">Skip to content</a></div>
+		<div id="page">
+			<header class="doc-nav hidden">
+				<div class="heading-container">
+					<div class="heading">
+						<div class="info">
+							<div class="module">rxv</div>
+							<div class="toggle-version-container">
+								<span>0.1.0 </span>
+								<div
+									id="dark-mode-toggle"
+									role="switch"
+									aria-checked="false"
+									aria-label="Toggle dark mode"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" class="light-icon" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" class="dark-icon" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><g><rect fill="none" height="24" width="24"/></g><g><g><g><path d="M11.1,12.08C8.77,7.57,10.6,3.6,11.63,2.01C6.27,2.2,1.98,6.59,1.98,12c0,0.14,0.02,0.28,0.02,0.42 C2.62,12.15,3.29,12,4,12c1.66,0,3.18,0.83,4.1,2.15C9.77,14.63,11,16.17,11,18c0,1.52-0.87,2.83-2.12,3.51 c0.98,0.32,2.03,0.5,3.11,0.5c3.5,0,6.58-1.8,8.37-4.52C18,17.72,13.38,16.52,11.1,12.08z"/></g><path d="M7,16l-0.18,0C6.4,14.84,5.3,14,4,14c-1.66,0-3,1.34-3,3s1.34,3,3,3c0.62,0,2.49,0,3,0c1.1,0,2-0.9,2-2 C9,16.9,8.1,16,7,16z"/></g></g></svg>
+
+								</div>
+							</div>
+							<svg xmlns="http://www.w3.org/2000/svg" id="toggle-menu" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+
+						</div>
+						<div id="search">
+							<input type="text" placeholder="Search... (beta)" autocomplete="off" />
+						</div>
+					</div>
+				</div>
+				<nav class="search hidden"></nav>
+				<nav class="content hidden">
+					<ul>
+						<li class="open">
+<div class="menu-row"><a href="./index.html">README</a></div>
+</li>
+<li class="open active">
+<div class="menu-row"><a href="./rxv.html">rxv</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./main.html">main</a></div>
+</li>
+
+					</ul>
+				</nav>
+			</header>
+			<div class="doc-scrollview" tabindex="-1" id="main-content">
+				<div class="doc-container">
+					<div class="doc-content">
+								<section id="readme_rxv" class="doc-node">
+			<div class="title"><h1> rxv <a href="#readme_rxv">#</a></h1></div>
+<div align="center"> <h1>Reactive V</h1>
+
+<p><a href="https://vlang.io">vlang.io</a> | <a href="https://ulises-jeremias.github.io/rxv">Docs</a> | <a href="https://github.com/ulises-jeremias/rxv/blob/main/CONTRIBUTING.md">Contributing</a></p></div> <div align="center">
+
+<p>[![Continuous Integration][workflowbadge]][workflowurl] [![Deploy Documentation][deploydocsbadge]][deploydocsurl] [![License: MIT][licensebadge]][licenseurl]</p></div>
+
+<p>Reactive Extensions for the V language</p>
+<h2 id="reactivex">ReactiveX</h2>
+<p><a href="http://reactivex.io/">ReactiveX</a>, or Rx for short, is an API for programming with Observable streams. This is the official ReactiveX API for <a href="https://vlang.io/">the V Programming language</a>.</p>
+<p>ReactiveX is a new, alternative way of asynchronous programming to callbacks, promises, and deferred. It is about processing streams of events or items, with events being any occurrences or changes within the system. A stream of events is called an <a href="http://reactivex.io/documentation/contract.html">Observable</a>.</p>
+<p>An operator is a function that defines an Observable, how and when it should emit data. The list of operators covered is available <a href="https://github.com/ulises-jeremias/rxv/blob/master/README.md#supported-operators-in-rxv">here</a>.</p>
+<h2 id="rxv">RxV</h2>
+<p>The RxV implementation is based on the concept of pipelines. A pipeline is a series of stages connected by channels, where each stage is a group of routines running the same function.</p>
+<h3 id="install-rxv">Install rxv</h3>
+<pre><code class="language-sh">v install rxv</code></pre>
+<p>Done. Installation completed.</p>
+<h2 id="testing">Testing</h2>
+<p>To test the module, just type the following command:</p>
+<pre><code class="language-sh"><span class="token punctuation">.</span><span class="token operator">/</span>bin<span class="token operator">/</span>test ##</code></pre>
+<p>[workflowbadge]: <a href="https://github.com/ulises-jeremias/rxv/actions/workflows/ci.yml/badge.svg">https://github.com/ulises-jeremias/rxv/actions/workflows/ci.yml/badge.svg</a> [deploydocsbadge]: <a href="https://github.com/ulises-jeremias/rxv/actions/workflows/deploy-docs.yml/badge.svg">https://github.com/ulises-jeremias/rxv/actions/workflows/deploy-docs.yml/badge.svg</a> [licensebadge]: <a href="https://img.shields.io/badge/License-MIT-blue.svg">https://img.shields.io/badge/License-MIT-blue.svg</a> [workflowurl]: <a href="https://github.com/ulises-jeremias/rxv/actions/workflows/ci.yml">https://github.com/ulises-jeremias/rxv/actions/workflows/ci.yml</a> [deploydocsurl]: <a href="https://github.com/ulises-jeremias/rxv/actions/workflows/deploy-docs.yml">https://github.com/ulises-jeremias/rxv/actions/workflows/deploy-docs.yml</a> [licenseurl]: <a href="https://github.com/ulises-jeremias/rxv/blob/main/LICENSE">https://github.com/ulises-jeremias/rxv/blob/main/LICENSE</a></p>
+
+</section>
+
+		<section id="create" class="doc-node">
+			<div class="title"><h2>fn create <a href="#create">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L25"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> create<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>producer ProducerFn<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>create builds an ObservableImpl from a producer function.</p>
+
+</section>
+
+		<section id="defer_" class="doc-node">
+			<div class="title"><h2>fn defer_ <a href="#defer_">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L82"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> defer_<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>factory <span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="empty" class="doc-node">
+			<div class="title"><h2>fn empty <a href="#empty">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L35"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> empty<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>empty completes immediately without emitting any item.</p>
+
+</section>
+
+		<section id="from_channel" class="doc-node">
+			<div class="title"><h2>fn from_channel <a href="#from_channel">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L17"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> from_channel<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ch <span class="token builtin">chan</span> Item<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>from_channel wraps an existing channel as an ObservableImpl.</p>
+
+</section>
+
+		<section id="from_error" class="doc-node">
+			<div class="title"><h2>fn from_error <a href="#from_error">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/item.v#L24"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> from_error<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>err <span class="token builtin">IError</span><span class="token punctuation">)</span> Item<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="just" class="doc-node">
+			<div class="title"><h2>fn just <a href="#just">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> just<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>items <span class="token punctuation">...</span><span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>just emits each provided value then completes.</p>
+
+</section>
+
+		<section id="map_" class="doc-node">
+			<div class="title"><h2>fn map_ <a href="#map_">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L231"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> map_<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">,</span> <span class="token builtin">U</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> apply MapFn<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">,</span> <span class="token builtin">U</span><span class="token punctuation">]</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">U</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="new_channel_iterable" class="doc-node">
+			<div class="title"><h2>fn new_channel_iterable <a href="#new_channel_iterable">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/iterable_channel.v#L13"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> new_channel_iterable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ch <span class="token builtin">chan</span> Item<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ChannelIterable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="new_create_iterable" class="doc-node">
+			<div class="title"><h2>fn new_create_iterable <a href="#new_create_iterable">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/iterable_channel.v#L54"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> new_create_iterable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>producer ProducerFn<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>CreateIterable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="new_slice_iterable" class="doc-node">
+			<div class="title"><h2>fn new_slice_iterable <a href="#new_slice_iterable">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/iterable_channel.v#L28"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> new_slice_iterable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>items <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>SliceIterable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="of" class="doc-node">
+			<div class="title"><h2>fn of <a href="#of">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/item.v#L16"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> of<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>value <span class="token builtin">T</span><span class="token punctuation">)</span> Item<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="parse_options" class="doc-node">
+			<div class="title"><h2>fn parse_options <a href="#parse_options">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/option.v#L19"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">parse_options</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> Options</code></pre>
+<p>parse_options merges a list of RxOption functions into an Options value.</p>
+
+</section>
+
+		<section id="range" class="doc-node">
+			<div class="title"><h2>fn range <a href="#range">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L56"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">range</span><span class="token punctuation">(</span>start <span class="token builtin">int</span><span class="token punctuation">,</span> count <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span></code></pre>
+<p>range emits integers in [start, start+count).</p>
+
+</section>
+
+		<section id="throw" class="doc-node">
+			<div class="title"><h2>fn throw <a href="#throw">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/factory.v#L45"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> throw<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>err <span class="token builtin">IError</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>throw emits a single error then completes.</p>
+
+</section>
+
+		<section id="with_buffer_size" class="doc-node">
+			<div class="title"><h2>fn with_buffer_size <a href="#with_buffer_size">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/option.v#L57"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">with_buffer_size</span><span class="token punctuation">(</span>n <span class="token builtin">int</span><span class="token punctuation">)</span> RxOption</code></pre>
+<p>--- built-in option constructors ---</p>
+
+</section>
+
+		<section id="with_context" class="doc-node">
+			<div class="title"><h2>fn with_context <a href="#with_context">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/option.v#L69"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">with_context</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">)</span> RxOption</code></pre>
+
+
+</section>
+
+		<section id="with_eager_observation" class="doc-node">
+			<div class="title"><h2>fn with_eager_observation <a href="#with_eager_observation">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/option.v#L75"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">with_eager_observation</span><span class="token punctuation">(</span><span class="token punctuation">)</span> RxOption</code></pre>
+
+
+</section>
+
+		<section id="with_error_strategy" class="doc-node">
+			<div class="title"><h2>fn with_error_strategy <a href="#with_error_strategy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/option.v#L81"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">with_error_strategy</span><span class="token punctuation">(</span>strategy OnErrorStrategy<span class="token punctuation">)</span> RxOption</code></pre>
+
+
+</section>
+
+		<section id="with_pool" class="doc-node">
+			<div class="title"><h2>fn with_pool <a href="#with_pool">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/option.v#L63"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">with_pool</span><span class="token punctuation">(</span>n <span class="token builtin">int</span><span class="token punctuation">)</span> RxOption</code></pre>
+
+
+</section>
+
+		<section id="BackpressureStrategy.from" class="doc-node">
+			<div class="title"><h2>fn BackpressureStrategy.from <a href="#BackpressureStrategy.from">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/types.v#L3"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> BackpressureStrategy<span class="token punctuation">.</span>from<span class="token punctuation">[</span><span class="token builtin">W</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token builtin">W</span><span class="token punctuation">)</span> <span class="token operator">!</span>BackpressureStrategy</code></pre>
+
+
+</section>
+
+		<section id="CloseChannelStrategy.from" class="doc-node">
+			<div class="title"><h2>fn CloseChannelStrategy.from <a href="#CloseChannelStrategy.from">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/item.v#L3"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> CloseChannelStrategy<span class="token punctuation">.</span>from<span class="token punctuation">[</span><span class="token builtin">W</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token builtin">W</span><span class="token punctuation">)</span> <span class="token operator">!</span>CloseChannelStrategy</code></pre>
+
+
+</section>
+
+		<section id="ObservationStrategy.from" class="doc-node">
+			<div class="title"><h2>fn ObservationStrategy.from <a href="#ObservationStrategy.from">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/types.v#L43"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> ObservationStrategy<span class="token punctuation">.</span>from<span class="token punctuation">[</span><span class="token builtin">W</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token builtin">W</span><span class="token punctuation">)</span> <span class="token operator">!</span>ObservationStrategy</code></pre>
+
+
+</section>
+
+		<section id="OnErrorStrategy.from" class="doc-node">
+			<div class="title"><h2>fn OnErrorStrategy.from <a href="#OnErrorStrategy.from">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/types.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> OnErrorStrategy<span class="token punctuation">.</span>from<span class="token punctuation">[</span><span class="token builtin">W</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token builtin">W</span><span class="token punctuation">)</span> <span class="token operator">!</span>OnErrorStrategy</code></pre>
+
+
+</section>
+
+		<section id="Iterable" class="doc-node">
+			<div class="title"><h2>interface Iterable <a href="#Iterable">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/iterable.v#L4"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">interface</span> Iterable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">mut</span><span class="token punctuation">:</span>
+	<span class="token function">observe</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token builtin">chan</span> Item<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Iterable[T] is the base interface for anything that can be observed.</p>
+
+</section>
+
+		<section id="Observable" class="doc-node">
+			<div class="title"><h2>interface Observable <a href="#Observable">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/iterable.v#L15"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">interface</span> Observable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	Iterable
+<span class="token punctuation">}</span></code></pre>
+<p>Note: Observable[T] as a generic interface with generic method params (likefilter(PredicateFn[T])) is not yet fully supported by the V compiler — the interface check fails to substitute T in method signatures. We therefore expose ObservableImpl[T] directly as the public API. The Observable[T] interface is kept minimal (only observe) for use where a common supertype is needed without operators.</p>
+
+</section>
+
+		<section id="ChannelIterable[T].observe" class="doc-node">
+			<div class="title"><h2>fn (ChannelIterable[T]) observe <a href="#ChannelIterable[T].observe">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/iterable_channel.v#L17"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> i ChannelIterable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">observe</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token builtin">chan</span> Item<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="CompletedFn" class="doc-node">
+			<div class="title"><h2>type CompletedFn <a href="#CompletedFn">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/types.v#L21"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">type</span> CompletedFn <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p>CompletedFn is called when the stream completes.</p>
+
+</section>
+
+		<section id="CreateIterable[T].observe" class="doc-node">
+			<div class="title"><h2>fn (CreateIterable[T]) observe <a href="#CreateIterable[T].observe">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/iterable_channel.v#L67"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> i CreateIterable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">observe</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token builtin">chan</span> Item<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="ErrFn" class="doc-node">
+			<div class="title"><h2>type ErrFn <a href="#ErrFn">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/types.v#L18"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">type</span> ErrFn <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>err <span class="token builtin">IError</span><span class="token punctuation">)</span></code></pre>
+<p>ErrFn is called when an error item is received.</p>
+
+</section>
+
+		<section id="MapFn" class="doc-node">
+			<div class="title"><h2>type MapFn <a href="#MapFn">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/types.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">type</span> MapFn<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">,</span> <span class="token builtin">U</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>value <span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token builtin">U</span></code></pre>
+<p>MapFn[T, U] transforms a T value into a U, or returns an error.</p>
+
+</section>
+
+		<section id="NextFn" class="doc-node">
+			<div class="title"><h2>type NextFn <a href="#NextFn">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/types.v#L15"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">type</span> NextFn<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>value <span class="token builtin">T</span><span class="token punctuation">)</span></code></pre>
+<p>NextFn[T] is called for each next value in for_each.</p>
+
+</section>
+
+		<section id="ObservableImpl[T].str" class="doc-node">
+			<div class="title"><h2>fn (ObservableImpl[T]) str <a href="#ObservableImpl[T].str">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L37"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">str</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span></code></pre>
+
+
+</section>
+
+		<section id="PredicateFn" class="doc-node">
+			<div class="title"><h2>type PredicateFn <a href="#PredicateFn">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/types.v#L12"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">type</span> PredicateFn<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>value <span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
+<p>PredicateFn[T] tests a value; return true to keep it.</p>
+
+</section>
+
+		<section id="ProducerFn" class="doc-node">
+			<div class="title"><h2>type ProducerFn <a href="#ProducerFn">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/types.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">type</span> ProducerFn<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> ch <span class="token builtin">chan</span> Item<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>ProducerFn[T] sends items onto a channel given a context.</p>
+
+</section>
+
+		<section id="RxOption" class="doc-node">
+			<div class="title"><h2>type RxOption <a href="#RxOption">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/option.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">type</span> RxOption <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> options Options<span class="token punctuation">)</span></code></pre>
+<p>RxOption is a functional option applied to an Options struct.</p>
+
+</section>
+
+		<section id="SliceIterable[T].observe" class="doc-node">
+			<div class="title"><h2>fn (SliceIterable[T]) observe <a href="#SliceIterable[T].observe">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/iterable_channel.v#L40"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> i SliceIterable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">observe</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token builtin">chan</span> Item<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="rxv.Item[T].is_error" class="doc-node">
+			<div class="title"><h2>fn (rxv.Item[T]) is_error <a href="#rxv.Item[T].is_error">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/item.v#L31"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>i Item<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">is_error</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
+
+
+</section>
+
+		<section id="rxv.Item[T].get_value" class="doc-node">
+			<div class="title"><h2>fn (rxv.Item[T]) get_value <a href="#rxv.Item[T].get_value">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/item.v#L36"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>i Item<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">get_value</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">T</span></code></pre>
+<p>get_value returns the item's value. Only call when has_value is true.</p>
+
+</section>
+
+		<section id="rxv.Item[T].send_context" class="doc-node">
+			<div class="title"><h2>fn (rxv.Item[T]) send_context <a href="#rxv.Item[T].send_context">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/item.v#L40"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>i Item<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">send_context</span><span class="token punctuation">(</span>done <span class="token builtin">chan</span> <span class="token builtin">int</span><span class="token punctuation">,</span> ch <span class="token builtin">chan</span> Item<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
+
+
+</section>
+
+		<section id="rxv.ObservableImpl[T].observe" class="doc-node">
+			<div class="title"><h2>fn (rxv.ObservableImpl[T]) observe <a href="#rxv.ObservableImpl[T].observe">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L41"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">observe</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token builtin">chan</span> Item<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="rxv.ObservableImpl[T].filter" class="doc-node">
+			<div class="title"><h2>fn (rxv.ObservableImpl[T]) filter <a href="#rxv.ObservableImpl[T].filter">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L77"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">filter</span><span class="token punctuation">(</span>predicate PredicateFn<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="rxv.ObservableImpl[T].take" class="doc-node">
+			<div class="title"><h2>fn (rxv.ObservableImpl[T]) take <a href="#rxv.ObservableImpl[T].take">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L120"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">take</span><span class="token punctuation">(</span>n <span class="token builtin">u32</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="rxv.ObservableImpl[T].for_each" class="doc-node">
+			<div class="title"><h2>fn (rxv.ObservableImpl[T]) for_each <a href="#rxv.ObservableImpl[T].for_each">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L167"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">for_each</span><span class="token punctuation">(</span>next_fn NextFn<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> err_fn ErrFn<span class="token punctuation">,</span> completed_fn CompletedFn<span class="token punctuation">,</span> opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token builtin">chan</span> <span class="token builtin">int</span></code></pre>
+
+
+</section>
+
+		<section id="rxv.Options.build_channel_t" class="doc-node">
+			<div class="title"><h2>fn (rxv.Options) build_channel_t <a href="#rxv.Options.build_channel_t">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/option.v#L30"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>o Options<span class="token punctuation">)</span> build_channel_t<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">chan</span> Item<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>build_channel_t creates a typed buffered channel.</p>
+
+</section>
+
+		<section id="rxv.Options.get_pool" class="doc-node">
+			<div class="title"><h2>fn (rxv.Options) get_pool <a href="#rxv.Options.get_pool">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/option.v#L44"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>o Options<span class="token punctuation">)</span> <span class="token function">get_pool</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token builtin">int</span></code></pre>
+<p>get_pool returns the pool size if set.</p>
+
+</section>
+
+		<section id="rxv.Options.is_eager_observation" class="doc-node">
+			<div class="title"><h2>fn (rxv.Options) is_eager_observation <a href="#rxv.Options.is_eager_observation">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/option.v#L51"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>o Options<span class="token punctuation">)</span> <span class="token function">is_eager_observation</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
+
+
+</section>
+
+		<section id="BackpressureStrategy" class="doc-node">
+			<div class="title"><h2>enum BackpressureStrategy <a href="#BackpressureStrategy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/types.v#L24"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">enum</span> <span class="token symbol">BackpressureStrategy</span> <span class="token punctuation">{</span>
+	block
+	drop
+<span class="token punctuation">}</span></code></pre>
+<p>BackpressureStrategy controls how full channels are handled.</p>
+
+</section>
+
+		<section id="CloseChannelStrategy" class="doc-node">
+			<div class="title"><h2>enum CloseChannelStrategy <a href="#CloseChannelStrategy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/item.v#L58"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">enum</span> <span class="token symbol">CloseChannelStrategy</span> <span class="token punctuation">{</span>
+	leave_channel_open
+	close_channel
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+
+		<section id="ObservationStrategy" class="doc-node">
+			<div class="title"><h2>enum ObservationStrategy <a href="#ObservationStrategy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/types.v#L36"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">enum</span> <span class="token symbol">ObservationStrategy</span> <span class="token punctuation">{</span>
+	lazy
+	eager
+<span class="token punctuation">}</span></code></pre>
+<p>ObservationStrategy controls eager vs lazy subscription.</p>
+
+</section>
+
+		<section id="OnErrorStrategy" class="doc-node">
+			<div class="title"><h2>enum OnErrorStrategy <a href="#OnErrorStrategy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/types.v#L30"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">enum</span> <span class="token symbol">OnErrorStrategy</span> <span class="token punctuation">{</span>
+	stop_on_error
+	continue_on_error
+<span class="token punctuation">}</span></code></pre>
+<p>OnErrorStrategy controls operator behaviour on errors.</p>
+
+</section>
+
+		<section id="ChannelIterable" class="doc-node">
+			<div class="title"><h2>struct ChannelIterable <a href="#ChannelIterable">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/iterable_channel.v#L8"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> ChannelIterable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">mut</span><span class="token punctuation">:</span>
+	next <span class="token builtin">chan</span> Item<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<p>---- ChannelIterable -------------------------------------------------------- Used internally to get a channel from a pre-existing channel.</p>
+
+</section>
+
+		<section id="CreateIterable" class="doc-node">
+			<div class="title"><h2>struct CreateIterable <a href="#CreateIterable">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/iterable_channel.v#L49"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> CreateIterable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">mut</span><span class="token punctuation">:</span>
+	producer ProducerFn<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>---- CreateIterable ---------------------------------------------------------</p>
+
+</section>
+
+		<section id="Item" class="doc-node">
+			<div class="title"><h2>struct Item <a href="#Item">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/item.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> Item<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	value     <span class="token builtin">T</span>
+	has_value <span class="token builtin">bool</span>
+	err       <span class="token builtin">IError</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Item represents an emitted value or error in the rxv stream.</p>
+<p>Note: We use <code>has_value bool</code> instead of <code>?T</code> to avoid a V compiler codegen bug (V 0.5.1) where optional ?T field access generates wrong C temp types when multiple generic specializations coexist in one translation unit.</p>
+
+</section>
+
+		<section id="ObservableImpl" class="doc-node">
+			<div class="title"><h2>struct ObservableImpl <a href="#ObservableImpl">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L31"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[heap]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">mut</span><span class="token punctuation">:</span>
+	ch     <span class="token builtin">chan</span> Item<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span>
+	parent context<span class="token punctuation">.</span>Context
+<span class="token punctuation">}</span></code></pre>
+<p>ObservableImpl[T] is the primary reactive stream type.</p>
+<p>DESIGN NOTE — why <code>chan Item[T]</code> not <code>Iterable[T]</code>: V's generic codegen has a bug where assigning to an interface field inside a generic function cross-contaminates specializations. Using a concrete <code>chan Item[T]</code> avoids that.</p>
+<p>DESIGN NOTE — why try_pop not select: V's select codegen for generic channels allocates the receive-buffer with the wrong type when multiple specializations of the same function coexist in the same translation unit. try_pop bypasses that.</p>
+<p>DESIGN NOTE — for_each and channel-capture pattern: V closures capture arrays by copy, not by reference. The workaround:1. User closures capture a <code>chan T</code> (results_ch) instead of <code>[]T</code>2. main thread drains bridge channel, calling user next_fn on each value3. completed_fn is called after drain4. for_each returns the signal channel</p>
+<p>User code receives results by draining results_ch into a local array AFTER &lt;-for_each_signal completes. Example: done := obs.for_each(fn [mut results] (v) { results &lt;- v }, ...) &lt;-done for { v := &lt;-results_ch; if closed {break} else { arr &lt;&lt; v } }</p>
+
+</section>
+
+		<section id="Options" class="doc-node">
+			<div class="title"><h2>struct Options <a href="#Options">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/option.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token symbol">Options</span> <span class="token punctuation">{</span>
+<span class="token keyword">mut</span><span class="token punctuation">:</span>
+	buffer_size    <span class="token builtin">int</span>
+	pool           <span class="token builtin">int</span>
+	ctx            context<span class="token punctuation">.</span>Context
+	eager          <span class="token builtin">bool</span>
+	error_strategy OnErrorStrategy
+<span class="token punctuation">}</span></code></pre>
+<p>Options holds resolved operator configuration.</p>
+
+</section>
+
+		<section id="Options.build_context" class="doc-node">
+			<div class="title"><h2>fn (Options) build_context <a href="#Options.build_context">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/option.v#L35"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o Options<span class="token punctuation">)</span> <span class="token function">build_context</span><span class="token punctuation">(</span>parent context<span class="token punctuation">.</span>Context<span class="token punctuation">)</span> context<span class="token punctuation">.</span>Context</code></pre>
+<p>build_context returns the context for an operator.</p>
+
+</section>
+
+		<section id="SliceIterable" class="doc-node">
+			<div class="title"><h2>struct SliceIterable <a href="#SliceIterable">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/iterable_channel.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> SliceIterable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">mut</span><span class="token punctuation">:</span>
+	items <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">T</span>
+<span class="token punctuation">}</span></code></pre>
+<p>---- SliceIterable ----------------------------------------------------------</p>
+
+</section>
+
+
+						<div class="footer">Powered by vdoc. Generated on: 8 May 2026 01:51:01</div>
+					</div>
+					<div class="doc-toc"><ul><li class="open"><a href="#readme_rxv">README</a></li>
+<li class="open"><a href="#create">fn create</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#defer_">fn defer_</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#empty">fn empty</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#from_channel">fn from_channel</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#from_error">fn from_error</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#just">fn just</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#map_">fn map_</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#new_channel_iterable">fn new_channel_iterable</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#new_create_iterable">fn new_create_iterable</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#new_slice_iterable">fn new_slice_iterable</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#of">fn of</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#parse_options">fn parse_options</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#range">fn range</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#throw">fn throw</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#with_buffer_size">fn with_buffer_size</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#with_context">fn with_context</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#with_eager_observation">fn with_eager_observation</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#with_error_strategy">fn with_error_strategy</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#with_pool">fn with_pool</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#BackpressureStrategy.from">fn BackpressureStrategy.from</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#CloseChannelStrategy.from">fn CloseChannelStrategy.from</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ObservationStrategy.from">fn ObservationStrategy.from</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#OnErrorStrategy.from">fn OnErrorStrategy.from</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#Iterable">interface Iterable</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#Observable">interface Observable</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ChannelIterable[T].observe">type ChannelIterable[T]</a>        <ul>
+<li><a href="#ChannelIterable[T].observe">fn observe</a></li>
+</ul>
+</li>
+<li class="open"><a href="#CompletedFn">type CompletedFn</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#CreateIterable[T].observe">type CreateIterable[T]</a>        <ul>
+<li><a href="#CreateIterable[T].observe">fn observe</a></li>
+</ul>
+</li>
+<li class="open"><a href="#ErrFn">type ErrFn</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#MapFn">type MapFn</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#NextFn">type NextFn</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ObservableImpl[T].str">type ObservableImpl[T]</a>        <ul>
+<li><a href="#ObservableImpl[T].str">fn str</a></li>
+</ul>
+</li>
+<li class="open"><a href="#PredicateFn">type PredicateFn</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ProducerFn">type ProducerFn</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#RxOption">type RxOption</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#SliceIterable[T].observe">type SliceIterable[T]</a>        <ul>
+<li><a href="#SliceIterable[T].observe">fn observe</a></li>
+</ul>
+</li>
+<li class="open"><a href="#rxv.Item[T].is_error">type rxv.Item[T]</a>        <ul>
+<li><a href="#rxv.Item[T].is_error">fn is_error</a></li>
+<li><a href="#rxv.Item[T].get_value">fn get_value</a></li>
+<li><a href="#rxv.Item[T].send_context">fn send_context</a></li>
+</ul>
+</li>
+<li class="open"><a href="#rxv.ObservableImpl[T].observe">type rxv.ObservableImpl[T]</a>        <ul>
+<li><a href="#rxv.ObservableImpl[T].observe">fn observe</a></li>
+<li><a href="#rxv.ObservableImpl[T].filter">fn filter</a></li>
+<li><a href="#rxv.ObservableImpl[T].take">fn take</a></li>
+<li><a href="#rxv.ObservableImpl[T].for_each">fn for_each</a></li>
+</ul>
+</li>
+<li class="open"><a href="#rxv.Options.build_channel_t">type rxv.Options</a>        <ul>
+<li><a href="#rxv.Options.build_channel_t">fn build_channel_t</a></li>
+<li><a href="#rxv.Options.get_pool">fn get_pool</a></li>
+<li><a href="#rxv.Options.is_eager_observation">fn is_eager_observation</a></li>
+</ul>
+</li>
+<li class="open"><a href="#BackpressureStrategy">enum BackpressureStrategy</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#CloseChannelStrategy">enum CloseChannelStrategy</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ObservationStrategy">enum ObservationStrategy</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#OnErrorStrategy">enum OnErrorStrategy</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ChannelIterable">struct ChannelIterable</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#CreateIterable">struct CreateIterable</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#Item">struct Item</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ObservableImpl">struct ObservableImpl</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#Options">struct Options</a>        <ul>
+<li><a href="#Options.build_context">fn build_context</a></li>
+</ul>
+</li>
+<li class="open"><a href="#SliceIterable">struct SliceIterable</a>        <ul>
+</ul>
+</li>
+</ul></div>
+				</div>
+			</div>
+		</div>
+		<script src="doc.js"></script>
+		<script async src="search_index.js"></script>
+	</body>
+</html>
