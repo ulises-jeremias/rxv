@@ -11,7 +11,9 @@ mut:
 }
 
 pub fn new_channel_iterable[T](ch chan Item[T]) &ChannelIterable[T] {
-	return &ChannelIterable[T]{next: ch}
+	return &ChannelIterable[T]{
+		next: ch
+	}
 }
 
 pub fn (mut i ChannelIterable[T]) observe(opts ...RxOption) chan Item[T] {
@@ -26,7 +28,9 @@ mut:
 }
 
 pub fn new_slice_iterable[T](items []T) &SliceIterable[T] {
-	return &SliceIterable[T]{items: items}
+	return &SliceIterable[T]{
+		items: items
+	}
 }
 
 // slice_emit is a named generic helper used by spawn (anonymous generic closures are unsupported).
@@ -52,7 +56,9 @@ mut:
 }
 
 pub fn new_create_iterable[T](producer ProducerFn[T]) &CreateIterable[T] {
-	return &CreateIterable[T]{producer: producer}
+	return &CreateIterable[T]{
+		producer: producer
+	}
 }
 
 // create_run is a named generic helper for spawn.

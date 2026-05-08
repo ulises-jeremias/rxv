@@ -5,7 +5,10 @@ fn test_from_slice() {
 	ch := obs.observe()
 	mut results := []int{}
 	for {
-		mut item := rxv.Item[int]{ has_value: false, err: none }
+		mut item := rxv.Item[int]{
+			has_value: false
+			err:       none
+		}
 		s := ch.try_pop(mut item)
 		if s == .success {
 			if item.has_value {
@@ -23,7 +26,10 @@ fn test_repeat() {
 	ch := obs.observe()
 	mut results := []string{}
 	for {
-		mut item := rxv.Item[string]{ has_value: false, err: none }
+		mut item := rxv.Item[string]{
+			has_value: false
+			err:       none
+		}
 		s := ch.try_pop(mut item)
 		if s == .success {
 			if item.has_value {

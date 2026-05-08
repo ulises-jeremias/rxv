@@ -8,7 +8,10 @@ import time
 
 fn obs_flat_map_run[T, U](mapper fn (t T) &ObservableImpl[U], src chan Item[T], next chan Item[U]) {
 	for {
-		mut item := Item[T]{ has_value: false, err: none }
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
 		s := src.try_pop(mut item)
 		if s == .success {
 			if item.is_error() {
@@ -19,7 +22,10 @@ fn obs_flat_map_run[T, U](mapper fn (t T) &ObservableImpl[U], src chan Item[T], 
 				mut obs := mapper(item.get_value())
 				inner := obs.observe()
 				for {
-					mut inner_item := Item[U]{ has_value: false, err: none }
+					mut inner_item := Item[U]{
+						has_value: false
+						err:       none
+					}
 					ps := inner.try_pop(mut inner_item)
 					if ps == .success {
 						if inner_item.is_error() {
@@ -62,7 +68,10 @@ pub fn flat_map_[T, U](mut o ObservableImpl[T], mapper fn (t T) &ObservableImpl[
 
 fn obs_concat_map_run[T, U](mapper fn (t T) &ObservableImpl[U], src chan Item[T], next chan Item[U]) {
 	for {
-		mut item := Item[T]{ has_value: false, err: none }
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
 		s := src.try_pop(mut item)
 		if s == .success {
 			if item.is_error() {
@@ -73,7 +82,10 @@ fn obs_concat_map_run[T, U](mapper fn (t T) &ObservableImpl[U], src chan Item[T]
 				mut obs := mapper(item.get_value())
 				inner := obs.observe()
 				for {
-					mut inner_item := Item[U]{ has_value: false, err: none }
+					mut inner_item := Item[U]{
+						has_value: false
+						err:       none
+					}
 					ps := inner.try_pop(mut inner_item)
 					if ps == .success {
 						if inner_item.is_error() {

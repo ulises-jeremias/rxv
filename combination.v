@@ -10,7 +10,10 @@ fn obs_merge_run[T](src1 chan Item[T], src2 chan Item[T], next chan Item[T]) {
 	mut src2_done := false
 	for !src1_done || !src2_done {
 		if !src1_done {
-			mut item := Item[T]{ has_value: false, err: none }
+			mut item := Item[T]{
+				has_value: false
+				err:       none
+			}
 			s := src1.try_pop(mut item)
 			if s == .success {
 				if item.is_error() {
@@ -26,7 +29,10 @@ fn obs_merge_run[T](src1 chan Item[T], src2 chan Item[T], next chan Item[T]) {
 			}
 		}
 		if !src2_done {
-			mut item := Item[T]{ has_value: false, err: none }
+			mut item := Item[T]{
+				has_value: false
+				err:       none
+			}
 			s := src2.try_pop(mut item)
 			if s == .success {
 				if item.is_error() {
@@ -66,7 +72,10 @@ pub fn merge[T](mut o1 ObservableImpl[T], mut o2 ObservableImpl[T], opts ...RxOp
 fn obs_concat_run[T](sources []chan Item[T], next chan Item[T]) {
 	for src in sources {
 		for {
-			mut item := Item[T]{ has_value: false, err: none }
+			mut item := Item[T]{
+				has_value: false
+				err:       none
+			}
 			s := src.try_pop(mut item)
 			if s == .success {
 				if item.is_error() {

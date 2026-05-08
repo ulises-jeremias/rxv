@@ -7,7 +7,10 @@ fn test_merge() {
 	ch := merged.observe()
 	mut results := []int{}
 	for {
-		mut item := rxv.Item[int]{ has_value: false, err: none }
+		mut item := rxv.Item[int]{
+			has_value: false
+			err:       none
+		}
 		s := ch.try_pop(mut item)
 		if s == .success {
 			if item.has_value {
@@ -28,7 +31,10 @@ fn test_concat() {
 	ch := concatted.observe()
 	mut results := []int{}
 	for {
-		mut item := rxv.Item[int]{ has_value: false, err: none }
+		mut item := rxv.Item[int]{
+			has_value: false
+			err:       none
+		}
 		s := ch.try_pop(mut item)
 		if s == .success {
 			if item.has_value {

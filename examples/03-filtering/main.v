@@ -3,7 +3,9 @@ import rxv
 fn main() {
 	// filter — keep only even numbers
 	mut obs := rxv.range(1, 10)
-	mut evens := obs.filter(fn (v int) bool { return v % 2 == 0 })
+	mut evens := obs.filter(fn (v int) bool {
+		return v % 2 == 0
+	})
 	println('even numbers from 1..10:')
 	done := evens.for_each(fn (v int) {
 		print('${v} ')
@@ -47,7 +49,9 @@ fn main() {
 
 	// chain: filter + take + last
 	mut r20 := rxv.range(1, 20)
-	mut filtered := r20.filter(fn (v int) bool { return v % 3 == 0 })
+	mut filtered := r20.filter(fn (v int) bool {
+		return v % 3 == 0
+	})
 	mut taken := filtered.take(4)
 	mut chain := taken.last()
 	println('multiples of 3, first 4, last one:')

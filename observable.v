@@ -24,7 +24,10 @@ const poll_sleep = 10 * time.microsecond
 
 fn obs_filter_run[T](predicate PredicateFn[T], src chan Item[T], next chan Item[T]) {
 	for {
-		mut item := Item[T]{ has_value: false, err: none }
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
 		s := src.try_pop(mut item)
 		if s == .success {
 			if item.is_error() {
@@ -59,7 +62,10 @@ pub fn (mut o ObservableImpl[T]) filter(predicate PredicateFn[T], opts ...RxOpti
 fn obs_take_run[T](n u32, src chan Item[T], next chan Item[T]) {
 	mut count := u32(0)
 	for count < n {
-		mut item := Item[T]{ has_value: false, err: none }
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
 		s := src.try_pop(mut item)
 		if s == .success {
 			next <- item
@@ -88,7 +94,10 @@ pub fn (mut o ObservableImpl[T]) take(n u32, opts ...RxOption) &ObservableImpl[T
 
 fn obs_for_each_bridge[T](bridge chan T, src chan Item[T], signal chan int) {
 	for {
-		mut item := Item[T]{ has_value: false, err: none }
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
 		s := src.try_pop(mut item)
 		if s == .success {
 			if item.is_error() {
@@ -138,7 +147,10 @@ pub fn (mut o ObservableImpl[T]) for_each(next_fn NextFn[T], err_fn ErrFn, compl
 
 fn obs_map_run[T, U](apply MapFn[T, U], src chan Item[T], next chan Item[U]) {
 	for {
-		mut item := Item[T]{ has_value: false, err: none }
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
 		s := src.try_pop(mut item)
 		if s == .success {
 			if item.is_error() {
@@ -178,7 +190,10 @@ pub fn map_[T, U](mut o ObservableImpl[T], apply MapFn[T, U], opts ...RxOption) 
 fn obs_scan_run[T, U](seed U, accumulator fn (acc U, val T) U, src chan Item[T], next chan Item[U]) {
 	mut acc := seed
 	for {
-		mut item := Item[T]{ has_value: false, err: none }
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
 		s := src.try_pop(mut item)
 		if s == .success {
 			if item.is_error() {
@@ -216,7 +231,10 @@ pub fn scan_[T, U](mut o ObservableImpl[T], seed U, accumulator fn (acc U, val T
 fn obs_reduce_run[T, U](seed U, accumulator fn (acc U, val T) U, src chan Item[T], next chan Item[U]) {
 	mut acc := seed
 	for {
-		mut item := Item[T]{ has_value: false, err: none }
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
 		s := src.try_pop(mut item)
 		if s == .success {
 			if item.is_error() {
@@ -253,7 +271,10 @@ pub fn reduce_[T, U](mut o ObservableImpl[T], seed U, accumulator fn (acc U, val
 fn obs_count_run[T](src chan Item[T], next chan Item[int]) {
 	mut n := 0
 	for {
-		mut item := Item[T]{ has_value: false, err: none }
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
 		s := src.try_pop(mut item)
 		if s == .success {
 			if item.is_error() {
@@ -290,7 +311,10 @@ pub fn count_[T](mut o ObservableImpl[T], opts ...RxOption) &ObservableImpl[int]
 fn obs_distinct_run[T](src chan Item[T], next chan Item[T]) {
 	mut seen := map[string]bool{}
 	for {
-		mut item := Item[T]{ has_value: false, err: none }
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
 		s := src.try_pop(mut item)
 		if s == .success {
 			if item.is_error() {
@@ -331,7 +355,10 @@ fn obs_distinct_until_changed_run[T](src chan Item[T], next chan Item[T]) {
 	mut has_prev := false
 	mut prev := T{}
 	for {
-		mut item := Item[T]{ has_value: false, err: none }
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
 		s := src.try_pop(mut item)
 		if s == .success {
 			if item.is_error() {
@@ -372,7 +399,10 @@ pub fn (mut o ObservableImpl[T]) distinct_until_changed(opts ...RxOption) &Obser
 fn obs_first_run[T](src chan Item[T], next chan Item[T]) {
 	mut found := false
 	for !found {
-		mut item := Item[T]{ has_value: false, err: none }
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
 		s := src.try_pop(mut item)
 		if s == .success {
 			if item.is_error() {
@@ -405,9 +435,15 @@ pub fn (mut o ObservableImpl[T]) first(opts ...RxOption) &ObservableImpl[T] {
 }
 
 fn obs_last_run[T](src chan Item[T], next chan Item[T]) {
-	mut last := Item[T]{ has_value: false, err: none }
+	mut last := Item[T]{
+		has_value: false
+		err:       none
+	}
 	for {
-		mut item := Item[T]{ has_value: false, err: none }
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
 		s := src.try_pop(mut item)
 		if s == .success {
 			if item.is_error() {
@@ -449,7 +485,10 @@ fn obs_timeout_run[T](timeout_ms int, src chan Item[T], next chan Item[T]) {
 	mut elapsed_us := i64(0)
 	limit_us := i64(timeout_ms) * 1000
 	for {
-		mut item := Item[T]{ has_value: false, err: none }
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
 		s := src.try_pop(mut item)
 		if s == .success {
 			elapsed_us = 0
@@ -489,7 +528,10 @@ fn obs_average_f64_run(src chan Item[f64], next chan Item[f64]) {
 	mut sum := f64(0)
 	mut count := 0
 	for {
-		mut item := Item[f64]{ has_value: false, err: none }
+		mut item := Item[f64]{
+			has_value: false
+			err:       none
+		}
 		s := src.try_pop(mut item)
 		if s == .success {
 			if item.is_error() {
@@ -529,7 +571,10 @@ pub fn (mut o ObservableImpl[f64]) average_f64(opts ...RxOption) &ObservableImpl
 fn obs_sum_f64_run(src chan Item[f64], next chan Item[f64]) {
 	mut sum := f64(0)
 	for {
-		mut item := Item[f64]{ has_value: false, err: none }
+		mut item := Item[f64]{
+			has_value: false
+			err:       none
+		}
 		s := src.try_pop(mut item)
 		if s == .success {
 			if item.is_error() {

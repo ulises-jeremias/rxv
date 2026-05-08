@@ -90,7 +90,10 @@ fn defer_producer_run[T](factory fn () &ObservableImpl[T], done chan int, ch cha
 		if ds == .success || ds == .closed {
 			break
 		}
-		mut item := Item[T]{ has_value: false, err: none }
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
 		s := src.try_pop(mut item)
 		if s == .success {
 			item.send_context(done, ch)

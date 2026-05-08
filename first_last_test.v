@@ -4,7 +4,10 @@ fn test_first() {
 	mut obs := rxv.just[int](10, 20, 30)
 	mut result := obs.first()
 	ch := result.observe()
-	mut item := rxv.Item[int]{ has_value: false, err: none }
+	mut item := rxv.Item[int]{
+		has_value: false
+		err:       none
+	}
 	for {
 		s := ch.try_pop(mut item)
 		if s == .success || s == .closed {
@@ -19,7 +22,10 @@ fn test_last() {
 	mut obs := rxv.just[int](10, 20, 30)
 	mut result := obs.last()
 	ch := result.observe()
-	mut item := rxv.Item[int]{ has_value: false, err: none }
+	mut item := rxv.Item[int]{
+		has_value: false
+		err:       none
+	}
 	for {
 		s := ch.try_pop(mut item)
 		if s == .success || s == .closed {

@@ -3,7 +3,9 @@ import rxv
 fn main() {
 	// map_ — double each number
 	mut nums := rxv.range(1, 5)
-	mut doubled := rxv.map_[int, int](mut nums, fn (v int) ?int { return v * 2 })
+	mut doubled := rxv.map_[int, int](mut nums, fn (v int) ?int {
+		return v * 2
+	})
 	println('doubled:')
 	done := doubled.for_each(fn (v int) {
 		print('${v} ')

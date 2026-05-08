@@ -13,5 +13,5 @@ mut:
 // interface is kept minimal (only observe) for use where a common supertype
 // is needed without operators.
 pub interface Observable[T] {
-	Iterable[T]
+	Iterable
 }

@@ -4,7 +4,10 @@ fn test_count() {
 	mut obs := rxv.just[int](1, 2, 3, 4, 5)
 	mut result_obs := rxv.count_[int](mut obs)
 	ch := result_obs.observe()
-	mut item := rxv.Item[int]{ has_value: false, err: none }
+	mut item := rxv.Item[int]{
+		has_value: false
+		err:       none
+	}
 	for {
 		s := ch.try_pop(mut item)
 		if s == .success || s == .closed {
@@ -23,7 +26,10 @@ fn test_scan() {
 	ch := result.observe()
 	mut results := []int{}
 	for {
-		mut item := rxv.Item[int]{ has_value: false, err: none }
+		mut item := rxv.Item[int]{
+			has_value: false
+			err:       none
+		}
 		s := ch.try_pop(mut item)
 		if s == .success {
 			if item.has_value {
@@ -42,7 +48,10 @@ fn test_reduce() {
 		return acc + val
 	})
 	ch := result.observe()
-	mut item := rxv.Item[int]{ has_value: false, err: none }
+	mut item := rxv.Item[int]{
+		has_value: false
+		err:       none
+	}
 	for {
 		s := ch.try_pop(mut item)
 		if s == .success || s == .closed {
