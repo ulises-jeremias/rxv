@@ -115,6 +115,24 @@ mut l := rxv.just[int](10, 20, 30).last()
 // emits: 30
 ```
 
+### `.skip(n)`
+
+Suppresses the first `n` items emitted by the source.
+
+```v ignore
+mut obs := rxv.just[int](1, 2, 3, 4, 5).skip(2)
+// emits: 3, 4, 5
+```
+
+### `.take_last(n)`
+
+Emits only the last `n` items from the source.
+
+```v ignore
+mut obs := rxv.just[int](1, 2, 3, 4, 5).take_last(2)
+// emits: 4, 5
+```
+
 ### `.distinct`
 
 Suppresses all items already seen.
