@@ -927,10 +927,10 @@ pub fn buffer_[T](mut o ObservableImpl[T], count u32, opts ...RxOption) &Observa
 	}
 }
 
-fn buffer_count_worker[T](count u32, src chan Item[T], next chan Item[[]T]) {
-	mut buf := []T{}
+fn buffer_count_worker[U](count u32, src chan Item[U], next chan Item[[]U]) {
+	mut buf := []U{}
 	for {
-		mut item := Item[T]{
+		mut item := Item[U]{
 			has_value: false
 			err:       none
 		}
@@ -938,7 +938,7 @@ fn buffer_count_worker[T](count u32, src chan Item[T], next chan Item[[]T]) {
 		if s == .success {
 			if item.is_error() {
 				if buf.len > 0 {
-					next <- of[[]T](buf)
+					next <- of[[]U](buf)
 				}
 				next <- item
 				break
@@ -946,13 +946,13 @@ fn buffer_count_worker[T](count u32, src chan Item[T], next chan Item[[]T]) {
 			if item.has_value {
 				buf << item.get_value()
 				if u32(buf.len) >= count {
-					next <- of[[]T](buf)
-					buf = []T{}
+					next <- of[[]U](buf)
+					buf = []U{}
 				}
 			}
 		} else if s == .closed {
 			if buf.len > 0 {
-				next <- of[[]T](buf)
+				next <- of[[]U](buf)
 			}
 			break
 		} else {
@@ -1087,11 +1087,11 @@ fn buffer_time[T](period_ms int, src chan Item[T], next chan Item[[]T]) {
 	spawn buffer_time_worker[T](period_ms, src, next)
 }
 
-fn buffer_time_worker[T](period_ms int, src chan Item[T], next chan Item[[]T]) {
-	mut buf := []T{}
+fn buffer_time_worker[U](period_ms int, src chan Item[U], next chan Item[[]U]) {
+	mut buf := []U{}
 	mut last_flush := time.now()
 	for {
-		mut item := Item[T]{
+		mut item := Item[U]{
 			has_value: false
 			err:       none
 		}
@@ -1099,7 +1099,7 @@ fn buffer_time_worker[T](period_ms int, src chan Item[T], next chan Item[[]T]) {
 		if s == .success {
 			if item.is_error() {
 				if buf.len > 0 {
-					next <- of[[]T](buf)
+					next <- of[[]U](buf)
 				}
 				next <- item
 				break
@@ -1109,14 +1109,14 @@ fn buffer_time_worker[T](period_ms int, src chan Item[T], next chan Item[[]T]) {
 			}
 		} else if s == .closed {
 			if buf.len > 0 {
-				next <- of[[]T](buf)
+				next <- of[[]U](buf)
 			}
 			break
 		} else {
 			now := time.now()
 			if now.unix_offset_ms() - last_flush.unix_offset_ms() >= i64(period_ms) && buf.len > 0 {
-				next <- of[[]T](buf)
-				buf = []T{}
+				next <- of[[]U](buf)
+				buf = []U{}
 				last_flush = now
 			} else {
 				time.sleep(poll_sleep)
