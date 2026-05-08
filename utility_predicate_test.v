@@ -3,7 +3,9 @@ import rxv
 // test all items match predicate
 fn test_all_match() {
 	mut obs := rxv.just[int](2, 4, 6, 8)
-	mut result := obs.all(fn (v int) bool { return v % 2 == 0 })
+	mut result := obs.all(fn (v int) bool {
+		return v % 2 == 0
+	})
 	ch := result.observe()
 	mut item := rxv.Item[bool]{
 		has_value: false
@@ -22,7 +24,9 @@ fn test_all_match() {
 // test all fails on non-matching item
 fn test_all_some_dont_match() {
 	mut obs := rxv.just[int](2, 4, 5, 8)
-	mut result := obs.all(fn (v int) bool { return v % 2 == 0 })
+	mut result := obs.all(fn (v int) bool {
+		return v % 2 == 0
+	})
 	ch := result.observe()
 	mut item := rxv.Item[bool]{
 		has_value: false
@@ -41,7 +45,9 @@ fn test_all_some_dont_match() {
 // test all on empty stream returns true
 fn test_all_empty() {
 	mut obs := rxv.empty[int]()
-	mut result := obs.all(fn (v int) bool { return v > 0 })
+	mut result := obs.all(fn (v int) bool {
+		return v > 0
+	})
 	ch := result.observe()
 	mut item := rxv.Item[bool]{
 		has_value: false
@@ -60,7 +66,9 @@ fn test_all_empty() {
 // test any finds a match
 fn test_any_found() {
 	mut obs := rxv.just[int](1, 3, 5, 6)
-	mut result := obs.any(fn (v int) bool { return v % 2 == 0 })
+	mut result := obs.any(fn (v int) bool {
+		return v % 2 == 0
+	})
 	ch := result.observe()
 	mut item := rxv.Item[bool]{
 		has_value: false
@@ -79,7 +87,9 @@ fn test_any_found() {
 // test any on no match returns false
 fn test_any_not_found() {
 	mut obs := rxv.just[int](1, 3, 5, 7)
-	mut result := obs.any(fn (v int) bool { return v % 2 == 0 })
+	mut result := obs.any(fn (v int) bool {
+		return v % 2 == 0
+	})
 	ch := result.observe()
 	mut item := rxv.Item[bool]{
 		has_value: false
@@ -98,7 +108,9 @@ fn test_any_not_found() {
 // test find returns first matching item
 fn test_find_found() {
 	mut obs := rxv.just[int](1, 3, 5, 6, 8)
-	mut result := obs.find(fn (v int) bool { return v % 2 == 0 })
+	mut result := obs.find(fn (v int) bool {
+		return v % 2 == 0
+	})
 	ch := result.observe()
 	mut item := rxv.Item[int]{
 		has_value: false
@@ -117,7 +129,9 @@ fn test_find_found() {
 // test find on no match completes without value
 fn test_find_not_found() {
 	mut obs := rxv.just[int](1, 3, 5, 7)
-	mut result := obs.find(fn (v int) bool { return v % 2 == 0 })
+	mut result := obs.find(fn (v int) bool {
+		return v % 2 == 0
+	})
 	ch := result.observe()
 	mut item := rxv.Item[int]{
 		has_value: false
@@ -135,7 +149,9 @@ fn test_find_not_found() {
 // test contains found
 fn test_contains_found() {
 	mut obs := rxv.just[int](1, 2, 3, 4, 5)
-	mut result := obs.contains(fn (v int) bool { return v == 3 })
+	mut result := obs.contains(fn (v int) bool {
+		return v == 3
+	})
 	ch := result.observe()
 	mut item := rxv.Item[bool]{
 		has_value: false
@@ -154,7 +170,9 @@ fn test_contains_found() {
 // test contains not found
 fn test_contains_not_found() {
 	mut obs := rxv.just[int](1, 2, 3, 4, 5)
-	mut result := obs.contains(fn (v int) bool { return v == 99 })
+	mut result := obs.contains(fn (v int) bool {
+		return v == 99
+	})
 	ch := result.observe()
 	mut item := rxv.Item[bool]{
 		has_value: false
