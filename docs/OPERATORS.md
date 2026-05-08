@@ -205,6 +205,51 @@ mut obs := rxv.just[int](1, 3, 5, 6, 8).find(fn (v int) bool { return v % 2 == 0
 // emits: 6
 ```
 
+### `.debounce(delay_ms)`
+
+Emits an item only after the specified delay has passed without any other item being emitted.
+
+```v ignore
+mut obs := rxv.just[string]('a', 'b', 'c').debounce(100)
+// 'c' arrives after 100ms silence
+```
+
+### `.buffer(count)`
+
+Collects items into batches of the specified size and emits each batch.
+
+```v ignore
+mut obs := rxv.just[int](1, 2, 3, 4, 5).buffer(2)
+// emits: [1, 2], [3, 4], [5]
+```
+
+### `.sample(period_ms)`
+
+Emits the most recent item at the specified periodic interval.
+
+```v ignore
+mut obs := rxv.just[int](1, 2, 3).sample(50)
+// emits: the last item seen at each 50ms interval
+```
+
+### `.throttle_first(delay_ms)`
+
+Emits the first item, then ignores subsequent items until the delay expires.
+
+```v ignore
+mut obs := rxv.just[int](1, 2, 3, 4, 5).throttle_first(100)
+// emits: 1, then ignores until 100ms passes, then allows next first item through
+```
+
+### `.buffer_with_time(period_ms)`
+
+Collects items into a buffer and emits it every `period_ms` milliseconds.
+
+```v ignore
+mut obs := rxv.just[int](1, 2, 3).buffer_with_time(500)
+// emits a batch every 500ms regardless of count
+```
+
 ---
 
 ## Transformation Operators
