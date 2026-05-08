@@ -720,7 +720,7 @@
 </section>
 
 		<section id="ObservableImpl[f64].average_f64" class="doc-node">
-			<div class="title"><h2>fn (ObservableImpl[f64]) average_f64 <a href="#ObservableImpl[f64].average_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L558"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (ObservableImpl[f64]) average_f64 <a href="#ObservableImpl[f64].average_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L646"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">average_f64</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
 <p>average_f64 computes the average of f64 values emitted by the source.</p>
@@ -728,7 +728,7 @@
 </section>
 
 		<section id="ObservableImpl[f64].sum_f64" class="doc-node">
-			<div class="title"><h2>fn (ObservableImpl[f64]) sum_f64 <a href="#ObservableImpl[f64].sum_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L598"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (ObservableImpl[f64]) sum_f64 <a href="#ObservableImpl[f64].sum_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L686"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">sum_f64</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
 <p>sum_f64 computes the sum of f64 values emitted by the source.</p>
@@ -855,8 +855,24 @@
 
 </section>
 
+		<section id="rxv.ObservableImpl[T].skip" class="doc-node">
+			<div class="title"><h2>fn (rxv.ObservableImpl[T]) skip <a href="#rxv.ObservableImpl[T].skip">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L512"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">skip</span><span class="token punctuation">(</span>n <span class="token builtin">u32</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>skip suppresses the first n items emitted by the source.</p>
+
+</section>
+
+		<section id="rxv.ObservableImpl[T].take_last" class="doc-node">
+			<div class="title"><h2>fn (rxv.ObservableImpl[T]) take_last <a href="#rxv.ObservableImpl[T].take_last">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L557"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">take_last</span><span class="token punctuation">(</span>n <span class="token builtin">u32</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>take_last emits only the last n items from the source.</p>
+
+</section>
+
 		<section id="rxv.ObservableImpl[T].timeout" class="doc-node">
-			<div class="title"><h2>fn (rxv.ObservableImpl[T]) timeout <a href="#rxv.ObservableImpl[T].timeout">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L514"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (rxv.ObservableImpl[T]) timeout <a href="#rxv.ObservableImpl[T].timeout">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/rxv/observable.v#L602"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">timeout</span><span class="token punctuation">(</span>timeout_ms <span class="token builtin">int</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span>RxOption<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ObservableImpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>timeout emits an error if no item is received within <code>timeout_ms</code> milliseconds.</p>
@@ -1014,7 +1030,7 @@
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 8 May 2026 05:05:47</div>
+						<div class="footer">Powered by vdoc. Generated on: 8 May 2026 15:50:37</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_rxv">README</a></li>
 <li class="open"><a href="#concat">fn concat</a>        <ul>
@@ -1182,6 +1198,8 @@
 <li><a href="#rxv.ObservableImpl[T].distinct_until_changed">fn distinct_until_changed</a></li>
 <li><a href="#rxv.ObservableImpl[T].first">fn first</a></li>
 <li><a href="#rxv.ObservableImpl[T].last">fn last</a></li>
+<li><a href="#rxv.ObservableImpl[T].skip">fn skip</a></li>
+<li><a href="#rxv.ObservableImpl[T].take_last">fn take_last</a></li>
 <li><a href="#rxv.ObservableImpl[T].timeout">fn timeout</a></li>
 </ul>
 </li>
