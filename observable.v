@@ -477,6 +477,217 @@ pub fn (mut o ObservableImpl[T]) last(opts ...RxOption) &ObservableImpl[T] {
 	}
 }
 
+// ---- skip ----------------------------------------------------------------
+
+fn obs_skip_run[T](n u32, src chan Item[T], next chan Item[T]) {
+	mut skipped := u32(0)
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- item
+				break
+			}
+			if item.has_value {
+				if skipped < n {
+					skipped++
+				} else {
+					next <- item
+				}
+			}
+		} else if s == .closed {
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
+}
+
+// skip suppresses the first n items emitted by the source.
+pub fn (mut o ObservableImpl[T]) skip(n u32, opts ...RxOption) &ObservableImpl[T] {
+	mut option := parse_options(...opts)
+	next := option.build_channel_t[T]()
+	src := o.ch
+	spawn obs_skip_run[T](n, src, next)
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
+// ---- take_last -----------------------------------------------------------
+
+fn obs_take_last_run[T](n u32, src chan Item[T], next chan Item[T]) {
+	mut window := []Item[T]{}
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- item
+				break
+			}
+			if item.has_value {
+				window << item
+				if window.len > int(n) {
+					window.delete(0)
+				}
+			}
+		} else if s == .closed {
+			for i in 0 .. window.len {
+				next <- window[i]
+			}
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
+}
+
+// take_last emits only the last n items from the source.
+pub fn (mut o ObservableImpl[T]) take_last(n u32, opts ...RxOption) &ObservableImpl[T] {
+	mut option := parse_options(...opts)
+	next := option.build_channel_t[T]()
+	src := o.ch
+	spawn obs_take_last_run[T](n, src, next)
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
+// ---- contains -------------------------------------------------------------
+
+fn obs_contains_run[T](pred PredicateFn[T], src chan Item[T], next chan Item[bool]) {
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- of[bool](false)
+				break
+			}
+			if item.has_value && pred(item.get_value()) {
+				next <- of[bool](true)
+				break
+			}
+		} else if s == .closed {
+			next <- of[bool](false)
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
+}
+
+// contains returns true if the source emits an item that satisfies the predicate.
+pub fn (mut o ObservableImpl[T]) contains(pred PredicateFn[T], opts ...RxOption) &ObservableImpl[bool] {
+	mut option := parse_options(...opts)
+	next := option.build_channel_t[bool]()
+	src := o.ch
+	spawn obs_contains_run[T](pred, src, next)
+	return &ObservableImpl[bool]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
+// ---- is_empty -------------------------------------------------------------
+
+fn obs_is_empty_run[T](src chan Item[T], next chan Item[bool]) {
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- of[bool](false)
+				break
+			}
+			if item.has_value {
+				next <- of[bool](false)
+				break
+			}
+		} else if s == .closed {
+			next <- of[bool](true)
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
+}
+
+// is_empty returns true if the source Observable completes without emitting any item.
+pub fn (mut o ObservableImpl[T]) is_empty(opts ...RxOption) &ObservableImpl[bool] {
+	mut option := parse_options(...opts)
+	next := option.build_channel_t[bool]()
+	src := o.ch
+	spawn obs_is_empty_run[T](src, next)
+	return &ObservableImpl[bool]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
+// ---- element_at -----------------------------------------------------------
+
+fn obs_element_at_run[T](index u32, src chan Item[T], next chan Item[T]) {
+	mut idx := u32(0)
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- item
+				break
+			}
+			if item.has_value {
+				if idx == index {
+					next <- item
+					break
+				}
+				idx++
+			}
+		} else if s == .closed {
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
+}
+
+// element_at returns the item at the specified index or errors if out of bounds.
+pub fn (mut o ObservableImpl[T]) element_at(index u32, opts ...RxOption) &ObservableImpl[T] {
+	mut option := parse_options(...opts)
+	next := option.build_channel_t[T]()
+	src := o.ch
+	spawn obs_element_at_run[T](index, src, next)
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
 // ---- timeout --------------------------------------------------------------
 // NOTE: timeout_ms granularity is ~10µs poll intervals.
 // A value of 0 disables the timeout.

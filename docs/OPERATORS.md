@@ -133,6 +133,33 @@ mut d := rxv.just[int](1, 1, 2, 3, 3, 1).distinct_until_changed()
 // emits: 1, 2, 3, 1
 ```
 
+### `.contains(predicate)`
+
+Returns true if any item satisfies the predicate.
+
+```v ignore
+mut obs := rxv.just[int](1, 2, 3, 4, 5).contains(fn (v int) bool { return v == 3 })
+// emits: true
+```
+
+### `.is_empty()`
+
+Returns true if the source completes without emitting any item.
+
+```v ignore
+mut obs := rxv.empty[int]().is_empty()
+// emits: true
+```
+
+### `.element_at(index)`
+
+Returns the item at the specified index or completes without value if out of bounds.
+
+```v ignore
+mut obs := rxv.just[int](10, 20, 30).element_at(1)
+// emits: 20
+```
+
 ---
 
 ## Transformation Operators
