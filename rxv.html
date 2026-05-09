@@ -154,7 +154,7 @@
     done <span class="token operator">:=</span> total<span class="token punctuation">.</span><span class="token function">for_each</span><span class="token punctuation">(</span><span class="token keyword">fn</span> <span class="token punctuation">(</span>v <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token function">println</span><span class="token punctuation">(</span><span class="token string">&#39;Sum 1..10 = </span><span class="token string_interp">$</span>{v}<span class="token string">&#39;</span><span class="token punctuation">)</span>
     <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>e <span class="token builtin">IError</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token function">eprintln</span><span class="token punctuation">(</span>e<span class="token punctuation">.</span><span class="token function">msg</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token function">eprintln</span><span class="token punctuation">(</span><span class="token string">&#39;error: </span><span class="token string_interp">$</span>{e}<span class="token string">&#39;</span><span class="token punctuation">)</span>
     <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
     _ <span class="token operator">=</span> <span class="token operator">&lt;-</span>done
     <span class="token comment">// Output: Sum 1..10 = 55</span>
@@ -215,6 +215,12 @@
 <td><code>.take(n)</code></td>
 <td>Emit at most N items</td></tr>
 <tr>
+<td><code>.skip(n)</code></td>
+<td>Skip the first N items</td></tr>
+<tr>
+<td><code>.take_last(n)</code></td>
+<td>Emit only the last N items</td></tr>
+<tr>
 <td><code>.first()</code></td>
 <td>Emit only the first item</td></tr>
 <tr>
@@ -228,7 +234,32 @@
 <td>Suppress consecutive duplicates</td></tr>
 <tr>
 <td><code>.timeout(ms)</code></td>
-<td>Error if no item within deadline</td></tr></tbody></table>
+<td>Error if no item within deadline</td></tr>
+<tr>
+<td><code>.contains(pred)</code></td>
+<td>Emit true if any item satisfies predicate</td></tr>
+<tr>
+<td><code>.is_empty()</code></td>
+<td>Emit true if source completes without items</td></tr>
+<tr>
+<td><code>.element_at(index)</code></td>
+<td>Emit item at index or error if out of bounds</td></tr></tbody></table>
+<h3 id="timing-">Timing <em>(free functions — see <a href="#v-compiler-notes">V Compiler Notes</a>)</em></h3>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Description</th></tr></thead>
+<tbody>
+<tr>
+<td><code>debounce_[T](mut o, delay_ms)</code></td>
+<td>Emit after silent window</td></tr>
+<tr>
+<td><code>sample[T](mut o, period_ms)</code></td>
+<td>Emit most recent at intervals</td></tr>
+<tr>
+<td><code>throttle_first_[T](mut o, delay_ms)</code></td>
+<td>Emit first, block until window resets</td></tr></tbody></table>
 <h3 id="transforming-">Transforming <em>(free functions — see <a href="#v-compiler-notes">V Compiler Notes</a>)</em></h3>
 <table>
 <thead>
@@ -1102,7 +1133,7 @@
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 9 May 2026 04:44:34</div>
+						<div class="footer">Powered by vdoc. Generated on: 9 May 2026 04:54:09</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_rxv">README</a></li>
 <li class="open"><a href="#concat">fn concat</a>        <ul>
