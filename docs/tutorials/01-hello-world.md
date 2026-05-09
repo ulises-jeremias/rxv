@@ -5,7 +5,7 @@ This tutorial shows the simplest possible RxV program.
 ## Install
 
 ```sh
-v install rxv
+v install ulises-jeremias.rxv
 ```
 
 ## Code

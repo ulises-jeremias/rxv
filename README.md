@@ -54,7 +54,7 @@ RxV brings this model to V using:
 ## Install
 
 ```sh
-v install rxv
+v install ulises-jeremias.rxv
 ```
 
 ---
