@@ -5,16 +5,12 @@ concurrency:
    cancel-in-progress: true
 
 on:
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
   schedule:
     - cron: "31 1,12 * * *"
-
   push:
     branches:
       - main
-
   pull_request:
     branches:
       - main
@@ -31,6 +27,7 @@ jobs:
 
   validate-docs:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout RxV
         uses: actions/checkout@v3
@@ -55,6 +52,7 @@ jobs:
 
   fmt-check:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout RxV
@@ -80,6 +78,7 @@ jobs:
 
   run-tests:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
 
     strategy:
       matrix:
