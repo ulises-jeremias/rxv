@@ -45,7 +45,7 @@ from user events, HTTP responses, database results, or any other source.
 RxV brings this model to V using:
 
 - **Generic Observables** — `ObservableImpl[T]` works with any type
-- **Channel-based pipelines** — each operator spawns a coroutine and connects
+- **Channel-based pipelines** — each operator spawns a thread and connects
   via `chan Item[T]`
 - **Composable operators** — filter, map, merge, reduce, and more
 

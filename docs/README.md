@@ -11,7 +11,7 @@ Welcome to the RxV documentation — a ReactiveX implementation for the
 |----------|-------------|
 | [API Reference](API.md) | Full type and function reference |
 | [Operators](OPERATORS.md) | All operators with usage examples |
-| [Concurrency Model](#concurrency-model) | Coroutines, cancellation, memory leaks |
+| [Concurrency Model](#concurrency-model) | Threads, cancellation, memory leaks |
 | [Tutorial 01 — Hello World](tutorials/01-hello-world.md) | Your first Observable |
 | [Tutorial 02 — Creating Observables](tutorials/02-creating-observables.md) | `just`, `from_slice`, `range`, `create`, `interval` |
 | [Tutorial 03 — Filtering](tutorials/03-filtering.md) | `filter`, `take`, `first`, `last`, `distinct` |
@@ -68,21 +68,21 @@ RxV is implemented with these design constraints:
 
 ## Concurrency Model
 
-Understanding when and how coroutines are spawned helps write correct,
+Understanding when and how threads are spawned helps write correct,
 leak-free code.
 
-### Coroutine lifecycle
+### Thread lifecycle
 
 Every operator that has an asynchronous source (channel, timer, interval)
-spawns a **worker coroutine** that runs the `obs_*_run` function. The worker
+spawns a **worker thread** that runs the `obs_*_run` function. The worker
 reads from the source, optionally transforms, and pushes to the downstream
 channel. The worker terminates when the source closes, or when an error is
 encountered.
 
-### Subscribing does NOT spawn a new coroutine
+### Subscribing does NOT spawn a new thread
 
 `for_each`, `observe`, and all other subscription methods read from the
-observable's channel — they **do not** spawn new coroutines. The downstream
+observable's channel — they **do not** spawn new threads. The downstream
 simply polls or receives from the channel that the upstream worker fills.
 
 ### Cancellation via context
@@ -101,14 +101,14 @@ is canceled, the operator's worker should terminate.
 
 The most common source of leaks is **leaving a subscription hanging**:
 creating an observable and never calling `observe()` or `for_each()`. The
-source coroutine (e.g. in `interval`, `timer`, `from_channel`) will block
+source thread (e.g. in `interval`, `timer`, `from_channel`) will block
 trying to send to a channel that nobody reads.
 
 **Always consume or close:**
 
 ```v ignore
 mut obs := rxv.interval(100)
-// BAD: coroutine leaks after 500ms
+// BAD: thread leaks after 500ms
 if false {
     // never subscribes
 }
@@ -126,7 +126,7 @@ Each operator's worker runs independently. Channels between operators have
 a configurable buffer size (default via `option.buffer_size`). When the
 downstream is slow, the upstream may block or drop depending on the operator.
 
-### Operators that spawn coroutines
+### Operators that spawn threads
 
 | Operator | When worker spawns | When it terminates |
 |----------|---------------------|-------------------|
