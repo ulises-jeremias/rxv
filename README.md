@@ -275,7 +275,7 @@ Step-by-step guides in [docs/tutorials/](docs/tutorials/):
 Or run a single test file directly:
 
 ```sh
-cd ~/.vmodules && v run rxv/filter_observe_test.v
+cd ~/.vmodules/ulises_jeremias && v run rxv/filter_observe_test.v
 ```
 
 > **Note:** Avoid `v test rxv` — it runs all tests in parallel which can

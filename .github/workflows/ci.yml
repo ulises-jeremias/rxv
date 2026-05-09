@@ -43,7 +43,9 @@ jobs:
         run: v doctor
 
       - name: Copy source code to V Modules
-        run: cp -rf ./rxv ~/.vmodules
+        run: |
+          mkdir -p ~/.vmodules/ulises_jeremias
+          cp -rf ./rxv ~/.vmodules/ulises_jeremias/rxv
 
       - name: Validate Docs
         run: |
@@ -69,12 +71,13 @@ jobs:
         run: v doctor
 
       - name: Move source code to V Modules
-        run: mv ./rxv ~/.vmodules
+        run: |
+          mkdir -p ~/.vmodules/ulises_jeremias
+          mv ./rxv ~/.vmodules/ulises_jeremias/rxv
 
       - name: Verify Fmt
         run: |
-          cd ~
-          v fmt -verify ~/.vmodules/rxv
+          v fmt -verify ~/.vmodules/ulises_jeremias/rxv
 
   run-tests:
     runs-on: ${{ matrix.os }}
@@ -85,7 +88,7 @@ jobs:
         os:
           - ubuntu-22.04
           - ubuntu-20.04
-        flags: 
+        flags:
           - ""
           # TODO: Add --prod flag once the new release is ready
           # - "--prod"
@@ -105,10 +108,12 @@ jobs:
         run: v doctor
 
       - name: Move RxV source code to V Modules
-        run: mv ./rxv ~/.vmodules
+        run: |
+          mkdir -p ~/.vmodules/ulises_jeremias
+          mv ./rxv ~/.vmodules/ulises_jeremias/rxv
 
       - name: Execute Tests using Pure V Backend
-        run: ~/.vmodules/rxv/bin/test ${{ matrix.flags }}
+        run: ~/.vmodules/ulises_jeremias/rxv/bin/test ${{ matrix.flags }}
 
       - name: Execute Tests using Pure V Backend and Garbage Collection enabled
-        run: ~/.vmodules/rxv/bin/test ${{ matrix.flags }} --use-gc boehm
+        run: ~/.vmodules/ulises_jeremias/rxv/bin/test ${{ matrix.flags }} --use-gc boehm
