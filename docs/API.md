@@ -12,6 +12,7 @@
 - [ObservableImpl\[T\]](#observableimplt)
 - [Factory Functions](#factory-functions)
 - [Filtering Operators](#filtering-operators)
+- [Timing Operators (free functions)](#timing-operators)
 - [Transformation Operators](#transformation-operators)
 - [Aggregation Operators (free functions)](#aggregation-operators)
 - [Combination Operators](#combination-operators)
@@ -57,11 +58,19 @@ pub struct ObservableImpl[T] { ... }
 | `observe(...opts) chan Item[T]` | channel | Subscribe and receive items |
 | `filter(predicate, ...opts)` | `&ObservableImpl[T]` | Keep only matching items |
 | `take(n u32, ...opts)` | `&ObservableImpl[T]` | Emit at most `n` items |
+| `skip(n u32, ...opts)` | `&ObservableImpl[T]` | Skip the first `n` items |
+| `take_last(n u32, ...opts)` | `&ObservableImpl[T]` | Emit only the last `n` items |
 | `distinct(...opts)` | `&ObservableImpl[T]` | Suppress duplicates |
 | `distinct_until_changed(...opts)` | `&ObservableImpl[T]` | Suppress consecutive duplicates |
 | `first(...opts)` | `&ObservableImpl[T]` | Emit only the first item |
 | `last(...opts)` | `&ObservableImpl[T]` | Emit only the last item |
 | `timeout(ms int, ...opts)` | `&ObservableImpl[T]` | Error if no item within `ms` |
+| `contains(pred, ...opts)` | `&ObservableImpl[bool]` | Emit true if any item satisfies predicate |
+| `is_empty(...opts)` | `&ObservableImpl[bool]` | Emit true if source completes without items |
+| `element_at(index u32, ...opts)` | `&ObservableImpl[T]` | Emit item at index |
+| `all(pred, ...opts)` | `&ObservableImpl[bool]` | Emit true if all items satisfy predicate |
+| `any(pred, ...opts)` | `&ObservableImpl[bool]` | Emit true if any item satisfies predicate |
+| `find(pred, ...opts)` | `&ObservableImpl[T]` | Emit the first item satisfying predicate |
 | `for_each(next, err, done, ...opts)` | `chan int` | Subscribe with callbacks |
 | `average_f64(...opts)` | `&ObservableImpl[f64]` | Average (f64 observable only) |
 | `sum_f64(...opts)` | `&ObservableImpl[f64]` | Sum (f64 observable only) |
@@ -94,10 +103,33 @@ Functions that create new Observables.
 |-------------------|-------------|
 | `.filter(predicate PredicateFn[T])` | Emit only items passing the predicate |
 | `.take(n u32)` | Emit at most `n` items |
+| `.skip(n u32)` | Skip the first `n` items |
+| `.take_last(n u32)` | Emit only the last `n` items |
 | `.first()` | Emit only the first item |
 | `.last()` | Emit only the last item |
 | `.distinct()` | Suppress all previously seen items |
 | `.distinct_until_changed()` | Suppress consecutive duplicate items |
+| `.timeout(ms int)` | Error if no item received within `ms` milliseconds |
+| `.contains(pred PredicateFn[T])` | Emit true if any item satisfies predicate |
+| `.is_empty()` | Emit true if source completes without emitting any item |
+| `.element_at(index u32)` | Emit the item at the given index |
+| `.all(pred PredicateFn[T])` | Emit true if all items satisfy the predicate |
+| `.any(pred PredicateFn[T])` | Emit true if at least one item satisfies the predicate |
+| `.find(pred PredicateFn[T])` | Emit the first item that satisfies the predicate |
+
+---
+
+## Timing Operators
+
+> Due to V 0.5.x compiler limitations, timing operators are **free functions**.
+> Workers are spawned at operator call time (not at subscribe time).
+> All workers honor context cancellation via `o.parent.done()`.
+
+| Function | Description |
+|----------|-------------|
+| `debounce_[T](mut o, delay_ms int)` | Emit an item only after `delay_ms` of silence |
+| `sample[T](mut o, period_ms int)` | Emit the most recent item every `period_ms` |
+| `throttle_first_[T](mut o, delay_ms int)` | Emit first item, suppress until `delay_ms` expires |
 
 ---
 
@@ -137,8 +169,8 @@ Functions that create new Observables.
 
 ## Utility Operators
 
-| Method | Description |
-|--------|-------------|
+| Method / Function | Description |
+|-------------------|-------------|
 | `.timeout(ms int)` | Emit error if no item received within `ms` milliseconds |
 | `timer(delay_ms int)` | Emit `0` once after delay, then complete |
 | `interval(period_ms int)` | Emit sequential integers forever at given period |

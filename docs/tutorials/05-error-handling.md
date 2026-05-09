@@ -38,7 +38,7 @@ fn main() {
 	done := obs.for_each(fn (v int) {
 		println('value: ${v}')
 	}, fn (e IError) {
-		eprintln('error: ${e.msg()}')
+		eprintln('error: ${e}')
 	}, fn () {
 		println('done')
 	})
@@ -90,7 +90,7 @@ mut timed := slow_obs.timeout(500)
 
 done := timed.for_each(
 	fn (v int) { println('got: ${v}') },
-	fn (e IError) { eprintln('timeout! ${e.msg()}') },
+	fn (e IError) { eprintln('timeout! ${e}') },
 	fn () { println('done') },
 )
 _ = <-done

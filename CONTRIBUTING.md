@@ -6,13 +6,13 @@
 username will be referred to later as 'YOUR_GITHUB_USERNAME'. Change it
 accordingly in the steps below.)
 
-1. Fork https://github.com/vlang/rxv using GitHub's interface to your own account.
+1. Fork https://github.com/ulises-jeremias/rxv using GitHub's interface to your own account.
    Let's say that the forked repository is at
-   `https://github.com/YOUR_GITHUB_USERNAME/v` .
-2. Clone the main rxv repository https://github.com/vlang/rxv to a local folder on
-   your computer, say named rxv/ (`git clone https://github.com/vlang/rxv rxv`)
+   `https://github.com/YOUR_GITHUB_USERNAME/rxv` .
+2. Clone the main rxv repository https://github.com/ulises-jeremias/rxv to a local folder on
+   your computer, say named rxv/ (`git clone https://github.com/ulises-jeremias/rxv rxv`)
 3. `cd rxv`
-4. `git remote add pullrequest https://github.com/YOUR_GITHUB_USERNAME/v`
+4. `git remote add pullrequest https://github.com/YOUR_GITHUB_USERNAME/rxv`
    NB: the remote named `pullrequest` should point to YOUR own forked repo, not the
    main v repository! After this, your local cloned repository is prepared for
    making pullrequests, and you can just do normal git operations such as:
@@ -21,7 +21,7 @@ accordingly in the steps below.)
 5. When finished with a feature/bugfix/change, you can:
    `git checkout -b fix_alabala`
 6. `git push pullrequest` # (NOTE: the `pullrequest` remote was setup on step 4)
-7. On GitHub's web interface, go to: https://github.com/vlang/rxv/pulls
+7. On GitHub's web interface, go to: https://github.com/ulises-jeremias/rxv/pulls
 
    Here the UI shows a dialog with a button to make a new pull request based on
    the new pushed branch.
@@ -62,7 +62,7 @@ NB: You still need to have a GitHub account.
 
 (steps 1..3 need to be done just _once_):
 
-1. `hub clone vlang/rxv my_rxv`
+1. `hub clone ulises-jeremias/rxv my_rxv`
 2. `cd my_rxv`
 3. `hub fork --remote-name pullrequest`
 

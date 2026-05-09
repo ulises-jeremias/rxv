@@ -111,7 +111,7 @@ fn main() {
 	done := total.for_each(fn (v int) {
 		println('Sum 1..10 = ${v}')
 	}, fn (e IError) {
-		eprintln(e.msg())
+		eprintln('error: ${e}')
 	}, fn () {})
 	_ = <-done
 	// Output: Sum 1..10 = 55
@@ -144,11 +144,24 @@ fn main() {
 |----------|-------------|
 | `.filter(predicate)` | Keep only matching items |
 | `.take(n)` | Emit at most N items |
+| `.skip(n)` | Skip the first N items |
+| `.take_last(n)` | Emit only the last N items |
 | `.first()` | Emit only the first item |
 | `.last()` | Emit only the last item |
 | `.distinct()` | Suppress all duplicates |
 | `.distinct_until_changed()` | Suppress consecutive duplicates |
 | `.timeout(ms)` | Error if no item within deadline |
+| `.contains(pred)` | Emit true if any item satisfies predicate |
+| `.is_empty()` | Emit true if source completes without items |
+| `.element_at(index)` | Emit item at index or error if out of bounds |
+
+### Timing *(free functions — see [V Compiler Notes](#v-compiler-notes))*
+
+| Operator | Description |
+|----------|-------------|
+| `debounce_[T](mut o, delay_ms)` | Emit after silent window |
+| `sample[T](mut o, period_ms)` | Emit most recent at intervals |
+| `throttle_first_[T](mut o, delay_ms)` | Emit first, block until window resets |
 
 ### Transforming *(free functions — see [V Compiler Notes](#v-compiler-notes))*
 

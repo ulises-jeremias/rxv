@@ -7,7 +7,7 @@ fn main() {
 	done := err_obs.for_each(fn (v int) {
 		println('value: ${v}')
 	}, fn (e IError) {
-		eprintln('caught error: ${e.msg()}')
+		eprintln('caught error: ${e}')
 	}, fn () {
 		println('done')
 	})
@@ -25,7 +25,7 @@ fn main() {
 	done2 := result.for_each(fn (v int) {
 		println('100 / x = ${v}')
 	}, fn (e IError) {
-		eprintln('error: ${e.msg()}')
+		eprintln('error: ${e}')
 	}, fn () {
 		println('done')
 	})
