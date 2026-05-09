@@ -910,12 +910,12 @@ fn debounce_inner[T](delay_ms int, src chan Item[T], next chan Item[T], done cha
 			break
 		} else {
 			select {
-			_ := <-done {
-				break
-			}
-			else {
-				time.sleep(poll_sleep)
-			}
+				_ := <-done {
+					break
+				}
+				else {
+					time.sleep(poll_sleep)
+				}
 			}
 		}
 	}
@@ -961,12 +961,12 @@ fn sample_worker[T](period_ms int, src chan Item[T], next chan Item[T], done cha
 			break
 		} else {
 			select {
-			_ := <-done {
-				break
-			}
-			else {
-				time.sleep(poll_sleep)
-			}
+				_ := <-done {
+					break
+				}
+				else {
+					time.sleep(poll_sleep)
+				}
 			}
 		}
 	}
@@ -1031,12 +1031,12 @@ fn throttle_first_worker[T](delay_ms int, src chan Item[T], next chan Item[T], d
 			break
 		} else {
 			select {
-			_ := <-done {
-				break
-			}
-			else {
-				time.sleep(poll_sleep)
-			}
+				_ := <-done {
+					break
+				}
+				else {
+					time.sleep(poll_sleep)
+				}
 			}
 		}
 	}
