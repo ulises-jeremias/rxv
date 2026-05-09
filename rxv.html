@@ -103,7 +103,7 @@
 <p>RxV brings this model to V using:</p>
 <ul>
 <li><strong>Generic Observables</strong> — <code>ObservableImpl[T]</code> works with any type</li>
-<li><strong>Channel-based pipelines</strong> — each operator spawns a coroutine and connects via <code>chan Item[T]</code></li>
+<li><strong>Channel-based pipelines</strong> — each operator spawns a thread and connects via <code>chan Item[T]</code></li>
 <li><strong>Composable operators</strong> — filter, map, merge, reduce, and more</li></ul>
 <hr />
 <h2 id="install">Install</h2>
@@ -1133,7 +1133,7 @@
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 9 May 2026 05:31:54</div>
+						<div class="footer">Powered by vdoc. Generated on: 9 May 2026 05:33:56</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_rxv">README</a></li>
 <li class="open"><a href="#concat">fn concat</a>        <ul>
