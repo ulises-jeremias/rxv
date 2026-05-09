@@ -63,7 +63,7 @@ For full control, use `create` with a producer function:
 
 ```v ignore
 import context
-import rxv
+import ulises_jeremias.rxv as rxv
 
 fn main() {
 	mut obs := rxv.create[int](fn (mut ctx context.Context, ch chan rxv.Item[int]) {
@@ -108,7 +108,7 @@ mut obs := rxv.timer(500)
 All observables are lazy — nothing happens until you subscribe.
 
 ```v
-import rxv
+import ulises_jeremias.rxv as rxv
 
 fn main() {
 	mut obs := rxv.just[int](1, 2, 3)

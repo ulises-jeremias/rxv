@@ -1,4 +1,4 @@
-import rxv
+import ulises_jeremias.rxv as rxv
 
 fn main() {
 	// merge — interleave two observables

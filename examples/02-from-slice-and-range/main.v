@@ -1,4 +1,4 @@
-import rxv
+import ulises_jeremias.rxv as rxv
 
 fn main() {
 	// from_slice emits each element of a slice

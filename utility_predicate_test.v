@@ -1,4 +1,4 @@
-import rxv
+import ulises_jeremias.rxv as rxv
 
 // test all items match predicate
 fn test_all_match() {

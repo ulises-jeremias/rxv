@@ -1,5 +1,5 @@
 Module {
-	name: 'rxv'
+	name: 'ulises_jeremias.rxv'
 	description: 'Reactive Extensions for the V language.'
 	version: '0.1.0'
 	license: 'MIT'

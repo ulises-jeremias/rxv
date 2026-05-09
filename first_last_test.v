@@ -1,4 +1,4 @@
-import rxv
+import ulises_jeremias.rxv as rxv
 
 fn test_first() {
 	mut obs := rxv.just[int](10, 20, 30)

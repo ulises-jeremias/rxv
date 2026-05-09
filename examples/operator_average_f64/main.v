@@ -1,4 +1,4 @@
-import rxv
+import ulises_jeremias.rxv as rxv
 
 fn main() {
 	mut obs := rxv.just[f64](0.0, 1.0, 2.0)

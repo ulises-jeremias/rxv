@@ -1,4 +1,4 @@
-import rxv
+import ulises_jeremias.rxv as rxv
 
 fn main() {
 	mut obs := rxv.just[string]('Hello, World!')

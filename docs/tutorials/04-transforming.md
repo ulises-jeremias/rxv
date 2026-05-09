@@ -97,7 +97,7 @@ mut result := rxv.concat_map_[int, string](mut ids,
 ## Full example
 
 ```v
-import rxv
+import ulises_jeremias.rxv as rxv
 
 fn main() {
 	mut obs := rxv.just[int](1, 2, 3, 4, 5)

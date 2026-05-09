@@ -31,7 +31,7 @@ mut obs := rxv.create[int](fn (ch chan rxv.Item[int]) {
 The second callback in `for_each` receives errors:
 
 ```v
-import rxv
+import ulises_jeremias.rxv as rxv
 
 fn main() {
 	mut obs := rxv.throw[int](error('oops'))

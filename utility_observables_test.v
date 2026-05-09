@@ -1,4 +1,4 @@
-import rxv
+import ulises_jeremias.rxv as rxv
 
 fn test_contains_found() {
 	mut obs := rxv.just[int](1, 2, 3, 4, 5)
