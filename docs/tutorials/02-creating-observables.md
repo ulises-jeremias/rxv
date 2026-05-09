@@ -75,7 +75,7 @@ fn main() {
 	// emits: 0, 1, 4
 	done := obs.for_each(
 		fn (v int) { println(v) },
-		fn (e IError) { eprintln(e.msg()) },
+		fn (e IError) { eprintln('error: ${e}') },
 		fn () { println('done') },
 	)
 	_ = <-done
@@ -117,7 +117,7 @@ fn main() {
 	done := obs.for_each(fn (v int) {
 		println(v)
 	}, fn (e IError) {
-		eprintln(e.msg())
+		eprintln('error: ${e}')
 	}, fn () {
 		println('done')
 	})

@@ -368,7 +368,9 @@ fn obs_distinct_until_changed_run[T](src chan Item[T], next chan Item[T]) {
 			if item.has_value {
 				val := item.get_value()
 				if !has_prev || prev != val {
-					prev = val
+					unsafe {
+						prev = val
+					}
 					has_prev = true
 					next <- item
 				}
@@ -850,6 +852,195 @@ pub fn (mut o ObservableImpl[T]) timeout(timeout_ms int, opts ...RxOption) &Obse
 		ch:     next
 		parent: o.parent
 	}
+}
+
+// debounce emits an item only after the specified delay has passed without any other item.
+pub fn debounce_[T](mut o ObservableImpl[T], delay_ms int, opts ...RxOption) &ObservableImpl[T] {
+	mut option := parse_options(...opts)
+	next := option.build_channel_t[T]()
+	src := o.ch
+	debounce[T](delay_ms, src, next, o.parent.done())
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
+fn debounce[T](delay_ms int, src chan Item[T], next chan Item[T], done chan int) {
+	spawn debounce_inner[T](delay_ms, src, next, done)
+}
+
+fn debounce_inner[T](delay_ms int, src chan Item[T], next chan Item[T], done chan int) {
+	mut last_item := Item[T]{
+		has_value: false
+		err:       none
+	}
+	mut has_last := false
+	mut timer_started := false
+	mut timer_start_time := i64(0)
+	for {
+		if has_last && timer_started {
+			elapsed := time.now().unix_offset() * 1_000 - timer_start_time
+			if elapsed >= i64(delay_ms) * 1_000 {
+				next <- last_item
+				has_last = false
+				timer_started = false
+			}
+		}
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- item
+				break
+			}
+			if item.has_value {
+				last_item = item
+				has_last = true
+				timer_started = true
+				timer_start_time = time.now().unix_offset() * 1_000
+			}
+		} else if s == .closed {
+			if has_last {
+				next <- last_item
+			}
+			break
+		} else {
+			select {
+				_ := <-done {
+					break
+				}
+				else {
+					time.sleep(poll_sleep)
+				}
+			}
+		}
+	}
+	next.close()
+}
+
+// ---- sample ---------------------------------------------------------------
+
+fn sample_[T](period_ms int, src chan Item[T], next chan Item[T], done chan int) {
+	spawn sample_worker[T](period_ms, src, next, done)
+}
+
+fn sample_worker[T](period_ms int, src chan Item[T], next chan Item[T], done chan int) {
+	mut last_item := Item[T]{
+		has_value: false
+		err:       none
+	}
+	mut has_last := false
+	mut last_sent_time := i64(0)
+	mut period_us := i64(period_ms) * 1000
+	for {
+		now := time.now().unix_offset() * 1_000_000
+		if has_last && (now - last_sent_time) >= period_us {
+			next <- last_item
+			last_sent_time = now
+			has_last = false
+		}
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- item
+				break
+			}
+			if item.has_value {
+				last_item = item
+				has_last = true
+			}
+		} else if s == .closed {
+			break
+		} else {
+			select {
+				_ := <-done {
+					break
+				}
+				else {
+					time.sleep(poll_sleep)
+				}
+			}
+		}
+	}
+	next.close()
+}
+
+// sample emits the most recent item at the specified periodic interval.
+pub fn sample[T](mut o ObservableImpl[T], period_ms int, opts ...RxOption) &ObservableImpl[T] {
+	mut option := parse_options(...opts)
+	next := option.build_channel_t[T]()
+	src := o.ch
+	sample_[T](period_ms, src, next, o.parent.done())
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
+// throttle_first emits the first item, then ignores subsequent items until delay expires.
+pub fn throttle_first_[T](mut o ObservableImpl[T], delay_ms int, opts ...RxOption) &ObservableImpl[T] {
+	mut option := parse_options(...opts)
+	next := option.build_channel_t[T]()
+	src := o.ch
+	throttle_first[T](delay_ms, src, next, o.parent.done())
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
+fn throttle_first[T](delay_ms int, src chan Item[T], next chan Item[T], done chan int) {
+	spawn throttle_first_worker[T](delay_ms, src, next, done)
+}
+
+fn throttle_first_worker[T](delay_ms int, src chan Item[T], next chan Item[T], done chan int) {
+	mut blocked := false
+	mut block_start := i64(0)
+	mut blocked_duration := i64(delay_ms) * 1_000_000
+	for {
+		if blocked {
+			elapsed := time.now().unix_offset() * 1_000_000 - block_start
+			if elapsed >= blocked_duration {
+				blocked = false
+			}
+		}
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- item
+				break
+			}
+			if item.has_value && !blocked {
+				next <- item
+				blocked = true
+				block_start = time.now().unix_offset() * 1_000_000
+			}
+		} else if s == .closed {
+			break
+		} else {
+			select {
+				_ := <-done {
+					break
+				}
+				else {
+					time.sleep(poll_sleep)
+				}
+			}
+		}
+	}
+	next.close()
 }
 
 // ---- average_f64 ---------------------------------------------------------

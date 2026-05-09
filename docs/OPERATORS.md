@@ -205,6 +205,36 @@ mut obs := rxv.just[int](1, 3, 5, 6, 8).find(fn (v int) bool { return v % 2 == 0
 // emits: 6
 ```
 
+### `debounce(delay_ms)`
+
+Emits an item only after the specified delay has passed without any other item being emitted.
+
+```v ignore
+mut obs := rxv.just[string]('a', 'b', 'c')
+mut debounced := rxv.debounce_[string](mut obs, 100)
+// 'c' arrives after 100ms silence
+```
+
+### `sample(period_ms)`
+
+Emits the most recent item at the specified periodic interval.
+
+```v ignore
+mut obs := rxv.just[int](1, 2, 3)
+mut sampled := rxv.sample[int](mut obs, 50)
+// emits: the last item seen at each 50ms interval
+```
+
+### `throttle_first(delay_ms)`
+
+Emits the first item, then ignores subsequent items until the delay expires.
+
+```v ignore
+mut obs := rxv.just[int](1, 2, 3, 4, 5)
+mut throttled := rxv.throttle_first_[int](mut obs, 100)
+// emits: 1, then ignores until 100ms passes, then allows next first item through
+```
+
 ---
 
 ## Transformation Operators
