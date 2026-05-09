@@ -859,18 +859,18 @@ pub fn debounce_[T](mut o ObservableImpl[T], delay_ms int, opts ...RxOption) &Ob
 	mut option := parse_options(...opts)
 	next := option.build_channel_t[T]()
 	src := o.ch
-	debounce[T](delay_ms, src, next)
+	debounce[T](delay_ms, src, next, o.parent.done())
 	return &ObservableImpl[T]{
 		ch:     next
 		parent: o.parent
 	}
 }
 
-fn debounce[T](delay_ms int, src chan Item[T], next chan Item[T]) {
-	spawn debounce_inner[T](delay_ms, src, next)
+fn debounce[T](delay_ms int, src chan Item[T], next chan Item[T], done chan int) {
+	spawn debounce_inner[T](delay_ms, src, next, done)
 }
 
-fn debounce_inner[T](delay_ms int, src chan Item[T], next chan Item[T]) {
+fn debounce_inner[T](delay_ms int, src chan Item[T], next chan Item[T], done chan int) {
 	mut last_item := Item[T]{
 		has_value: false
 		err:       none
@@ -909,7 +909,14 @@ fn debounce_inner[T](delay_ms int, src chan Item[T], next chan Item[T]) {
 			}
 			break
 		} else {
-			time.sleep(poll_sleep)
+			select {
+			_ := <-done {
+				break
+			}
+			else {
+				time.sleep(poll_sleep)
+			}
+			}
 		}
 	}
 	next.close()
@@ -917,11 +924,11 @@ fn debounce_inner[T](delay_ms int, src chan Item[T], next chan Item[T]) {
 
 // ---- sample ---------------------------------------------------------------
 
-fn sample_[T](period_ms int, src chan Item[T], next chan Item[T]) {
-	spawn sample_worker[T](period_ms, src, next)
+fn sample_[T](period_ms int, src chan Item[T], next chan Item[T], done chan int) {
+	spawn sample_worker[T](period_ms, src, next, done)
 }
 
-fn sample_worker[T](period_ms int, src chan Item[T], next chan Item[T]) {
+fn sample_worker[T](period_ms int, src chan Item[T], next chan Item[T], done chan int) {
 	mut last_item := Item[T]{
 		has_value: false
 		err:       none
@@ -953,7 +960,14 @@ fn sample_worker[T](period_ms int, src chan Item[T], next chan Item[T]) {
 		} else if s == .closed {
 			break
 		} else {
-			time.sleep(poll_sleep)
+			select {
+			_ := <-done {
+				break
+			}
+			else {
+				time.sleep(poll_sleep)
+			}
+			}
 		}
 	}
 	next.close()
@@ -964,7 +978,7 @@ pub fn sample[T](mut o ObservableImpl[T], period_ms int, opts ...RxOption) &Obse
 	mut option := parse_options(...opts)
 	next := option.build_channel_t[T]()
 	src := o.ch
-	sample_[T](period_ms, src, next)
+	sample_[T](period_ms, src, next, o.parent.done())
 	return &ObservableImpl[T]{
 		ch:     next
 		parent: o.parent
@@ -976,18 +990,18 @@ pub fn throttle_first_[T](mut o ObservableImpl[T], delay_ms int, opts ...RxOptio
 	mut option := parse_options(...opts)
 	next := option.build_channel_t[T]()
 	src := o.ch
-	throttle_first[T](delay_ms, src, next)
+	throttle_first[T](delay_ms, src, next, o.parent.done())
 	return &ObservableImpl[T]{
 		ch:     next
 		parent: o.parent
 	}
 }
 
-fn throttle_first[T](delay_ms int, src chan Item[T], next chan Item[T]) {
-	spawn throttle_first_worker[T](delay_ms, src, next)
+fn throttle_first[T](delay_ms int, src chan Item[T], next chan Item[T], done chan int) {
+	spawn throttle_first_worker[T](delay_ms, src, next, done)
 }
 
-fn throttle_first_worker[T](delay_ms int, src chan Item[T], next chan Item[T]) {
+fn throttle_first_worker[T](delay_ms int, src chan Item[T], next chan Item[T], done chan int) {
 	mut blocked := false
 	mut block_start := i64(0)
 	mut blocked_duration := i64(delay_ms) * 1_000_000
@@ -1016,7 +1030,14 @@ fn throttle_first_worker[T](delay_ms int, src chan Item[T], next chan Item[T]) {
 		} else if s == .closed {
 			break
 		} else {
-			time.sleep(poll_sleep)
+			select {
+			_ := <-done {
+				break
+			}
+			else {
+				time.sleep(poll_sleep)
+			}
+			}
 		}
 	}
 	next.close()

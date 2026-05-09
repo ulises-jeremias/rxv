@@ -133,9 +133,10 @@ downstream is slow, the upstream may block or drop depending on the operator.
 | `interval` | On creation | Never (use `take` to limit) |
 | `timer` | On creation | After emitting 0 or delay |
 | `from_channel` | On `observe()` | When source channel closes |
-| `debounce` | On `observe()` | On source close or cancel |
-| `timeout` | On `observe()` | On source close or timeout |
-| `sample` | On `observe()` | On source close |
+| `debounce` | On operator call | On source close or cancel |
+| `timeout` | On operator call | On source close or timeout |
+| `sample` | On operator call | On source close or cancel |
+| `throttle_first` | On operator call | On source close or cancel |
 | `throttle_first` | On `observe()` | On source close |
 | All synchronous operators (`just`, `from_slice`, `range`) | On `observe()` | Immediately after emit |
 
