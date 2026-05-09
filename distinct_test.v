@@ -1,4 +1,4 @@
-import ulises_jeremias.rxv as rxv
+import ulises_jeremias.rxv
 
 fn test_distinct() {
 	mut obs := rxv.just[int](1, 2, 2, 3, 1, 3)

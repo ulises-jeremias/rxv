@@ -11,7 +11,7 @@ v install ulises-jeremias.rxv
 ## Code
 
 ```v
-import ulises_jeremias.rxv as rxv
+import ulises_jeremias.rxv
 
 fn main() {
 	// Create an Observable that emits one string then completes

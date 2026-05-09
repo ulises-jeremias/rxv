@@ -1,4 +1,4 @@
-import ulises_jeremias.rxv as rxv
+import ulises_jeremias.rxv
 
 fn test_all_all_match() {
 	mut obs := rxv.just[int](2, 4, 6, 8)

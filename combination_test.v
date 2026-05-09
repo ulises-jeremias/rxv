@@ -1,4 +1,4 @@
-import ulises_jeremias.rxv as rxv
+import ulises_jeremias.rxv
 
 fn test_merge() {
 	mut obs1 := rxv.just[int](1, 2)

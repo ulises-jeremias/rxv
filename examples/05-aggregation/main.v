@@ -1,4 +1,4 @@
-import ulises_jeremias.rxv as rxv
+import ulises_jeremias.rxv
 
 fn main() {
 	// scan_ — running total

@@ -70,7 +70,7 @@ Operators return a new Observable, so you can chain them.
 Due to a V 0.5.x limitation, each step must be assigned to its own variable:
 
 ```v
-import ulises_jeremias.rxv as rxv
+import ulises_jeremias.rxv
 
 fn main() {
 	mut obs := rxv.range(1, 20)

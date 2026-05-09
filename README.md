@@ -62,7 +62,7 @@ v install ulises-jeremias.rxv
 ## Quick Start
 
 ```v
-import ulises_jeremias.rxv as rxv
+import ulises_jeremias.rxv
 
 fn main() {
 	// 1. Create a stream of integers
@@ -99,7 +99,7 @@ fn main() {
 ## A More Complete Example
 
 ```v
-import ulises_jeremias.rxv as rxv
+import ulises_jeremias.rxv
 
 fn main() {
 	// Aggregate: sum all integers from 1 to 10

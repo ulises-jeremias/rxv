@@ -1,4 +1,4 @@
-import ulises_jeremias.rxv as rxv
+import ulises_jeremias.rxv
 
 fn test_from_slice() {
 	mut obs := rxv.from_slice[int]([10, 20, 30])

@@ -1,4 +1,4 @@
-import ulises_jeremias.rxv as rxv
+import ulises_jeremias.rxv
 
 fn test_flat_map() {
 	mut obs := rxv.just[int](1, 2, 3)
