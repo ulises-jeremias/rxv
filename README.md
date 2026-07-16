@@ -295,3 +295,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution workflow.
 [workflowurl]: https://github.com/ulises-jeremias/rxv/actions/workflows/ci.yml
 [deploydocsurl]: https://github.com/ulises-jeremias/rxv/actions/workflows/deploy-docs.yml
 [licenseurl]: https://github.com/ulises-jeremias/rxv/blob/main/LICENSE
+
+## 👥 Contributors
+
+<a href="https://github.com/ulises-jeremias/rxv/contributors">
+  <img src="https://contrib.rocks/image?repo=ulises-jeremias/rxv"/>
+</a>
+
+Made with [contributors-img](https://contrib.rocks).
