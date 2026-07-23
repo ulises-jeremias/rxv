@@ -13,7 +13,7 @@
 [![Continuous Integration][workflowbadge]][workflowurl]
 [![Deploy Documentation][deploydocsbadge]][deploydocsurl]
 [![License: MIT][licensebadge]][licenseurl]
-[![Discord](https://img.shields.io/discord/1527933660764831825?label=Discord&logo=discord&logoColor=white)](https://discord.gg/dwFTsR7fK2)
+[![Discord](https://img.shields.io/discord/1527933660764831825?label=Discord&logo=discord&logoColor=white)](https://discord.gg/bR5VyATgka)
 
 </div>
 
