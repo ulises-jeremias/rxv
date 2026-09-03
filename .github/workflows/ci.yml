@@ -38,8 +38,8 @@ jobs:
         uses: vlang/setup-v@v1
         with:
           # Pinned: V master drifts (v3/fastc WIP broke the build on 2026-09-03).
-          # Known-good HEAD, same pin as agent-toolkit. Unpin once master heals.
-          version: 78e581e
+          # V master HEAD at the last green run (2026-09-02 12:44Z); it both builds and fmt-matches this tree. Unpin once master heals.
+          version: b338390
 
       - name: V doctor
         run: v doctor
@@ -68,8 +68,8 @@ jobs:
         uses: vlang/setup-v@v1
         with:
           # Pinned: V master drifts (v3/fastc WIP broke the build on 2026-09-03).
-          # Known-good HEAD, same pin as agent-toolkit. Unpin once master heals.
-          version: 78e581e
+          # V master HEAD at the last green run (2026-09-02 12:44Z); it both builds and fmt-matches this tree. Unpin once master heals.
+          version: b338390
 
       - name: V doctor
         run: v doctor
@@ -109,8 +109,8 @@ jobs:
         uses: vlang/setup-v@v1
         with:
           # Pinned: V master drifts (v3/fastc WIP broke the build on 2026-09-03).
-          # Known-good HEAD, same pin as agent-toolkit. Unpin once master heals.
-          version: 78e581e
+          # V master HEAD at the last green run (2026-09-02 12:44Z); it both builds and fmt-matches this tree. Unpin once master heals.
+          version: b338390
 
       - name: V doctor
         run: v doctor
