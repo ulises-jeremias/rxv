@@ -37,7 +37,9 @@ jobs:
       - name: Setup V
         uses: vlang/setup-v@v1
         with:
-          check-latest: true
+          # Pinned: V master drifts (v3/fastc WIP broke the build on 2026-09-03).
+          # Known-good HEAD, same pin as agent-toolkit. Unpin once master heals.
+          version: 78e581e
 
       - name: V doctor
         run: v doctor
@@ -65,7 +67,9 @@ jobs:
       - name: Setup V
         uses: vlang/setup-v@v1
         with:
-          check-latest: true
+          # Pinned: V master drifts (v3/fastc WIP broke the build on 2026-09-03).
+          # Known-good HEAD, same pin as agent-toolkit. Unpin once master heals.
+          version: 78e581e
 
       - name: V doctor
         run: v doctor
@@ -104,7 +108,9 @@ jobs:
       - name: Setup V
         uses: vlang/setup-v@v1
         with:
-          check-latest: true
+          # Pinned: V master drifts (v3/fastc WIP broke the build on 2026-09-03).
+          # Known-good HEAD, same pin as agent-toolkit. Unpin once master heals.
+          version: 78e581e
 
       - name: V doctor
         run: v doctor
