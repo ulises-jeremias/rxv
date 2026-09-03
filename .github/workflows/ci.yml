@@ -87,7 +87,9 @@ jobs:
       matrix:
         os:
           - ubuntu-24.04
-          - ubuntu-22.04
+          # ubuntu-22.04 dropped: upstream V's bundled tcc requires
+          # GLIBC_2.38 (22.04 ships 2.35), breaking every run. Re-add
+          # once upstream restores 22.04-compatible binaries.
         flags:
           - ""
           # TODO: Add --prod flag once the new release is ready
