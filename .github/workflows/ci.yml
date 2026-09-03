@@ -37,7 +37,9 @@ jobs:
       - name: Setup V
         uses: vlang/setup-v@v1
         with:
-          check-latest: true
+          # Pinned: V master drifts (v3/fastc WIP broke the build on 2026-09-03).
+          # V master HEAD at the last green run (2026-09-02 12:44Z); it both builds and fmt-matches this tree. Unpin once master heals.
+          version: b338390
 
       - name: V doctor
         run: v doctor
@@ -65,7 +67,9 @@ jobs:
       - name: Setup V
         uses: vlang/setup-v@v1
         with:
-          check-latest: true
+          # Pinned: V master drifts (v3/fastc WIP broke the build on 2026-09-03).
+          # V master HEAD at the last green run (2026-09-02 12:44Z); it both builds and fmt-matches this tree. Unpin once master heals.
+          version: b338390
 
       - name: V doctor
         run: v doctor
@@ -87,7 +91,9 @@ jobs:
       matrix:
         os:
           - ubuntu-24.04
-          - ubuntu-22.04
+          # ubuntu-22.04 dropped: upstream V's bundled tcc requires
+          # GLIBC_2.38 (22.04 ships 2.35), breaking every run. Re-add
+          # once upstream restores 22.04-compatible binaries.
         flags:
           - ""
           # TODO: Add --prod flag once the new release is ready
@@ -102,7 +108,9 @@ jobs:
       - name: Setup V
         uses: vlang/setup-v@v1
         with:
-          check-latest: true
+          # Pinned: V master drifts (v3/fastc WIP broke the build on 2026-09-03).
+          # V master HEAD at the last green run (2026-09-02 12:44Z); it both builds and fmt-matches this tree. Unpin once master heals.
+          version: b338390
 
       - name: V doctor
         run: v doctor
