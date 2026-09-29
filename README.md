@@ -14,6 +14,7 @@
 [![Deploy Documentation][deploydocsbadge]][deploydocsurl]
 [![License: MIT][licensebadge]][licenseurl]
 [![Discord](https://img.shields.io/discord/1527933660764831825?label=Discord&logo=discord&logoColor=white)](https://discord.gg/bR5VyATgka)
+[![Mentioned in Awesome V][awesomevbadge]][awesomevurl]
 
 </div>
 
@@ -296,6 +297,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution workflow.
 [workflowurl]: https://github.com/ulises-jeremias/rxv/actions/workflows/ci.yml
 [deploydocsurl]: https://github.com/ulises-jeremias/rxv/actions/workflows/deploy-docs.yml
 [licenseurl]: https://github.com/ulises-jeremias/rxv/blob/main/LICENSE
+[awesomevbadge]: https://awesome.re/mentioned-badge.svg
+[awesomevurl]: https://github.com/vlang/awesome-v
 
 ## 👥 Contributors
 
