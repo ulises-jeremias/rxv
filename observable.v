@@ -186,6 +186,81 @@ pub fn (mut o ObservableImpl[T]) take(n u32, opts ...RxOption) &ObservableImpl[T
 	}
 }
 
+fn obs_take_while_run[T](predicate PredicateFn[T], src chan Item[T], next chan Item[T]) {
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- item
+				break
+			}
+			if !predicate(item.get_value()) {
+				break
+			}
+			next <- item
+		} else if s == .closed {
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
+}
+
+// take_while emits source values while predicate remains true.
+pub fn (mut o ObservableImpl[T]) take_while(predicate PredicateFn[T], opts ...RxOption) &ObservableImpl[T] {
+	mut option := parse_options(...opts)
+	next := option.build_channel_t[T]()
+	spawn obs_take_while_run[T](predicate, o.ch, next)
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
+fn obs_take_until_run[T, U](src chan Item[T], notifier chan Item[U], next chan Item[T]) {
+	for {
+		mut signal := Item[U]{
+			has_value: false
+			err:       none
+		}
+		if notifier.try_pop(mut signal) == .success {
+			break
+		}
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			next <- item
+			if item.is_error() {
+				break
+			}
+		} else if s == .closed {
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
+}
+
+// take_until emits source values until the notifier emits any item.
+pub fn take_until[T, U](mut o ObservableImpl[T], mut notifier ObservableImpl[U], opts ...RxOption) &ObservableImpl[T] {
+	mut option := parse_options(...opts)
+	next := option.build_channel_t[T]()
+	spawn obs_take_until_run[T, U](o.ch, notifier.ch, next)
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
 // ---- start_with -----------------------------------------------------------
 
 fn obs_start_with_run[T](prefix []T, src chan Item[T], next chan Item[T]) {
