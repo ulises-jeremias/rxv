@@ -123,3 +123,51 @@ pub fn concat_map_[T, U](mut o ObservableImpl[T], mapper fn (t T) &ObservableImp
 		parent: o.parent
 	}
 }
+
+fn obs_catch_error_run[T](handler fn (IError) &ObservableImpl[T], src chan Item[T], next chan Item[T]) {
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				mut fallback := handler(item.err)
+				fallback_ch := fallback.observe()
+				for {
+					mut fallback_item := Item[T]{
+						has_value: false
+						err:       none
+					}
+					fs := fallback_ch.try_pop(mut fallback_item)
+					if fs == .success {
+						next <- fallback_item
+					} else if fs == .closed {
+						break
+					} else {
+						time.sleep(poll_sleep)
+					}
+				}
+				break
+			}
+			next <- item
+		} else if s == .closed {
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
+}
+
+// catch_error replaces a source error with the observable returned by handler.
+pub fn catch_error_[T](mut o ObservableImpl[T], handler fn (IError) &ObservableImpl[T], opts ...RxOption) &ObservableImpl[T] {
+	mut option := parse_options(...opts)
+	next := chan Item[T]{cap: option.buffer_size}
+	spawn obs_catch_error_run[T](handler, o.ch, next)
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
