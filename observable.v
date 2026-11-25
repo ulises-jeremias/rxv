@@ -166,6 +166,41 @@ pub fn (mut o ObservableImpl[T]) tap(side_effect NextFn[T]) &ObservableImpl[T] {
 	}
 }
 
+// ---- ignore_elements ------------------------------------------------------
+
+fn obs_ignore_elements_run[T](src chan Item[T], next chan Item[T]) {
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- item
+				break
+			}
+		} else if s == .closed {
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
+}
+
+// ignore_elements discards values and preserves source errors/completion.
+pub fn (mut o ObservableImpl[T]) ignore_elements() &ObservableImpl[T] {
+	option := parse_options()
+	next := option.build_channel_t[T]()
+	src := o.ch
+	spawn obs_ignore_elements_run[T](src, next)
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
 // ---- for_each -------------------------------------------------------------
 
 fn obs_for_each_bridge[T](bridge chan T, src chan Item[T], signal chan int) {
