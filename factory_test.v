@@ -66,6 +66,25 @@ fn test_timer_factory_emits_once() {
 	assert collect_factory_values(mut source) == [0]
 }
 
+fn test_interval_factory_emits_until_channel_is_closed() {
+	mut source := interval(1)
+	ch := source.observe()
+	mut values := []int{}
+	for values.len < 3 {
+		mut item := Item[int]{
+			has_value: false
+			err:       none
+		}
+		if ch.try_pop(mut item) == .success {
+			values << item.get_value()
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	source.ch.close()
+	assert values == [0, 1, 2]
+}
+
 fn test_timeout_factory_reports_stalled_source() {
 	channel := chan Item[int]{cap: 1}
 	mut source := from_channel[int](channel).timeout(1)

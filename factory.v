@@ -118,7 +118,9 @@ fn interval_emit(period_ms int, ch chan Item[int]) {
 	mut count := 0
 	for {
 		time.sleep(time.millisecond * period_ms)
-		ch <- of[int](count)
+		if ch.try_push(of[int](count)) == .closed {
+			break
+		}
 		count++
 	}
 }
