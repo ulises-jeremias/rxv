@@ -77,3 +77,41 @@ fn test_timing_operators_preserve_errors() {
 	}
 	assert item.err.str() == 'timing failed'
 }
+
+fn test_debounce_emits_the_last_value_on_completion() {
+	mut source := just[int](1, 2, 3)
+	mut result := debounce_[int](mut source, 1)
+	assert collect_timing_values(mut result) == [3]
+}
+
+fn test_sample_handles_an_immediate_burst() {
+	mut source := just[int](1, 2, 3)
+	mut result := sample[int](mut source, 1)
+	assert collect_timing_values(mut result) == [1]
+}
+
+fn test_throttle_first_emits_the_first_value_from_a_burst() {
+	mut source := just[int](1, 2, 3)
+	mut result := throttle_first_[int](mut source, 1)
+	assert collect_timing_values(mut result) == [1]
+}
+
+fn collect_timing_values(mut source &ObservableImpl[int]) []int {
+	ch := source.observe()
+	mut values := []int{}
+	for {
+		mut item := Item[int]{
+			has_value: false
+			err:       none
+		}
+		s := ch.try_pop(mut item)
+		if s == .success {
+			assert !item.is_error()
+			values << item.get_value()
+		} else if s == .closed {
+			return values
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+}
