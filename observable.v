@@ -1119,6 +1119,65 @@ fn throttle_first_worker[T](delay_ms int, src chan Item[T], next chan Item[T], d
 	next.close()
 }
 
+// ---- min/max --------------------------------------------------------------
+
+fn obs_extreme_run[T](less fn (a T, b T) bool, find_max bool, src chan Item[T], next chan Item[T]) {
+	mut best := T{}
+	mut has_best := false
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- item
+				break
+			}
+			if item.has_value {
+				value := item.get_value()
+				if !has_best || if find_max { less(best, value) } else { less(value, best) } {
+					best = value
+					has_best = true
+				}
+			}
+		} else if s == .closed {
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	if has_best {
+		next <- of[T](best)
+	}
+	next.close()
+}
+
+// min_ emits the smallest source value according to less.
+pub fn min_[T](mut o ObservableImpl[T], less fn (a T, b T) bool, opts ...RxOption) &ObservableImpl[T] {
+	option := parse_options(...opts)
+	next := option.build_channel_t[T]()
+	src := o.ch
+	spawn obs_extreme_run[T](less, false, src, next)
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
+// max_ emits the largest source value according to less.
+pub fn max_[T](mut o ObservableImpl[T], less fn (a T, b T) bool, opts ...RxOption) &ObservableImpl[T] {
+	option := parse_options(...opts)
+	next := option.build_channel_t[T]()
+	src := o.ch
+	spawn obs_extreme_run[T](less, true, src, next)
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
 // ---- average_f64 ---------------------------------------------------------
 
 fn obs_average_f64_run(src chan Item[f64], next chan Item[f64]) {
