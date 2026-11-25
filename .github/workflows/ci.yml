@@ -37,9 +37,8 @@ jobs:
       - name: Setup V
         uses: vlang/setup-v@v1
         with:
-          # Pinned: V master drifts (v3/fastc WIP broke the build on 2026-09-03).
-          # V master HEAD at the last green run (2026-09-02 12:44Z); it both builds and fmt-matches this tree. Unpin once master heals.
-          version: b338390
+          # Pin the compiler used by the local validation baseline.
+          version: 7f5b9a3
 
       - name: V doctor
         run: v doctor
@@ -67,9 +66,8 @@ jobs:
       - name: Setup V
         uses: vlang/setup-v@v1
         with:
-          # Pinned: V master drifts (v3/fastc WIP broke the build on 2026-09-03).
-          # V master HEAD at the last green run (2026-09-02 12:44Z); it both builds and fmt-matches this tree. Unpin once master heals.
-          version: b338390
+          # Pin the compiler used by the local validation baseline.
+          version: 7f5b9a3
 
       - name: V doctor
         run: v doctor
@@ -108,9 +106,8 @@ jobs:
       - name: Setup V
         uses: vlang/setup-v@v1
         with:
-          # Pinned: V master drifts (v3/fastc WIP broke the build on 2026-09-03).
-          # V master HEAD at the last green run (2026-09-02 12:44Z); it both builds and fmt-matches this tree. Unpin once master heals.
-          version: b338390
+          # Pin the compiler used by the local validation baseline.
+          version: 7f5b9a3
 
       - name: V doctor
         run: v doctor

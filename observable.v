@@ -158,11 +158,11 @@ fn obs_map_run[T, U](apply MapFn[T, U], src chan Item[T], next chan Item[U]) {
 				continue
 			}
 			if item.has_value {
-				result := apply(item.get_value()) or {
-					next <- from_error[U](err)
-					continue
+				if result := apply(item.get_value()) {
+					next <- of[U](result)
+				} else {
+					next <- from_error[U](error('map function returned no value'))
 				}
-				next <- of[U](result)
 			}
 		} else if s == .closed {
 			break

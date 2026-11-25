@@ -106,7 +106,7 @@ fn defer_producer_run[T](factory fn () &ObservableImpl[T], done chan int, ch cha
 }
 
 pub fn defer_[T](factory fn () &ObservableImpl[T]) &ObservableImpl[T] {
-	producer := fn [factory] (mut ctx context.Context, ch chan Item[T]) {
+	producer := fn [factory] [T](mut ctx context.Context, ch chan Item[T]) {
 		done := ctx.done()
 		defer_producer_run[T](factory, done, ch)
 	}
