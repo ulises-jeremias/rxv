@@ -261,6 +261,89 @@ pub fn take_until[T, U](mut o ObservableImpl[T], mut notifier ObservableImpl[U],
 	}
 }
 
+fn obs_skip_while_run[T](predicate PredicateFn[T], src chan Item[T], next chan Item[T]) {
+	mut skipping := true
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- item
+				break
+			}
+			if skipping && predicate(item.get_value()) {
+				continue
+			}
+			skipping = false
+			next <- item
+		} else if s == .closed {
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
+}
+
+// skip_while suppresses source values while predicate remains true.
+pub fn (mut o ObservableImpl[T]) skip_while(predicate PredicateFn[T], opts ...RxOption) &ObservableImpl[T] {
+	mut option := parse_options(...opts)
+	next := option.build_channel_t[T]()
+	spawn obs_skip_while_run[T](predicate, o.ch, next)
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
+fn obs_skip_until_run[T, U](src chan Item[T], notifier chan Item[U], next chan Item[T]) {
+	mut skipping := true
+	for {
+		if skipping {
+			mut signal := Item[U]{
+				has_value: false
+				err:       none
+			}
+			if notifier.try_pop(mut signal) == .success {
+				skipping = false
+			}
+		}
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- item
+				break
+			}
+			if !skipping {
+				next <- item
+			}
+		} else if s == .closed {
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
+}
+
+// skip_until suppresses source values until the notifier emits any item.
+pub fn skip_until[T, U](mut o ObservableImpl[T], mut notifier ObservableImpl[U], opts ...RxOption) &ObservableImpl[T] {
+	mut option := parse_options(...opts)
+	next := option.build_channel_t[T]()
+	spawn obs_skip_until_run[T, U](o.ch, notifier.ch, next)
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
 // ---- start_with -----------------------------------------------------------
 
 fn obs_start_with_run[T](prefix []T, src chan Item[T], next chan Item[T]) {
