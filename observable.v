@@ -128,6 +128,44 @@ pub fn (mut o ObservableImpl[T]) start_with(items ...T) &ObservableImpl[T] {
 	}
 }
 
+// ---- tap ------------------------------------------------------------------
+
+fn obs_tap_run[T](side_effect NextFn[T], src chan Item[T], next chan Item[T]) {
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.has_value {
+				side_effect(item.get_value())
+			}
+			next <- item
+			if item.is_error() {
+				break
+			}
+		} else if s == .closed {
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
+}
+
+// tap runs a side effect for each value and forwards the source unchanged.
+pub fn (mut o ObservableImpl[T]) tap(side_effect NextFn[T]) &ObservableImpl[T] {
+	option := parse_options()
+	next := option.build_channel_t[T]()
+	src := o.ch
+	spawn obs_tap_run[T](side_effect, src, next)
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
 // ---- for_each -------------------------------------------------------------
 
 fn obs_for_each_bridge[T](bridge chan T, src chan Item[T], signal chan int) {
