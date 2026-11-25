@@ -90,6 +90,44 @@ pub fn (mut o ObservableImpl[T]) take(n u32, opts ...RxOption) &ObservableImpl[T
 	}
 }
 
+// ---- start_with -----------------------------------------------------------
+
+fn obs_start_with_run[T](prefix []T, src chan Item[T], next chan Item[T]) {
+	for value in prefix {
+		next <- of[T](value)
+	}
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			next <- item
+			if item.is_error() {
+				break
+			}
+		} else if s == .closed {
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
+}
+
+// start_with prepends values to the source sequence.
+pub fn (mut o ObservableImpl[T]) start_with(items ...T) &ObservableImpl[T] {
+	option := parse_options()
+	next := option.build_channel_t[T]()
+	src := o.ch
+	spawn obs_start_with_run[T](items.clone(), src, next)
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
 // ---- for_each -------------------------------------------------------------
 
 fn obs_for_each_bridge[T](bridge chan T, src chan Item[T], signal chan int) {
