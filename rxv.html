@@ -564,6 +564,14 @@ exhaust system resources. Use <code>./bin/test</code> which runs them sequential
 
 </section>
 
+		<section id="finally_" class="doc-node">
+			<div class="title"><h2>fn finally_ <a href="#finally_">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/transformation.v#L244"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">finally_</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> o <span class="token type_name">ObservableImpl</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> callback <span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span><span class="token type_name">RxOption</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token type_name">ObservableImpl</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>finally_ invokes callback once when the source completes or errors.</p>
+
+</section>
+
 		<section id="flat_map_" class="doc-node">
 			<div class="title"><h2>fn flat_map_ <a href="#flat_map_">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/transformation.v#L56"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -673,6 +681,14 @@ exhaust system resources. Use <code>./bin/test</code> which runs them sequential
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">of</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>value <span class="token type_name">T</span><span class="token punctuation">)</span> <span class="token type_name">Item</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 
+
+</section>
+
+		<section id="on_error_resume_next" class="doc-node">
+			<div class="title"><h2>fn on_error_resume_next <a href="#on_error_resume_next">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/transformation.v#L211"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">on_error_resume_next</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> o <span class="token type_name">ObservableImpl</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> fallback <span class="token type_name">ObservableImpl</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span><span class="token type_name">RxOption</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token type_name">ObservableImpl</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>on_error_resume_next continues with another observable after source error.</p>
 
 </section>
 
@@ -1360,7 +1376,7 @@ exhaust system resources. Use <code>./bin/test</code> which runs them sequential
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 25 Nov 2026 01:43:29</div>
+						<div class="footer">Powered by vdoc. Generated on: 25 Nov 2026 01:44:33</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_rxv">README</a></li>
 <li class="open"><a href="#catch_error_">fn catch_error_</a>        <ul>
@@ -1385,6 +1401,9 @@ exhaust system resources. Use <code>./bin/test</code> which runs them sequential
 </ul>
 </li>
 <li class="open"><a href="#empty">fn empty</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#finally_">fn finally_</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#flat_map_">fn flat_map_</a>        <ul>
@@ -1427,6 +1446,9 @@ exhaust system resources. Use <code>./bin/test</code> which runs them sequential
 </ul>
 </li>
 <li class="open"><a href="#of">fn of</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#on_error_resume_next">fn on_error_resume_next</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#parse_options">fn parse_options</a>        <ul>
