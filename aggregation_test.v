@@ -1,4 +1,5 @@
 import ulises_jeremias.rxv
+import time
 
 fn test_count() {
 	mut obs := rxv.just[int](1, 2, 3, 4, 5)
@@ -60,4 +61,42 @@ fn test_reduce() {
 	}
 	assert item.has_value
 	assert item.get_value() == 10
+}
+
+fn test_average_f64() {
+	mut obs := rxv.just[f64](1.0, 2.0, 4.0)
+	mut result := obs.average_f64()
+	ch := result.observe()
+	mut item := rxv.Item[f64]{
+		has_value: false
+		err:       none
+	}
+	for {
+		s := ch.try_pop(mut item)
+		if s == .success || s == .closed {
+			break
+		}
+		time.sleep(10 * time.microsecond)
+	}
+	assert item.has_value
+	assert item.get_value() == 7.0 / 3.0
+}
+
+fn test_sum_f64() {
+	mut obs := rxv.just[f64](1.5, 2.25, 4.0)
+	mut result := obs.sum_f64()
+	ch := result.observe()
+	mut item := rxv.Item[f64]{
+		has_value: false
+		err:       none
+	}
+	for {
+		s := ch.try_pop(mut item)
+		if s == .success || s == .closed {
+			break
+		}
+		time.sleep(10 * time.microsecond)
+	}
+	assert item.has_value
+	assert item.get_value() == 7.75
 }
