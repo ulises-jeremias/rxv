@@ -590,6 +590,49 @@ pub fn (mut o ObservableImpl[T]) last(opts ...RxOption) &ObservableImpl[T] {
 	}
 }
 
+// ---- default_if_empty -----------------------------------------------------
+
+fn obs_default_if_empty_run[T](default_value T, src chan Item[T], next chan Item[T]) {
+	mut has_value := false
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- item
+				break
+			}
+			if item.has_value {
+				has_value = true
+			}
+			next <- item
+		} else if s == .closed {
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	if !has_value {
+		next <- of[T](default_value)
+	}
+	next.close()
+}
+
+// default_if_empty emits default_value if the source completes without values.
+pub fn (mut o ObservableImpl[T]) default_if_empty(default_value T) &ObservableImpl[T] {
+	option := parse_options()
+	next := option.build_channel_t[T]()
+	src := o.ch
+	spawn obs_default_if_empty_run[T](default_value, src, next)
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
 // ---- skip ----------------------------------------------------------------
 
 fn obs_skip_run[T](n u32, src chan Item[T], next chan Item[T]) {
