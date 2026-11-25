@@ -163,6 +163,8 @@ fn main() {
 | `debounce_[T](mut o, delay_ms)` | Emit after silent window |
 | `sample[T](mut o, period_ms)` | Emit most recent at intervals |
 | `throttle_first_[T](mut o, delay_ms)` | Emit first, block until window resets |
+| `.time_interval()` | Annotate values with elapsed time since the previous value |
+| `.timestamp()` | Annotate values with their observation time |
 
 ### Transforming *(free functions — see [V Compiler Notes](#v-compiler-notes))*
 

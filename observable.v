@@ -20,6 +20,102 @@ pub fn (mut o ObservableImpl[T]) observe(opts ...RxOption) chan Item[T] {
 
 const poll_sleep = 10 * time.microsecond
 
+// TimeInterval contains a source value and the elapsed time since the
+// previous source value. The first interval is zero.
+pub struct TimeInterval[T] {
+pub:
+	value    T
+	interval time.Duration
+}
+
+// Timestamp contains a source value and the wall-clock time at which it was
+// observed.
+pub struct Timestamp[T] {
+pub:
+	value     T
+	timestamp time.Time
+}
+
+fn obs_time_interval_run[T](src chan Item[T], next chan Item[TimeInterval[T]]) {
+	mut previous := i64(0)
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- from_error[TimeInterval[T]](item.err)
+				break
+			}
+			now := time.now().unix_nano() / 1000
+			interval := time.Duration(0)
+			if previous > 0 {
+				interval = time.Duration(now - previous) * time.microsecond
+			}
+			previous = now
+			next <- of[TimeInterval[T]](TimeInterval[T]{
+				value:    item.get_value()
+				interval: interval
+			})
+		} else if s == .closed {
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
+}
+
+// time_interval annotates each value with the elapsed time since the
+// previous value.
+pub fn (mut o ObservableImpl[T]) time_interval(opts ...RxOption) &ObservableImpl[TimeInterval[T]] {
+	mut option := parse_options(...opts)
+	next := option.build_channel_t[TimeInterval[T]]()
+	spawn obs_time_interval_run[T](o.ch, next)
+	return &ObservableImpl[TimeInterval[T]]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
+fn obs_timestamp_run[T](src chan Item[T], next chan Item[Timestamp[T]]) {
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				next <- from_error[Timestamp[T]](item.err)
+				break
+			}
+			next <- of[Timestamp[T]](Timestamp[T]{
+				value:     item.get_value()
+				timestamp: time.now()
+			})
+		} else if s == .closed {
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
+}
+
+// timestamp annotates each value with the current wall-clock time.
+pub fn (mut o ObservableImpl[T]) timestamp(opts ...RxOption) &ObservableImpl[Timestamp[T]] {
+	mut option := parse_options(...opts)
+	next := option.build_channel_t[Timestamp[T]]()
+	spawn obs_timestamp_run[T](o.ch, next)
+	return &ObservableImpl[Timestamp[T]]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
 // ---- filter ----------------------------------------------------------------
 
 fn obs_filter_run[T](predicate PredicateFn[T], src chan Item[T], next chan Item[T]) {
@@ -1034,7 +1130,7 @@ fn debounce_inner[T](delay_ms int, src chan Item[T], next chan Item[T], done cha
 	mut timer_start_time := i64(0)
 	for {
 		if has_last && timer_started {
-			elapsed := time.now().unix_offset() * 1_000 - timer_start_time
+			elapsed := time.now().unix_nano() / 1000 - timer_start_time
 			if elapsed >= i64(delay_ms) * 1_000 {
 				next <- last_item
 				has_last = false
@@ -1055,7 +1151,7 @@ fn debounce_inner[T](delay_ms int, src chan Item[T], next chan Item[T], done cha
 				last_item = item
 				has_last = true
 				timer_started = true
-				timer_start_time = time.now().unix_offset() * 1_000
+				timer_start_time = time.now().unix_nano() / 1000
 			}
 		} else if s == .closed {
 			if has_last {
@@ -1091,7 +1187,7 @@ fn sample_worker[T](period_ms int, src chan Item[T], next chan Item[T], done cha
 	mut last_sent_time := i64(0)
 	mut period_us := i64(period_ms) * 1000
 	for {
-		now := time.now().unix_offset() * 1_000_000
+		now := time.now().unix_nano() / 1000
 		if has_last && (now - last_sent_time) >= period_us {
 			next <- last_item
 			last_sent_time = now
@@ -1158,10 +1254,10 @@ fn throttle_first[T](delay_ms int, src chan Item[T], next chan Item[T], done cha
 fn throttle_first_worker[T](delay_ms int, src chan Item[T], next chan Item[T], done chan int) {
 	mut blocked := false
 	mut block_start := i64(0)
-	mut blocked_duration := i64(delay_ms) * 1_000_000
+	mut blocked_duration := i64(delay_ms) * 1_000
 	for {
 		if blocked {
-			elapsed := time.now().unix_offset() * 1_000_000 - block_start
+			elapsed := time.now().unix_nano() / 1000 - block_start
 			if elapsed >= blocked_duration {
 				blocked = false
 			}
@@ -1179,7 +1275,7 @@ fn throttle_first_worker[T](delay_ms int, src chan Item[T], next chan Item[T], d
 			if item.has_value && !blocked {
 				next <- item
 				blocked = true
-				block_start = time.now().unix_offset() * 1_000_000
+				block_start = time.now().unix_nano() / 1000
 			}
 		} else if s == .closed {
 			break
