@@ -604,11 +604,27 @@ exhaust system resources. Use <code>./bin/test</code> which runs them sequential
 
 </section>
 
+		<section id="max_" class="doc-node">
+			<div class="title"><h2>fn max_ <a href="#max_">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/observable.v#L1170"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">max_</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> o <span class="token type_name">ObservableImpl</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> less <span class="token keyword">fn</span> <span class="token punctuation">(</span>a <span class="token type_name">T</span><span class="token punctuation">,</span> b <span class="token type_name">T</span><span class="token punctuation">)</span> <span class="token builtin">bool</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span><span class="token type_name">RxOption</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token type_name">ObservableImpl</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>max_ emits the largest source value according to less.</p>
+
+</section>
+
 		<section id="merge" class="doc-node">
 			<div class="title"><h2>fn merge <a href="#merge">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/combination.v#L58"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">merge</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> o1 <span class="token type_name">ObservableImpl</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> o2 <span class="token type_name">ObservableImpl</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span><span class="token type_name">RxOption</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token type_name">ObservableImpl</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 <p>merge combines two observables by interleaving their emissions.</p>
+
+</section>
+
+		<section id="min_" class="doc-node">
+			<div class="title"><h2>fn min_ <a href="#min_">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/observable.v#L1158"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">min_</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> o <span class="token type_name">ObservableImpl</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> less <span class="token keyword">fn</span> <span class="token punctuation">(</span>a <span class="token type_name">T</span><span class="token punctuation">,</span> b <span class="token type_name">T</span><span class="token punctuation">)</span> <span class="token builtin">bool</span><span class="token punctuation">,</span> opts <span class="token punctuation">...</span><span class="token type_name">RxOption</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token type_name">ObservableImpl</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>min_ emits the smallest source value according to less.</p>
 
 </section>
 
@@ -1042,7 +1058,7 @@ exhaust system resources. Use <code>./bin/test</code> which runs them sequential
 </section>
 
 		<section id="ObservableImpl[f64].average_f64" class="doc-node">
-			<div class="title"><h2>fn (ObservableImpl[f64]) average_f64 <a href="#ObservableImpl[f64].average_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/observable.v#L1155"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (ObservableImpl[f64]) average_f64 <a href="#ObservableImpl[f64].average_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/observable.v#L1214"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o <span class="token type_name">ObservableImpl</span><span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">average_f64</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span><span class="token type_name">RxOption</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token type_name">ObservableImpl</span><span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
 <p>average_f64 computes the average of f64 values emitted by the source.</p>
@@ -1050,7 +1066,7 @@ exhaust system resources. Use <code>./bin/test</code> which runs them sequential
 </section>
 
 		<section id="ObservableImpl[f64].sum_f64" class="doc-node">
-			<div class="title"><h2>fn (ObservableImpl[f64]) sum_f64 <a href="#ObservableImpl[f64].sum_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/observable.v#L1195"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (ObservableImpl[f64]) sum_f64 <a href="#ObservableImpl[f64].sum_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/ulises-jeremias/rxv/blob/master/observable.v#L1254"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o <span class="token type_name">ObservableImpl</span><span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">sum_f64</span><span class="token punctuation">(</span>opts <span class="token punctuation">...</span><span class="token type_name">RxOption</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token type_name">ObservableImpl</span><span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
 <p>sum_f64 computes the sum of f64 values emitted by the source.</p>
@@ -1240,7 +1256,7 @@ exhaust system resources. Use <code>./bin/test</code> which runs them sequential
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 25 Nov 2026 00:53:32</div>
+						<div class="footer">Powered by vdoc. Generated on: 25 Nov 2026 00:54:22</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_rxv">README</a></li>
 <li class="open"><a href="#concat">fn concat</a>        <ul>
@@ -1285,7 +1301,13 @@ exhaust system resources. Use <code>./bin/test</code> which runs them sequential
 <li class="open"><a href="#map_">fn map_</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#max_">fn max_</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#merge">fn merge</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#min_">fn min_</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#new_channel_iterable">fn new_channel_iterable</a>        <ul>
