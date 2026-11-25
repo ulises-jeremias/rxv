@@ -171,3 +171,82 @@ pub fn catch_error_[T](mut o ObservableImpl[T], handler fn (IError) &ObservableI
 		parent: o.parent
 	}
 }
+
+fn obs_on_error_resume_next_run[T](src chan Item[T], fallback chan Item[T], next chan Item[T]) {
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			if item.is_error() {
+				for {
+					mut fallback_item := Item[T]{
+						has_value: false
+						err:       none
+					}
+					fs := fallback.try_pop(mut fallback_item)
+					if fs == .success {
+						next <- fallback_item
+					} else if fs == .closed {
+						next.close()
+						return
+					} else {
+						time.sleep(poll_sleep)
+					}
+				}
+			}
+			next <- item
+		} else if s == .closed {
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	next.close()
+}
+
+// on_error_resume_next continues with another observable after source error.
+pub fn on_error_resume_next[T](mut o ObservableImpl[T], mut fallback ObservableImpl[T], opts ...RxOption) &ObservableImpl[T] {
+	mut option := parse_options(...opts)
+	next := chan Item[T]{cap: option.buffer_size}
+	spawn obs_on_error_resume_next_run[T](o.ch, fallback.ch, next)
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
+
+fn obs_finally_run[T](callback fn (), src chan Item[T], next chan Item[T]) {
+	for {
+		mut item := Item[T]{
+			has_value: false
+			err:       none
+		}
+		s := src.try_pop(mut item)
+		if s == .success {
+			next <- item
+			if item.is_error() {
+				break
+			}
+		} else if s == .closed {
+			break
+		} else {
+			time.sleep(poll_sleep)
+		}
+	}
+	callback()
+	next.close()
+}
+
+// finally_ invokes callback once when the source completes or errors.
+pub fn finally_[T](mut o ObservableImpl[T], callback fn (), opts ...RxOption) &ObservableImpl[T] {
+	mut option := parse_options(...opts)
+	next := chan Item[T]{cap: option.buffer_size}
+	spawn obs_finally_run[T](callback, o.ch, next)
+	return &ObservableImpl[T]{
+		ch:     next
+		parent: o.parent
+	}
+}
