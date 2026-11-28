@@ -14,7 +14,7 @@ pub fn (o ObservableImpl[T]) str() string {
 	return 'Observable[T]'
 }
 
-pub fn (mut o ObservableImpl[T]) observe(opts ...RxOption) chan Item[T] {
+pub fn (o &ObservableImpl[T]) observe(opts ...RxOption) chan Item[T] {
 	return o.ch
 }
 

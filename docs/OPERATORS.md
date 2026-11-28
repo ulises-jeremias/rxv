@@ -276,6 +276,20 @@ mut result := rxv.concat_map_[int, string](mut obs, fn (v int) &rxv.ObservableIm
 // emits: 'item-1', 'extra-1', 'item-2', 'extra-2'
 ```
 
+### `.materialize()` and `.dematerialize()`
+
+`materialize` turns each value and terminal signal into a `Notification[T]`.
+A normally completed source emits a completion notification; an errored source
+emits one error notification and then the materialized stream completes.
+`dematerialize` restores those values and terminal signals.
+
+```v ignore
+mut source := rxv.just[int](1, 2, 3)
+mut signals := source.materialize()
+mut restored := signals.dematerialize()
+// restored emits: 1, 2, 3
+```
+
 ---
 
 ## Aggregation Operators
